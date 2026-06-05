@@ -1,0 +1,5853 @@
+{
+  "animations": {
+    "attack": {
+      "directions": 16,
+      "fps": 12,
+      "frames": 3,
+      "playback": "once"
+    },
+    "idle": {
+      "directions": 16,
+      "fps": 1,
+      "frames": 1,
+      "playback": "loop"
+    },
+    "walk": {
+      "directions": 16,
+      "fps": 8,
+      "frames": 4,
+      "playback": "loop"
+    }
+  },
+  "atlases": {
+    "color": {
+      "path": "color_atlas.png",
+      "size": [
+        2041,
+        1576
+      ]
+    },
+    "hitmask": {
+      "format": "PNG_R8_UINT_linear_no_antialias",
+      "palette": {
+        "arms": 3,
+        "head": 1,
+        "legs": 4,
+        "none": 0,
+        "torso": 2
+      },
+      "path": "hitmask_atlas.png",
+      "sampling": "nearest",
+      "size": [
+        2041,
+        1576
+      ]
+    }
+  },
+  "build": {
+    "generator": "pipeline/tools/bake.py",
+    "mesh": "humanoid",
+    "renderer": "render3d_software",
+    "states": [
+      "attack",
+      "idle",
+      "walk"
+    ]
+  },
+  "camera": {
+    "azimuth_degrees": 45,
+    "camera_elevation_degrees": 30,
+    "id": "game_iso_v1",
+    "projection": "orthographic_pixel_iso_dimetric_2_to_1",
+    "screen_y": "down",
+    "tile_px": [
+      64,
+      32
+    ]
+  },
+  "contract_hash": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
+  "default_state": "idle",
+  "direction_count": 16,
+  "expected_facing": [
+    {
+      "direction": 0,
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "direction": 1,
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "direction": 2,
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "direction": 3,
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "direction": 4,
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "direction": 5,
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "direction": 6,
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "direction": 7,
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "direction": 8,
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "direction": 9,
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "direction": 10,
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "direction": 11,
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "direction": 12,
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "direction": 13,
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "direction": 14,
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "direction": 15,
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "world_yaw_degrees": 337.5
+    }
+  ],
+  "frame_canvas": [
+    256,
+    256
+  ],
+  "frames": [
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 0,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        4,
+        4,
+        81,
+        217
+      ],
+      "rect": [
+        4,
+        4,
+        81,
+        217
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        88,
+        19
+      ],
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 1,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        89,
+        4,
+        92,
+        212
+      ],
+      "rect": [
+        89,
+        4,
+        92,
+        212
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        20
+      ],
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 2,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        185,
+        4,
+        92,
+        204
+      ],
+      "rect": [
+        185,
+        4,
+        92,
+        204
+      ],
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          244.516
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        22
+      ],
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 3,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        281,
+        4,
+        92,
+        212
+      ],
+      "rect": [
+        281,
+        4,
+        92,
+        212
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        20
+      ],
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 4,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        377,
+        4,
+        81,
+        217
+      ],
+      "rect": [
+        377,
+        4,
+        81,
+        217
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        87,
+        19
+      ],
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 5,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        462,
+        4,
+        71,
+        218
+      ],
+      "rect": [
+        462,
+        4,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        86,
+        20
+      ],
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 6,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        537,
+        4,
+        56,
+        215
+      ],
+      "rect": [
+        537,
+        4,
+        56,
+        215
+      ],
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.4,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        91,
+        22
+      ],
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 7,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        597,
+        4,
+        71,
+        218
+      ],
+      "rect": [
+        597,
+        4,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        86,
+        20
+      ],
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 8,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        672,
+        4,
+        81,
+        218
+      ],
+      "rect": [
+        672,
+        4,
+        81,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        87,
+        18
+      ],
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 9,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        757,
+        4,
+        92,
+        216
+      ],
+      "rect": [
+        757,
+        4,
+        92,
+        216
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        16
+      ],
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 10,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        853,
+        4,
+        92,
+        209
+      ],
+      "rect": [
+        853,
+        4,
+        92,
+        209
+      ],
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          193.316
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        17
+      ],
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 11,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        949,
+        4,
+        92,
+        216
+      ],
+      "rect": [
+        949,
+        4,
+        92,
+        216
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        16
+      ],
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 12,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1045,
+        4,
+        81,
+        218
+      ],
+      "rect": [
+        1045,
+        4,
+        81,
+        218
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        88,
+        18
+      ],
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 13,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1130,
+        4,
+        71,
+        218
+      ],
+      "rect": [
+        1130,
+        4,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        99,
+        20
+      ],
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 14,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1205,
+        4,
+        56,
+        215
+      ],
+      "rect": [
+        1205,
+        4,
+        56,
+        215
+      ],
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.6,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        109,
+        22
+      ],
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 15,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1265,
+        4,
+        71,
+        218
+      ],
+      "rect": [
+        1265,
+        4,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        99,
+        20
+      ],
+      "world_yaw_degrees": 337.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 0,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1340,
+        4,
+        127,
+        217
+      ],
+      "rect": [
+        1340,
+        4,
+        127,
+        217
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        64,
+        19
+      ],
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 1,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1471,
+        4,
+        119,
+        212
+      ],
+      "rect": [
+        1471,
+        4,
+        119,
+        212
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        69,
+        20
+      ],
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 2,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1594,
+        4,
+        92,
+        204
+      ],
+      "rect": [
+        1594,
+        4,
+        92,
+        204
+      ],
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          244.516
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        22
+      ],
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 3,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1690,
+        4,
+        92,
+        212
+      ],
+      "rect": [
+        1690,
+        4,
+        92,
+        212
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        20
+      ],
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 4,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1786,
+        4,
+        79,
+        217
+      ],
+      "rect": [
+        1786,
+        4,
+        79,
+        217
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        87,
+        19
+      ],
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 5,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1869,
+        4,
+        71,
+        218
+      ],
+      "rect": [
+        1869,
+        4,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        86,
+        20
+      ],
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 6,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1944,
+        4,
+        88,
+        215
+      ],
+      "rect": [
+        1944,
+        4,
+        88,
+        215
+      ],
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.4,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        84,
+        22
+      ],
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 7,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        4,
+        226,
+        116,
+        218
+      ],
+      "rect": [
+        4,
+        226,
+        116,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        70,
+        20
+      ],
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 8,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        124,
+        226,
+        127,
+        218
+      ],
+      "rect": [
+        124,
+        226,
+        127,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        64,
+        18
+      ],
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 9,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        255,
+        226,
+        119,
+        216
+      ],
+      "rect": [
+        255,
+        226,
+        119,
+        216
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        69,
+        16
+      ],
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 10,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        378,
+        226,
+        92,
+        209
+      ],
+      "rect": [
+        378,
+        226,
+        92,
+        209
+      ],
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          193.316
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        17
+      ],
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 11,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        474,
+        226,
+        92,
+        216
+      ],
+      "rect": [
+        474,
+        226,
+        92,
+        216
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        16
+      ],
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 12,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        570,
+        226,
+        79,
+        218
+      ],
+      "rect": [
+        570,
+        226,
+        79,
+        218
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        90,
+        18
+      ],
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 13,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        653,
+        226,
+        71,
+        218
+      ],
+      "rect": [
+        653,
+        226,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        99,
+        20
+      ],
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 14,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        728,
+        226,
+        88,
+        215
+      ],
+      "rect": [
+        728,
+        226,
+        88,
+        215
+      ],
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.6,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        84,
+        22
+      ],
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 15,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        820,
+        226,
+        116,
+        218
+      ],
+      "rect": [
+        820,
+        226,
+        116,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        70,
+        20
+      ],
+      "world_yaw_degrees": 337.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 0,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        940,
+        226,
+        158,
+        217
+      ],
+      "rect": [
+        940,
+        226,
+        158,
+        217
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        49,
+        19
+      ],
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 1,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1102,
+        226,
+        136,
+        212
+      ],
+      "rect": [
+        1102,
+        226,
+        136,
+        212
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        60,
+        20
+      ],
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 2,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1242,
+        226,
+        92,
+        204
+      ],
+      "rect": [
+        1242,
+        226,
+        92,
+        204
+      ],
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          244.516
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        22
+      ],
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 3,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1338,
+        226,
+        88,
+        212
+      ],
+      "rect": [
+        1338,
+        226,
+        88,
+        212
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        84,
+        20
+      ],
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 4,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1430,
+        226,
+        77,
+        217
+      ],
+      "rect": [
+        1430,
+        226,
+        77,
+        217
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        87,
+        19
+      ],
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 5,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1511,
+        226,
+        98,
+        218
+      ],
+      "rect": [
+        1511,
+        226,
+        98,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        79,
+        20
+      ],
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 6,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1613,
+        226,
+        130,
+        215
+      ],
+      "rect": [
+        1613,
+        226,
+        130,
+        215
+      ],
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.4,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        63,
+        22
+      ],
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 7,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1747,
+        226,
+        156,
+        218
+      ],
+      "rect": [
+        1747,
+        226,
+        156,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        50,
+        20
+      ],
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 8,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        4,
+        448,
+        158,
+        218
+      ],
+      "rect": [
+        4,
+        448,
+        158,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        49,
+        18
+      ],
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 9,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        166,
+        448,
+        136,
+        216
+      ],
+      "rect": [
+        166,
+        448,
+        136,
+        216
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        60,
+        16
+      ],
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 10,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        306,
+        448,
+        92,
+        209
+      ],
+      "rect": [
+        306,
+        448,
+        92,
+        209
+      ],
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          193.316
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        82,
+        17
+      ],
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 11,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        402,
+        448,
+        88,
+        216
+      ],
+      "rect": [
+        402,
+        448,
+        88,
+        216
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        84,
+        16
+      ],
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 12,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        494,
+        448,
+        77,
+        218
+      ],
+      "rect": [
+        494,
+        448,
+        77,
+        218
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        92,
+        18
+      ],
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 13,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        575,
+        448,
+        98,
+        218
+      ],
+      "rect": [
+        575,
+        448,
+        98,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        79,
+        20
+      ],
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 14,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        677,
+        448,
+        130,
+        215
+      ],
+      "rect": [
+        677,
+        448,
+        130,
+        215
+      ],
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.6,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        63,
+        22
+      ],
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 15,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        811,
+        448,
+        156,
+        218
+      ],
+      "rect": [
+        811,
+        448,
+        156,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "attack",
+      "trim": [
+        50,
+        20
+      ],
+      "world_yaw_degrees": 337.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 0,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        971,
+        448,
+        81,
+        217
+      ],
+      "rect": [
+        971,
+        448,
+        81,
+        217
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        88,
+        19
+      ],
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 1,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1056,
+        448,
+        92,
+        212
+      ],
+      "rect": [
+        1056,
+        448,
+        92,
+        212
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        82,
+        20
+      ],
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 2,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1152,
+        448,
+        92,
+        204
+      ],
+      "rect": [
+        1152,
+        448,
+        92,
+        204
+      ],
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          244.516
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        82,
+        22
+      ],
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 3,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1248,
+        448,
+        92,
+        212
+      ],
+      "rect": [
+        1248,
+        448,
+        92,
+        212
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        82,
+        20
+      ],
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 4,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1344,
+        448,
+        81,
+        217
+      ],
+      "rect": [
+        1344,
+        448,
+        81,
+        217
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        87,
+        19
+      ],
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 5,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1429,
+        448,
+        71,
+        218
+      ],
+      "rect": [
+        1429,
+        448,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        86,
+        20
+      ],
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 6,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1504,
+        448,
+        56,
+        215
+      ],
+      "rect": [
+        1504,
+        448,
+        56,
+        215
+      ],
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.4,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        91,
+        22
+      ],
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 7,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1564,
+        448,
+        71,
+        218
+      ],
+      "rect": [
+        1564,
+        448,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        86,
+        20
+      ],
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 8,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1639,
+        448,
+        81,
+        218
+      ],
+      "rect": [
+        1639,
+        448,
+        81,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        87,
+        18
+      ],
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 9,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1724,
+        448,
+        92,
+        216
+      ],
+      "rect": [
+        1724,
+        448,
+        92,
+        216
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        82,
+        16
+      ],
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 10,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1820,
+        448,
+        92,
+        209
+      ],
+      "rect": [
+        1820,
+        448,
+        92,
+        209
+      ],
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          193.316
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        82,
+        17
+      ],
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 11,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1916,
+        448,
+        92,
+        216
+      ],
+      "rect": [
+        1916,
+        448,
+        92,
+        216
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        82,
+        16
+      ],
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 12,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        4,
+        670,
+        81,
+        218
+      ],
+      "rect": [
+        4,
+        670,
+        81,
+        218
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        88,
+        18
+      ],
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 13,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        89,
+        670,
+        71,
+        218
+      ],
+      "rect": [
+        89,
+        670,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        99,
+        20
+      ],
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 14,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        164,
+        670,
+        56,
+        215
+      ],
+      "rect": [
+        164,
+        670,
+        56,
+        215
+      ],
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.6,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        109,
+        22
+      ],
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 15,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        224,
+        670,
+        71,
+        218
+      ],
+      "rect": [
+        224,
+        670,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "idle",
+      "trim": [
+        99,
+        20
+      ],
+      "world_yaw_degrees": 337.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 0,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        299,
+        670,
+        81,
+        217
+      ],
+      "rect": [
+        299,
+        670,
+        81,
+        217
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        88,
+        19
+      ],
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 1,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        384,
+        670,
+        92,
+        212
+      ],
+      "rect": [
+        384,
+        670,
+        92,
+        212
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        20
+      ],
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 2,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        480,
+        670,
+        92,
+        204
+      ],
+      "rect": [
+        480,
+        670,
+        92,
+        204
+      ],
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          244.516
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        22
+      ],
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 3,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        576,
+        670,
+        92,
+        212
+      ],
+      "rect": [
+        576,
+        670,
+        92,
+        212
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        20
+      ],
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 4,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        672,
+        670,
+        81,
+        217
+      ],
+      "rect": [
+        672,
+        670,
+        81,
+        217
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        87,
+        19
+      ],
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 5,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        757,
+        670,
+        71,
+        218
+      ],
+      "rect": [
+        757,
+        670,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        86,
+        20
+      ],
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 6,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        832,
+        670,
+        56,
+        215
+      ],
+      "rect": [
+        832,
+        670,
+        56,
+        215
+      ],
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.4,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        91,
+        22
+      ],
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 7,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        892,
+        670,
+        71,
+        218
+      ],
+      "rect": [
+        892,
+        670,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        86,
+        20
+      ],
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 8,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        967,
+        670,
+        81,
+        218
+      ],
+      "rect": [
+        967,
+        670,
+        81,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        87,
+        18
+      ],
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 9,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1052,
+        670,
+        92,
+        216
+      ],
+      "rect": [
+        1052,
+        670,
+        92,
+        216
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        16
+      ],
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 10,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1148,
+        670,
+        92,
+        209
+      ],
+      "rect": [
+        1148,
+        670,
+        92,
+        209
+      ],
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          193.316
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        17
+      ],
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 11,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1244,
+        670,
+        92,
+        216
+      ],
+      "rect": [
+        1244,
+        670,
+        92,
+        216
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        16
+      ],
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 12,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1340,
+        670,
+        81,
+        218
+      ],
+      "rect": [
+        1340,
+        670,
+        81,
+        218
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        88,
+        18
+      ],
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 13,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1425,
+        670,
+        71,
+        218
+      ],
+      "rect": [
+        1425,
+        670,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        99,
+        20
+      ],
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 14,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1500,
+        670,
+        56,
+        215
+      ],
+      "rect": [
+        1500,
+        670,
+        56,
+        215
+      ],
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.6,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        109,
+        22
+      ],
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 15,
+      "frame_index": 0,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1560,
+        670,
+        71,
+        218
+      ],
+      "rect": [
+        1560,
+        670,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        99,
+        20
+      ],
+      "world_yaw_degrees": 337.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 0,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1635,
+        670,
+        112,
+        221
+      ],
+      "rect": [
+        1635,
+        670,
+        112,
+        221
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        72,
+        19
+      ],
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 1,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1751,
+        670,
+        110,
+        220
+      ],
+      "rect": [
+        1751,
+        670,
+        110,
+        220
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        73,
+        20
+      ],
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 2,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1865,
+        670,
+        92,
+        213
+      ],
+      "rect": [
+        1865,
+        670,
+        92,
+        213
+      ],
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          244.516
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        22
+      ],
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 3,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        4,
+        895,
+        106,
+        210
+      ],
+      "rect": [
+        4,
+        895,
+        106,
+        210
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        75,
+        20
+      ],
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 4,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        114,
+        895,
+        124,
+        204
+      ],
+      "rect": [
+        114,
+        895,
+        124,
+        204
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        66,
+        19
+      ],
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 5,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        242,
+        895,
+        122,
+        209
+      ],
+      "rect": [
+        242,
+        895,
+        122,
+        209
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        67,
+        20
+      ],
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 6,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        368,
+        895,
+        102,
+        213
+      ],
+      "rect": [
+        368,
+        895,
+        102,
+        213
+      ],
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.4,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        77,
+        22
+      ],
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 7,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        474,
+        895,
+        96,
+        219
+      ],
+      "rect": [
+        474,
+        895,
+        96,
+        219
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        80,
+        20
+      ],
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 8,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        574,
+        895,
+        112,
+        222
+      ],
+      "rect": [
+        574,
+        895,
+        112,
+        222
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        72,
+        18
+      ],
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 9,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        690,
+        895,
+        110,
+        224
+      ],
+      "rect": [
+        690,
+        895,
+        110,
+        224
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        73,
+        16
+      ],
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 10,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        804,
+        895,
+        92,
+        218
+      ],
+      "rect": [
+        804,
+        895,
+        92,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          193.316
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        17
+      ],
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 11,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        900,
+        895,
+        106,
+        214
+      ],
+      "rect": [
+        900,
+        895,
+        106,
+        214
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        75,
+        16
+      ],
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 12,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1010,
+        895,
+        124,
+        205
+      ],
+      "rect": [
+        1010,
+        895,
+        124,
+        205
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        66,
+        18
+      ],
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 13,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1138,
+        895,
+        122,
+        209
+      ],
+      "rect": [
+        1138,
+        895,
+        122,
+        209
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        67,
+        20
+      ],
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 14,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1264,
+        895,
+        102,
+        213
+      ],
+      "rect": [
+        1264,
+        895,
+        102,
+        213
+      ],
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.6,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        77,
+        22
+      ],
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 15,
+      "frame_index": 1,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1370,
+        895,
+        96,
+        219
+      ],
+      "rect": [
+        1370,
+        895,
+        96,
+        219
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        80,
+        20
+      ],
+      "world_yaw_degrees": 337.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 0,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1470,
+        895,
+        81,
+        217
+      ],
+      "rect": [
+        1470,
+        895,
+        81,
+        217
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        88,
+        19
+      ],
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 1,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1555,
+        895,
+        92,
+        212
+      ],
+      "rect": [
+        1555,
+        895,
+        92,
+        212
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        20
+      ],
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 2,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1651,
+        895,
+        92,
+        204
+      ],
+      "rect": [
+        1651,
+        895,
+        92,
+        204
+      ],
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          244.516
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        22
+      ],
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 3,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1747,
+        895,
+        92,
+        212
+      ],
+      "rect": [
+        1747,
+        895,
+        92,
+        212
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        20
+      ],
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 4,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1843,
+        895,
+        81,
+        217
+      ],
+      "rect": [
+        1843,
+        895,
+        81,
+        217
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        87,
+        19
+      ],
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 5,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1928,
+        895,
+        71,
+        218
+      ],
+      "rect": [
+        1928,
+        895,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        86,
+        20
+      ],
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 6,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        4,
+        1123,
+        56,
+        215
+      ],
+      "rect": [
+        4,
+        1123,
+        56,
+        215
+      ],
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.4,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        91,
+        22
+      ],
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 7,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        64,
+        1123,
+        71,
+        218
+      ],
+      "rect": [
+        64,
+        1123,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        86,
+        20
+      ],
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 8,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        139,
+        1123,
+        81,
+        218
+      ],
+      "rect": [
+        139,
+        1123,
+        81,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        87,
+        18
+      ],
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 9,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        224,
+        1123,
+        92,
+        216
+      ],
+      "rect": [
+        224,
+        1123,
+        92,
+        216
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        16
+      ],
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 10,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        320,
+        1123,
+        92,
+        209
+      ],
+      "rect": [
+        320,
+        1123,
+        92,
+        209
+      ],
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          193.316
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        17
+      ],
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 11,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        416,
+        1123,
+        92,
+        216
+      ],
+      "rect": [
+        416,
+        1123,
+        92,
+        216
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        16
+      ],
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 12,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        512,
+        1123,
+        81,
+        218
+      ],
+      "rect": [
+        512,
+        1123,
+        81,
+        218
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        88,
+        18
+      ],
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 13,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        597,
+        1123,
+        71,
+        218
+      ],
+      "rect": [
+        597,
+        1123,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        99,
+        20
+      ],
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 14,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        672,
+        1123,
+        56,
+        215
+      ],
+      "rect": [
+        672,
+        1123,
+        56,
+        215
+      ],
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.6,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        109,
+        22
+      ],
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 15,
+      "frame_index": 2,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        732,
+        1123,
+        71,
+        218
+      ],
+      "rect": [
+        732,
+        1123,
+        71,
+        218
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        99,
+        20
+      ],
+      "world_yaw_degrees": 337.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 0,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        807,
+        1123,
+        124,
+        204
+      ],
+      "rect": [
+        807,
+        1123,
+        124,
+        204
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        66,
+        19
+      ],
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 1,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        935,
+        1123,
+        106,
+        210
+      ],
+      "rect": [
+        935,
+        1123,
+        106,
+        210
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        75,
+        20
+      ],
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 2,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1045,
+        1123,
+        92,
+        213
+      ],
+      "rect": [
+        1045,
+        1123,
+        92,
+        213
+      ],
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          244.516
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        22
+      ],
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 3,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1141,
+        1123,
+        110,
+        220
+      ],
+      "rect": [
+        1141,
+        1123,
+        110,
+        220
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          238.63
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        73,
+        20
+      ],
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 4,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1255,
+        1123,
+        112,
+        221
+      ],
+      "rect": [
+        1255,
+        1123,
+        112,
+        221
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          230.365
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        72,
+        19
+      ],
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 5,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1371,
+        1123,
+        96,
+        219
+      ],
+      "rect": [
+        1371,
+        1123,
+        96,
+        219
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        80,
+        20
+      ],
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 6,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1471,
+        1123,
+        102,
+        213
+      ],
+      "rect": [
+        1471,
+        1123,
+        102,
+        213
+      ],
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.4,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        77,
+        22
+      ],
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 7,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1577,
+        1123,
+        122,
+        209
+      ],
+      "rect": [
+        1577,
+        1123,
+        122,
+        209
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          102.932,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        67,
+        20
+      ],
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 8,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1703,
+        1123,
+        124,
+        205
+      ],
+      "rect": [
+        1703,
+        1123,
+        124,
+        205
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          105.103,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        66,
+        18
+      ],
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 9,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1831,
+        1123,
+        106,
+        214
+      ],
+      "rect": [
+        1831,
+        1123,
+        106,
+        214
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          111.668,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        75,
+        16
+      ],
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 10,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        1941,
+        1123,
+        92,
+        218
+      ],
+      "rect": [
+        1941,
+        1123,
+        92,
+        218
+      ],
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          128.0,
+          193.316
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        82,
+        17
+      ],
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 11,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        4,
+        1348,
+        110,
+        224
+      ],
+      "rect": [
+        4,
+        1348,
+        110,
+        224
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "sockets": {
+        "direction_tip": [
+          144.332,
+          199.202
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        73,
+        16
+      ],
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 12,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        118,
+        1348,
+        112,
+        222
+      ],
+      "rect": [
+        118,
+        1348,
+        112,
+        222
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "sockets": {
+        "direction_tip": [
+          150.897,
+          207.467
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        72,
+        18
+      ],
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 13,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        234,
+        1348,
+        96,
+        219
+      ],
+      "rect": [
+        234,
+        1348,
+        96,
+        219
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          213.724
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        80,
+        20
+      ],
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 14,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        334,
+        1348,
+        102,
+        213
+      ],
+      "rect": [
+        334,
+        1348,
+        102,
+        213
+      ],
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.6,
+          218.916
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        77,
+        22
+      ],
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "anchor": [
+        128.0,
+        218.916
+      ],
+      "direction": 15,
+      "frame_index": 3,
+      "logical_frame_canvas": [
+        256,
+        256
+      ],
+      "mask_rect": [
+        440,
+        1348,
+        122,
+        209
+      ],
+      "rect": [
+        440,
+        1348,
+        122,
+        209
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "sockets": {
+        "direction_tip": [
+          153.068,
+          224.108
+        ],
+        "origin": [
+          128.0,
+          218.916
+        ]
+      },
+      "state": "walk",
+      "trim": [
+        67,
+        20
+      ],
+      "world_yaw_degrees": 337.5
+    }
+  ],
+  "logical_frame_canvas": [
+    256,
+    256
+  ],
+  "manifest_version": "sprite_manifest_multistate_v1",
+  "state_contract_version": "sprite_states_multistate_v1",
+  "variant_class": "character",
+  "variant_id": "humanoid_anim",
+  "world_metrics": {
+    "eye_height_world": 1.62,
+    "footprint_radius_world": 0.3,
+    "height_world": 1.8,
+    "unit": "meter"
+  }
+}

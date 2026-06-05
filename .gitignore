@@ -8,3 +8,11 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# verify_set: keep the package (manifest + atlases + contact sheets + INDEX) but not the
+# bulky per-frame renderer intermediates (regenerable via produce_verify_set.py)
+pipeline/output/verify_set/*/color_*dir*.png
+pipeline/output/verify_set/*/region_*dir*.png
+pipeline/output/verify_set/*/_states.json
+pipeline/output/verify_set/*/anim_meta.json
+pipeline/output/verify_set/*/blender_meta.json

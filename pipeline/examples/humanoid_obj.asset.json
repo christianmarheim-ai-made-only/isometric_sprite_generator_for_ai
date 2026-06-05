@@ -1,0 +1,9 @@
+{
+  "asset_contract_version": "external_asset_v1",
+  "variant_id": "humanoid_obj",
+  "archetype": "humanoid",
+  "files": { "mesh": "../test_meshes/humanoid.obj" },
+  "geometry": { "up": "z", "forward": "+x", "unit": "meter" },
+  "region_source": "material_name",
+  "notes": "Static OBJ (no rig) -> bake_asset.py routes this to the numpy baker; HIT regions by material name."
+}
