@@ -261,8 +261,8 @@ _Updated by each loop iteration._
 
 | Slice | Status | Notes |
 |---|---|---|
-| P0 | next | docs only; verification already green |
-| P1 | todo | build.py, fixtures, stable report path |
+| P0 | done | runbook.md + m1_arrow_pilot_review.md |
+| P1 | next | build.py, fixtures, stable report path |
 | C0 | todo | |
 | C2 | todo | body regions only |
 | C4 | todo | body-only metrics |
