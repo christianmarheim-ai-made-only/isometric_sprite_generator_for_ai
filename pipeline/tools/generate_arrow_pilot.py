@@ -365,7 +365,6 @@ def main() -> int:
             "metrics_policy": "debug_placeholder_only_not_gameplay"
         },
         "build": {
-            "generated_at_utc": datetime.now(timezone.utc).isoformat(),
             "generator": "pipeline/tools/generate_arrow_pilot.py",
             "generator_mode": "deterministic_python_no_blender",
             "lockfile_hashes": individual_hashes,

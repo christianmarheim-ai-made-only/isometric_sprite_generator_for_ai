@@ -42,12 +42,11 @@
       "Blender camera and real rig-derived proxy rendering are deferred.",
       "Weapons/equipment/arms are deferred to M2A/M3 ADR review."
     ],
-    "generated_at_utc": "2026-06-05T06:54:08.397671+00:00",
     "generator": "pipeline/tools/generate_arrow_pilot.py",
     "generator_mode": "deterministic_python_no_blender",
     "lockfile_hashes": {
       "sprite_contract.lock.json": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
-      "sprite_states.lock.json": "sha256:bc80ffa1a6ff54822e5cd2f5d5092dabbbb09031301522a2bf0eda953a3d67ba",
+      "sprite_states.lock.json": "sha256:6d8e1981e9b86d334c3527e9918104270ed04531d7d8b6babec194a8ae6e2c88",
       "sprite_variants.lock.json": "sha256:eb9a206bbab46887b2203cf91819f293a0fc340adfeb52da18c8338587268bd1"
     }
   },

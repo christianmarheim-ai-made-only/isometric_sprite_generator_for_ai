@@ -31,10 +31,20 @@ import meshes  # noqa: E402
 from render3d import render_directions, ground_screen_direction, compute_fit  # noqa: E402
 from gate_engine_accept import engine_accept  # noqa: E402
 from measure_metrics import compute_world_metrics  # noqa: E402
+from contract_hash import compute_contract_hash  # noqa: E402
 
 PAD = 4
 DIRS = 16
 MESHES = {"cube": meshes.cube, "pole": meshes.pole, "arrow": meshes.arrow_wedge}
+LOCKFILES = PIPELINE_ROOT / "lockfiles"
+
+
+def _contract_fields() -> dict:
+    """contract_hash (sprite_contract.lock.json) + state_contract_version, so the engine's
+    documented fail-closed asserts (docs/BEVY_LOADER_INTEGRATION.md) apply to bake packages too."""
+    states = json.loads((LOCKFILES / "sprite_states.lock.json").read_text(encoding="utf-8"))
+    return {"contract_hash": compute_contract_hash(LOCKFILES),
+            "state_contract_version": states["state_contract_version"]}
 
 
 def _extrude_paste(atlas: Image.Image, frame: Image.Image, x: int, y: int, pad: int) -> None:
@@ -150,6 +160,7 @@ def bake(mesh: str, out: Path, canvas_px: int = 256, variant_id: str | None = No
                           "metrics_policy": "probe_placeholder"},
         "build": {"generator": "pipeline/tools/bake.py", "mesh": mesh, "renderer": "render3d_software"},
     }
+    manifest.update(_contract_fields())
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (out / "expected_facing_table.json").write_text(json.dumps(expected, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return manifest
@@ -214,6 +225,7 @@ def bake_character(out: Path, canvas_px: int = 256, variant_id: str = "humanoid_
         "build": {"generator": "pipeline/tools/bake.py", "mesh": "humanoid",
                   "renderer": "render3d_software"},
     }
+    manifest.update(_contract_fields())
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (out / "expected_facing_table.json").write_text(json.dumps(expected, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return manifest
@@ -228,12 +240,19 @@ def bake_character_anim(out: Path, canvas_px: int = 256, variant_id: str = "huma
     canvas = (canvas_px, canvas_px)
     states = json.loads((PIPELINE_ROOT / "lockfiles" / "sprite_states.lock.json").read_text(encoding="utf-8"))["states"]
 
-    swing = 0.35
+    swing, attack = 0.35, 1.1
     posed = {}
     for state, spec in states.items():
-        for fi in range(spec["frames"]):
-            ang = swing * math.sin(2 * math.pi * fi / spec["frames"]) if state == "walk" else 0.0
-            posed[(state, fi)] = meshes.humanoid(leg_swing=ang, arm_swing=ang)
+        nf = spec["frames"]
+        for fi in range(nf):
+            if state == "walk":
+                ls = swing * math.sin(2 * math.pi * fi / nf)
+                posed[(state, fi)] = meshes.humanoid(leg_swing=ls, arm_swing=ls)
+            elif state == "attack":
+                a = attack * (fi / (nf - 1) if nf > 1 else 1.0)  # ramp arms forward, hold terminal
+                posed[(state, fi)] = meshes.humanoid(leg_swing=0.0, arm_swing=a)
+            else:  # idle / rest pose
+                posed[(state, fi)] = meshes.humanoid()
     rest_verts = meshes.humanoid()[0]
     fit = compute_fit([v for (v, _, _) in posed.values()], n=DIRS, canvas=canvas)
 
@@ -302,6 +321,7 @@ def bake_character_anim(out: Path, canvas_px: int = 256, variant_id: str = "huma
         "build": {"generator": "pipeline/tools/bake.py", "mesh": "humanoid",
                   "renderer": "render3d_software", "states": sorted(states)},
     }
+    manifest.update(_contract_fields())
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (out / "expected_facing_table.json").write_text(json.dumps(expected, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return manifest

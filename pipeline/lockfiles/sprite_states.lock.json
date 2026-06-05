@@ -1,6 +1,16 @@
 {
   "state_contract_version": "sprite_states_multistate_v1",
   "states": {
+    "attack": {
+      "directions": 16,
+      "fps": 12,
+      "frames": 3,
+      "playback": "once",
+      "required_markers": [],
+      "required_sockets": [
+        "origin"
+      ]
+    },
     "idle": {
       "directions": 16,
       "fps": 1,

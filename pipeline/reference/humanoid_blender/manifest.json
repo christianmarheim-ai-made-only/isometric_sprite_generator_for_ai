@@ -40,6 +40,7 @@
       32
     ]
   },
+  "contract_hash": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
   "direction_count": 16,
   "expected_facing": [
     {
@@ -722,6 +723,7 @@
     }
   ],
   "manifest_version": "sprite_manifest_bake_v1",
+  "state_contract_version": "sprite_states_multistate_v1",
   "variant_class": "character",
   "variant_id": "humanoid_blender",
   "world_metrics": {

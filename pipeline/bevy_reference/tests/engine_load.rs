@@ -79,8 +79,28 @@ fn reference_multistate_character_is_engine_loadable() {
     assert_eq!(s.variant.directions, 16);
     assert_eq!(s.variant.frames.len(), 16, "default-state frame 0 per direction");
     assert_eq!(s.variant.default_state, "idle");
-    assert_eq!(s.variant.states, vec!["idle".to_string(), "walk".to_string()]);
+    assert_eq!(s.variant.states, vec!["attack".to_string(), "idle".to_string(), "walk".to_string()]);
+    assert_eq!(s.variant.animations["walk"].frames, 4);
+    assert_eq!(s.variant.animations["attack"].playback, "once");
     assert!(s.variant.metrics.eye_height_world.unwrap() <= s.variant.metrics.height_world);
+}
+
+#[test]
+fn multistate_tightcrop_sizing_reconstructs() {
+    // R5 review: the loader carries trim + logical_frame_canvas and reproduces the contract
+    // section-3 tight-crop sizing (NOT the rect-aspect mis-size of height*24).
+    let json = manifest("../reference/humanoid_anim/manifest.json");
+    let s = parse_manifest(&json).expect("multi-state loads");
+    let fd = s.variant.frame("walk", 0, 0).expect("walk dir0 f0 in the full atlas");
+    let h = s.variant.metrics.height_world;
+    let scale = h * 24.0 / fd.logical_h as f32;
+    let (w, ht, ox, oy) = fd.screen_placement(h);
+    assert!((ht - fd.h as f32 * scale).abs() < 1e-3, "on-screen height = rect.h * scale");
+    assert!((w - fd.w as f32 * scale).abs() < 1e-3, "on-screen width = rect.w * scale");
+    assert!((ox - fd.trim_x as f32 * scale).abs() < 1e-3 && (oy - fd.trim_y as f32 * scale).abs() < 1e-3);
+    assert!(fd.h < fd.logical_h, "frame is tight-cropped (tight rect < logical cell)");
+    assert!(ht < h * 24.0, "tight-crop size is below the full logical-cell height (no rect-aspect mis-size)");
+    assert!((0.0..=1.0).contains(&fd.anchor_x) && (0.0..=1.0).contains(&fd.anchor_y));
 }
 
 #[test]

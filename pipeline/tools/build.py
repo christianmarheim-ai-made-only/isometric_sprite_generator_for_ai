@@ -40,6 +40,7 @@ STEPS = [
     ("test_gates", [str(SCRIPT_DIR / "test_gates.py")]),
     ("test_bake", [str(SCRIPT_DIR / "test_bake.py")]),
     ("test_multistate", [str(SCRIPT_DIR / "test_multistate.py")]),
+    ("test_references", [str(SCRIPT_DIR / "test_references.py")]),
     ("test_engine_load", [str(SCRIPT_DIR / "test_engine_load.py")]),
     ("test_blender_parity", [str(SCRIPT_DIR / "test_blender_parity.py")]),
 ]

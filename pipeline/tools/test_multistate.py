@@ -40,15 +40,18 @@ def main() -> int:
         anims = m["animations"]
 
         ok &= check("multi-state package engine-accepted (Gate-1 coverage)", not engine_accept(m))
-        ok &= check("animations: idle(1) + walk(4); default_state idle",
-                    anims["idle"]["frames"] == 1 and anims["walk"]["frames"] == 4 and m["default_state"] == "idle")
+        ok &= check("animations: idle(1) loop + walk(4) loop + attack(3) ONCE; default_state idle",
+                    anims["idle"]["frames"] == 1 and anims["walk"]["frames"] == 4
+                    and anims["attack"]["frames"] == 3 and anims["attack"]["playback"] == "once"
+                    and m["default_state"] == "idle")
 
         cover: dict = {}
         for f in m["frames"]:
             cover.setdefault((f["state"], f["direction"]), set()).add(f["frame_index"])
         cov_ok = all(cover.get((s, d)) == set(range(anims[s]["frames"])) for s in anims for d in range(16))
-        ok &= check("coverage complete+unique per (state,direction); total = 16*(1+4)",
-                    cov_ok and len(m["frames"]) == 16 * (1 + 4))
+        total = sum(16 * anims[s]["frames"] for s in anims)
+        ok &= check(f"coverage complete+unique per (state,direction); total = {total}",
+                    cov_ok and len(m["frames"]) == total)
 
         lw, lh = m["logical_frame_canvas"]
         crop_ok = all(

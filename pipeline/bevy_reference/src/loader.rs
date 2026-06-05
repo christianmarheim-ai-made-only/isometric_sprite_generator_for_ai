@@ -4,14 +4,16 @@
 //! Implements BOTH:
 //!  - the CURRENT engine single-state contract (one `{direction, rect, anchor}` frame per
 //!    direction; `frames.len() == direction_count`), mirroring the shipped `parse_manifest`; AND
-//!  - the multi-state + tight-crop contract (multistate_sprite_contract.md): a top-level
-//!    `animations` map + per-frame `(state, frame_index)` + `default_state`, tight `rect` +
-//!    `trim` + `logical_frame_canvas`, logical-coords `anchor`. MIN engine behavior: validate
-//!    coverage and load the DEFAULT state's frame 0 per direction.
+//!  - the multi-state + tight-crop contract (docs/multistate_sprite_contract.md): a top-level
+//!    `animations` map (frames/fps/playback) + per-frame `(state, frame_index)` + `default_state`,
+//!    tight `rect` + `trim` + `logical_frame_canvas`, logical-coords `anchor`. It parses ALL
+//!    states + the tight-crop fields, validates coverage, builds the full
+//!    `(state, direction, frame_index)` atlas, and exposes the default state's frame 0 per
+//!    direction. `FrameDef::screen_placement` is the EXECUTABLE spec for contract section 3
+//!    (deterministic tight-crop sizing); the engine slice should reproduce it.
 //!
-//! Backward-compatible: a manifest with no `animations` loads exactly as the shipped engine
-//! does. The multi-state half is the reference for the pending engine loader slice; the
-//! single-state half mirrors the shipped engine. KEEP IN SYNC with the engine.
+//! Backward-compatible: a manifest with no `animations` loads exactly as the shipped engine.
+//! KEEP IN SYNC with the engine.
 
 use std::collections::BTreeMap;
 
@@ -20,6 +22,8 @@ use serde::Deserialize;
 pub const FORMAT_ID: &str = "game_iso_v1";
 pub const PROBE_DEFAULT_HEIGHT: f32 = 2.0;
 pub const PROBE_DEFAULT_FOOTPRINT: f32 = 0.5;
+/// On-screen px per world meter of height (engine render.rs HEIGHT_SCREEN_SCALE).
+pub const HEIGHT_SCREEN_SCALE: f32 = 24.0;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct WorldMetrics {
@@ -51,12 +55,39 @@ impl WorldMetrics {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FrameDef {
     pub direction: usize,
+    /// Tight atlas rect (the actual pixels).
     pub x: u32,
     pub y: u32,
     pub w: u32,
     pub h: u32,
+    /// Tight rect's top-left WITHIN the logical (untrimmed) frame.
+    pub trim_x: u32,
+    pub trim_y: u32,
+    /// The untrimmed logical cell (the sizing/anchoring reference).
+    pub logical_w: u32,
+    pub logical_h: u32,
+    /// Foot anchor as a fraction of the LOGICAL frame.
     pub anchor_x: f32,
     pub anchor_y: f32,
+}
+
+impl FrameDef {
+    /// Contract section-3 deterministic sizing/placement. Returns the on-screen
+    /// `(w, h, offset_x, offset_y)` in px for a sprite of `height_world` meters:
+    /// `scale = height_world * HEIGHT_SCREEN_SCALE / logical_h`; the tight region is drawn at
+    /// `rect.w*scale x rect.h*scale`, offset `trim*scale` from the logical top-left; the logical
+    /// anchor (`anchor * logical * scale`) lands on the projected foot. Trimmed padding is implied.
+    pub fn screen_placement(&self, height_world: f32) -> (f32, f32, f32, f32) {
+        let scale = height_world * HEIGHT_SCREEN_SCALE / self.logical_h as f32;
+        (self.w as f32 * scale, self.h as f32 * scale, self.trim_x as f32 * scale, self.trim_y as f32 * scale)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct AnimMeta {
+    pub frames: usize,
+    pub fps: f32,
+    pub playback: String,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -64,12 +95,21 @@ pub struct SpriteVariant {
     pub directions: usize,
     pub atlas_w: u32,
     pub atlas_h: u32,
-    /// The DEFAULT state's frame 0, one per direction (MIN engine behavior).
+    /// The DEFAULT state's frame 0, one per direction (MIN render set).
     pub frames: Vec<FrameDef>,
     pub metrics: WorldMetrics,
-    /// All animation state names (sorted). A single-state manifest yields `["idle"]`.
     pub states: Vec<String>,
     pub default_state: String,
+    /// Per-state animation metadata (frames/fps/playback). Single-state -> `{idle: 1, 1, loop}`.
+    pub animations: BTreeMap<String, AnimMeta>,
+    /// The full atlas, addressed by `(state, direction, frame_index)`.
+    pub all_frames: BTreeMap<(String, usize, usize), FrameDef>,
+}
+
+impl SpriteVariant {
+    pub fn frame(&self, state: &str, direction: usize, frame_index: usize) -> Option<&FrameDef> {
+        self.all_frames.get(&(state.to_string(), direction, frame_index))
+    }
 }
 
 pub struct LoadedSprite {
@@ -100,11 +140,17 @@ struct FrameEntry {
     state: Option<String>,
     #[serde(default)]
     frame_index: Option<usize>,
+    #[serde(default)]
+    trim: Option<[u32; 2]>,
+    #[serde(default)]
+    logical_frame_canvas: Option<[u32; 2]>,
 }
 #[derive(Deserialize)]
 struct AnimDef {
     directions: usize,
     frames: usize,
+    #[serde(default)]
+    fps: f32,
     #[serde(default)]
     playback: String,
 }
@@ -136,6 +182,8 @@ struct ManifestDef {
     logical_frame_canvas: Option<[u32; 2]>,
 }
 
+type Built = (Vec<FrameDef>, BTreeMap<(String, usize, usize), FrameDef>, BTreeMap<String, AnimMeta>, Vec<String>, String);
+
 /// Parse + validate a `game_iso_v1` manifest (single-state or multi-state).
 pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
     let m: ManifestDef = serde_json::from_str(json).map_err(|e| format!("manifest JSON: {e}"))?;
@@ -154,7 +202,6 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
     if aw == 0 || ah == 0 {
         return Err("atlases.color.size dimensions must be > 0".to_string());
     }
-    // Every frame's rect: nonzero + within the atlas (u64 avoids overflow on a hostile rect).
     for fr in &m.frames {
         let [x, y, w, h] = fr.rect;
         if w == 0 || h == 0 {
@@ -165,13 +212,11 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
         }
     }
 
-    // Anchor is expressed in LOGICAL frame coordinates (== frame_canvas when uncropped).
-    let [lw, lh] = m.logical_frame_canvas.unwrap_or(m.frame_canvas);
-    let (lw, lh) = (lw as f32, lh as f32);
+    let [lw0, lh0] = m.logical_frame_canvas.unwrap_or(m.frame_canvas);
 
-    let (frames, states, default_state) = match &m.animations {
-        Some(anims) if !anims.is_empty() => build_multistate(&m, anims, dc, lw, lh)?,
-        _ => (build_single(&m, dc, lw, lh)?, vec!["idle".to_string()], "idle".to_string()),
+    let (frames, all_frames, animations, states, default_state) = match &m.animations {
+        Some(anims) if !anims.is_empty() => build_multistate(&m, anims, dc, lw0, lh0)?,
+        _ => build_single(&m, dc, lw0, lh0)?,
     };
 
     let metrics = if m.variant_class == "probe" {
@@ -201,18 +246,29 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
     };
 
     Ok(LoadedSprite {
-        variant: SpriteVariant { directions: dc, atlas_w: aw, atlas_h: ah, frames, metrics, states, default_state },
+        variant: SpriteVariant {
+            directions: dc,
+            atlas_w: aw,
+            atlas_h: ah,
+            frames,
+            metrics,
+            states,
+            default_state,
+            animations,
+            all_frames,
+        },
         atlas: m.atlases.color.path,
         name: m.variant_id,
     })
 }
 
 /// Legacy single-state: exactly one frame per direction (the shipped engine rule).
-fn build_single(m: &ManifestDef, dc: usize, lw: f32, lh: f32) -> Result<Vec<FrameDef>, String> {
+fn build_single(m: &ManifestDef, dc: usize, lw0: u32, lh0: u32) -> Result<Built, String> {
     if m.frames.len() != dc {
         return Err(format!("frames ({}) must equal direction_count ({dc})", m.frames.len()));
     }
     let mut slots: Vec<Option<FrameDef>> = vec![None; dc];
+    let mut all: BTreeMap<(String, usize, usize), FrameDef> = BTreeMap::new();
     for fr in &m.frames {
         if fr.direction >= dc {
             return Err(format!("frame.direction {} out of range 0..{dc}", fr.direction));
@@ -220,20 +276,23 @@ fn build_single(m: &ManifestDef, dc: usize, lw: f32, lh: f32) -> Result<Vec<Fram
         if slots[fr.direction].is_some() {
             return Err(format!("duplicate frame for direction {}", fr.direction));
         }
-        slots[fr.direction] = Some(frame_def(fr, lw, lh));
+        let fd = frame_def(fr, lw0, lh0);
+        slots[fr.direction] = Some(fd);
+        all.insert(("idle".to_string(), fr.direction, 0), fd);
     }
-    slots.into_iter().enumerate().map(|(i, f)| f.ok_or_else(|| format!("missing frame for direction {i}"))).collect()
+    let frames: Vec<FrameDef> = slots
+        .into_iter()
+        .enumerate()
+        .map(|(i, f)| f.ok_or_else(|| format!("missing frame for direction {i}")))
+        .collect::<Result<_, _>>()?;
+    let mut animations = BTreeMap::new();
+    animations.insert("idle".to_string(), AnimMeta { frames: 1, fps: 1.0, playback: "loop".to_string() });
+    Ok((frames, all, animations, vec!["idle".to_string()], "idle".to_string()))
 }
 
-/// Multi-state contract: validate full `(state, direction, frame_index)` coverage and return
-/// the default state's frame 0 per direction.
-fn build_multistate(
-    m: &ManifestDef,
-    anims: &BTreeMap<String, AnimDef>,
-    dc: usize,
-    lw: f32,
-    lh: f32,
-) -> Result<(Vec<FrameDef>, Vec<String>, String), String> {
+/// Multi-state contract: validate full coverage, build the full atlas, return the default
+/// state's frame 0 per direction + animation metadata.
+fn build_multistate(m: &ManifestDef, anims: &BTreeMap<String, AnimDef>, dc: usize, lw0: u32, lh0: u32) -> Result<Built, String> {
     for (state, a) in anims {
         if a.directions != dc {
             return Err(format!("animations.{state}.directions ({}) must equal direction_count ({dc})", a.directions));
@@ -261,7 +320,6 @@ fn build_multistate(
         }
     };
 
-    // coverage[(state, direction)] = bitset over frame_index 0..frames-1
     let mut covered: BTreeMap<(&str, usize), Vec<bool>> = BTreeMap::new();
     for (state, a) in anims {
         for d in 0..dc {
@@ -269,6 +327,7 @@ fn build_multistate(
         }
     }
     let mut default_frames: Vec<Option<FrameDef>> = vec![None; dc];
+    let mut all: BTreeMap<(String, usize, usize), FrameDef> = BTreeMap::new();
     for fr in &m.frames {
         let state = fr.state.as_deref().ok_or("multi-state frame missing `state`")?;
         let a = anims.get(state).ok_or_else(|| format!("frame references unknown state {state:?}"))?;
@@ -284,8 +343,10 @@ fn build_multistate(
             return Err(format!("duplicate frame ({state}, dir {}, f{fi})", fr.direction));
         }
         slot[fi] = true;
+        let fd = frame_def(fr, lw0, lh0);
+        all.insert((state.to_string(), fr.direction, fi), fd);
         if state == default_state && fi == 0 {
-            default_frames[fr.direction] = Some(frame_def(fr, lw, lh));
+            default_frames[fr.direction] = Some(fd);
         }
     }
     for ((state, d), got) in &covered {
@@ -298,10 +359,28 @@ fn build_multistate(
         .enumerate()
         .map(|(d, f)| f.ok_or_else(|| format!("missing default-state \"{default_state}\" frame 0 for direction {d}")))
         .collect::<Result<_, _>>()?;
-    Ok((frames, anims.keys().cloned().collect(), default_state))
+    let animations: BTreeMap<String, AnimMeta> = anims
+        .iter()
+        .map(|(s, a)| (s.clone(), AnimMeta { frames: a.frames, fps: a.fps, playback: a.playback.clone() }))
+        .collect();
+    Ok((frames, all, animations, anims.keys().cloned().collect(), default_state))
 }
 
-fn frame_def(fr: &FrameEntry, lw: f32, lh: f32) -> FrameDef {
+fn frame_def(fr: &FrameEntry, lw0: u32, lh0: u32) -> FrameDef {
     let [x, y, w, h] = fr.rect;
-    FrameDef { direction: fr.direction, x, y, w, h, anchor_x: fr.anchor[0] / lw, anchor_y: fr.anchor[1] / lh }
+    let [tx, ty] = fr.trim.unwrap_or([0, 0]);
+    let [lw, lh] = fr.logical_frame_canvas.unwrap_or([lw0, lh0]);
+    FrameDef {
+        direction: fr.direction,
+        x,
+        y,
+        w,
+        h,
+        trim_x: tx,
+        trim_y: ty,
+        logical_w: lw,
+        logical_h: lh,
+        anchor_x: fr.anchor[0] / lw as f32,
+        anchor_y: fr.anchor[1] / lh as f32,
+    }
 }

@@ -31,7 +31,7 @@ import meshes  # noqa: E402
 from render3d import ground_screen_direction  # noqa: E402
 from measure_metrics import compute_world_metrics  # noqa: E402
 from gate_engine_accept import engine_accept  # noqa: E402
-from bake import _pack  # noqa: E402  (reuse the atlas packer + extrusion)
+from bake import _pack, _contract_fields  # noqa: E402  (reuse the atlas packer + contract fields)
 
 CANVAS, DIRS = 256, 16
 
@@ -158,6 +158,7 @@ def bake_blender(out: Path, blender_exe: str) -> tuple[dict, dict]:
         "build": {"generator": "pipeline/tools/blender_bake.py", "mesh": "humanoid",
                   "renderer": f"blender_workbench_{meta.get('blender_version', '?')}"},
     }
+    manifest.update(_contract_fields())
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return manifest, meta
 
