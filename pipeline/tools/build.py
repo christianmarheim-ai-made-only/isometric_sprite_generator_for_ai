@@ -48,6 +48,8 @@ STEPS = [
     ("test_engine_load", [str(SCRIPT_DIR / "test_engine_load.py")]),
     ("test_blender_parity", [str(SCRIPT_DIR / "test_blender_parity.py")]),
     ("test_rigged_anim", [str(SCRIPT_DIR / "test_rigged_anim.py")]),
+    ("test_combat_bake", [str(SCRIPT_DIR / "test_combat_bake.py")]),
+    ("test_texture_pass", [str(SCRIPT_DIR / "test_texture_pass.py")]),
 ]
 
 
