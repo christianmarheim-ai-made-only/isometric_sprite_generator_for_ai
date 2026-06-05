@@ -72,19 +72,38 @@ def _assemble(parts):
     return np.concatenate(vs), np.concatenate(fs), np.concatenate(rs)
 
 
-def humanoid():
-    """A body-only humanoid (~1.8 m) built from boxes -- foot at origin, facing +X.
+def _rot_y(v, pivot, ang):
+    """Rotate verts (Nx3) about the world Y axis through `pivot` by `ang` rad (forward/back)."""
+    if ang == 0.0:
+        return v
+    c, s = np.cos(ang), np.sin(ang)
+    p = np.asarray(pivot, dtype=float)
+    d = v - p
+    out = d.copy()
+    out[:, 0] = d[:, 0] * c + d[:, 2] * s
+    out[:, 2] = -d[:, 0] * s + d[:, 2] * c
+    return out + p
 
-    Per-face HIT region: head 1, torso 2, arms 3, legs 4 (no weapons/shield/gear this
-    iteration). Returns (verts Nx3, faces Mx3, face_region M,) for the R8 HIT proxy.
+
+def humanoid(leg_swing=0.0, arm_swing=0.0):
+    """A body-only humanoid (~1.8 m) from boxes -- foot at origin, facing +X.
+
+    `leg_swing`/`arm_swing` (radians) swing the legs about the hips and arms about the
+    shoulders (forward/back; left/right opposite; arms opposite the same-side leg) for a
+    walk cycle; 0 = rest pose. The ROOT (origin) stays fixed, so the foot anchor is stable
+    across the cycle (root-XY stability). humanoid() with no args is the R4/R6/R7 rest pose.
+
+    Per-face HIT region: head 1, torso 2, arms 3, legs 4. Returns (verts, faces, face_region).
     """
     parts = []
-    for sy in (-1.0, 1.0):                                   # two legs
+    for sy, sgn in ((-1.0, 1.0), (1.0, -1.0)):              # two legs (L/R swing opposite)
         cy = sy * 0.20
-        parts.append((*box(-0.11, 0.11, cy - 0.10, cy + 0.10, 0.0, 0.92), REGION["legs"]))
+        v, f = box(-0.11, 0.11, cy - 0.10, cy + 0.10, 0.0, 0.92)
+        parts.append((_rot_y(v, (0.0, cy, 0.92), sgn * leg_swing), f, REGION["legs"]))
     parts.append((*box(-0.16, 0.16, -0.24, 0.24, 0.88, 1.46), REGION["torso"]))
-    for sy in (-1.0, 1.0):                                   # two arms, outboard of the torso
+    for sy, sgn in ((-1.0, 1.0), (1.0, -1.0)):              # two arms (opposite same-side leg)
         cy = sy * 0.31
-        parts.append((*box(-0.08, 0.08, cy - 0.07, cy + 0.07, 0.86, 1.42), REGION["arms"]))
+        v, f = box(-0.08, 0.08, cy - 0.07, cy + 0.07, 0.86, 1.42)
+        parts.append((_rot_y(v, (0.0, cy, 1.42), -sgn * arm_swing), f, REGION["arms"]))
     parts.append((*box(-0.12, 0.12, -0.12, 0.12, 1.46, 1.80), REGION["head"]))
     return _assemble(parts)

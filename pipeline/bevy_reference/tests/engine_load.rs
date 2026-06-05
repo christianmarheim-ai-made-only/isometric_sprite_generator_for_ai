@@ -69,3 +69,38 @@ fn loader_rejects_zero_size_atlas() {
         "frames":[{"direction":0,"rect":[0,0,8,8],"anchor":[5,9]}]}"#;
     assert!(parse_manifest(bad).is_err(), "a zero-size atlas must be rejected");
 }
+
+#[test]
+fn reference_multistate_character_is_engine_loadable() {
+    // R5: the multi-state, tight-cropped character loads; the loader validates full
+    // (state,direction,frame_index) coverage and builds the DEFAULT state's frame 0 per dir.
+    let json = manifest("../reference/humanoid_anim/manifest.json");
+    let s = parse_manifest(&json).expect("engine must accept the multi-state character");
+    assert_eq!(s.variant.directions, 16);
+    assert_eq!(s.variant.frames.len(), 16, "default-state frame 0 per direction");
+    assert_eq!(s.variant.default_state, "idle");
+    assert_eq!(s.variant.states, vec!["idle".to_string(), "walk".to_string()]);
+    assert!(s.variant.metrics.eye_height_world.unwrap() <= s.variant.metrics.height_world);
+}
+
+#[test]
+fn loader_rejects_multistate_coverage_gap() {
+    // walk declares 2 frames/direction but only frame_index 0 is supplied -> reject.
+    let bad = r#"{"camera":{"id":"game_iso_v1"},"variant_class":"character","direction_count":1,
+        "frame_canvas":[10,10],"atlases":{"color":{"path":"c.png","size":[100,100]}},
+        "default_state":"walk","animations":{"walk":{"directions":1,"frames":2,"playback":"loop"}},
+        "world_metrics":{"height_world":1.0,"footprint_radius_world":0.2},
+        "frames":[{"state":"walk","direction":0,"frame_index":0,"rect":[0,0,8,8],"anchor":[5,9]}]}"#;
+    assert!(parse_manifest(bad).is_err(), "incomplete frame_index coverage must be rejected");
+}
+
+#[test]
+fn loader_rejects_anim_direction_mismatch() {
+    // animations.idle.directions (2) != direction_count (1) -> reject.
+    let bad = r#"{"camera":{"id":"game_iso_v1"},"variant_class":"character","direction_count":1,
+        "frame_canvas":[10,10],"atlases":{"color":{"path":"c.png","size":[100,100]}},
+        "animations":{"idle":{"directions":2,"frames":1,"playback":"loop"}},
+        "world_metrics":{"height_world":1.0,"footprint_radius_world":0.2},
+        "frames":[{"state":"idle","direction":0,"frame_index":0,"rect":[0,0,8,8],"anchor":[5,9]}]}"#;
+    assert!(parse_manifest(bad).is_err(), "animations.directions != direction_count must be rejected");
+}

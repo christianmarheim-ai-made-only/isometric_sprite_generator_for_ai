@@ -42,12 +42,12 @@
       "Blender camera and real rig-derived proxy rendering are deferred.",
       "Weapons/equipment/arms are deferred to M2A/M3 ADR review."
     ],
-    "generated_at_utc": "2026-06-05T05:10:33.317917+00:00",
+    "generated_at_utc": "2026-06-05T06:54:08.397671+00:00",
     "generator": "pipeline/tools/generate_arrow_pilot.py",
     "generator_mode": "deterministic_python_no_blender",
     "lockfile_hashes": {
       "sprite_contract.lock.json": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
-      "sprite_states.lock.json": "sha256:724e3fc3dd0fe9dbcdb6849729fa9a7bff2d013a53488f62baf5c416202ec8d1",
+      "sprite_states.lock.json": "sha256:bc80ffa1a6ff54822e5cd2f5d5092dabbbb09031301522a2bf0eda953a3d67ba",
       "sprite_variants.lock.json": "sha256:eb9a206bbab46887b2203cf91819f293a0fc340adfeb52da18c8338587268bd1"
     }
   },
@@ -1099,7 +1099,7 @@
     }
   ],
   "manifest_version": "sprite_manifest_debug_subset_v1",
-  "state_contract_version": "sprite_states_debug_v1",
+  "state_contract_version": "sprite_states_multistate_v1",
   "surface_policy": {
     "equipment_surface_policy": "not_exercised_in_m1_m2_arrow_pilot",
     "mask_semantics": "debug_single_foreground_region; see ADR-0015",

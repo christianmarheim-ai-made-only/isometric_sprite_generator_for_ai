@@ -1,13 +1,19 @@
-//! Engine sprite-manifest LOADER, vendored from the engine's
-//! `crates/client_bevy/src/sprite.rs::parse_manifest` (the parse path only), reduced to
-//! the `std` + `serde` subset (no Bevy, no `sim`) so the pipeline can run the REAL engine
-//! accept/reject logic in CI. KEEP IN SYNC with the engine `parse_manifest`.
+//! Engine sprite-manifest LOADER, vendored/extended from the engine
+//! `crates/client_bevy/src/sprite.rs::parse_manifest`, reduced to std+serde (no Bevy/sim).
 //!
-//! The engine consumes a minimal subset (camera.id, direction_count, frame_canvas,
-//! atlases.color, one `{direction, rect, anchor}` frame per direction, world_metrics) and
-//! ignores every other field, so this accepts both the minimal bake manifest and the rich
-//! arrow-pilot manifest. NOTE the load-bearing constraint: `frames.len() == direction_count`
-//! (one frame per direction) — there is no multi-state/animation support in the loader yet.
+//! Implements BOTH:
+//!  - the CURRENT engine single-state contract (one `{direction, rect, anchor}` frame per
+//!    direction; `frames.len() == direction_count`), mirroring the shipped `parse_manifest`; AND
+//!  - the multi-state + tight-crop contract (multistate_sprite_contract.md): a top-level
+//!    `animations` map + per-frame `(state, frame_index)` + `default_state`, tight `rect` +
+//!    `trim` + `logical_frame_canvas`, logical-coords `anchor`. MIN engine behavior: validate
+//!    coverage and load the DEFAULT state's frame 0 per direction.
+//!
+//! Backward-compatible: a manifest with no `animations` loads exactly as the shipped engine
+//! does. The multi-state half is the reference for the pending engine loader slice; the
+//! single-state half mirrors the shipped engine. KEEP IN SYNC with the engine.
+
+use std::collections::BTreeMap;
 
 use serde::Deserialize;
 
@@ -28,20 +34,14 @@ impl WorldMetrics {
             return Err(format!("height_world must be > 0 (got {})", self.height_world));
         }
         if !(self.footprint_radius_world > 0.0) {
-            return Err(format!(
-                "footprint_radius_world must be > 0 (got {})",
-                self.footprint_radius_world
-            ));
+            return Err(format!("footprint_radius_world must be > 0 (got {})", self.footprint_radius_world));
         }
         if let Some(eye) = self.eye_height_world {
             if !(eye > 0.0) {
                 return Err(format!("eye_height_world must be > 0 (got {eye})"));
             }
             if eye > self.height_world {
-                return Err(format!(
-                    "eye_height_world ({eye}) must be <= height_world ({})",
-                    self.height_world
-                ));
+                return Err(format!("eye_height_world ({eye}) must be <= height_world ({})", self.height_world));
             }
         }
         Ok(())
@@ -64,8 +64,12 @@ pub struct SpriteVariant {
     pub directions: usize,
     pub atlas_w: u32,
     pub atlas_h: u32,
+    /// The DEFAULT state's frame 0, one per direction (MIN engine behavior).
     pub frames: Vec<FrameDef>,
     pub metrics: WorldMetrics,
+    /// All animation state names (sorted). A single-state manifest yields `["idle"]`.
+    pub states: Vec<String>,
+    pub default_state: String,
 }
 
 pub struct LoadedSprite {
@@ -92,6 +96,17 @@ struct FrameEntry {
     direction: usize,
     rect: [u32; 4],
     anchor: [f32; 2],
+    #[serde(default)]
+    state: Option<String>,
+    #[serde(default)]
+    frame_index: Option<usize>,
+}
+#[derive(Deserialize)]
+struct AnimDef {
+    directions: usize,
+    frames: usize,
+    #[serde(default)]
+    playback: String,
 }
 #[derive(Deserialize)]
 struct WorldMetricsDef {
@@ -113,71 +128,51 @@ struct ManifestDef {
     frames: Vec<FrameEntry>,
     #[serde(default)]
     world_metrics: Option<WorldMetricsDef>,
+    #[serde(default)]
+    animations: Option<BTreeMap<String, AnimDef>>,
+    #[serde(default)]
+    default_state: Option<String>,
+    #[serde(default)]
+    logical_frame_canvas: Option<[u32; 2]>,
 }
 
-/// Parse + validate a `game_iso_v1` manifest exactly as the engine loader does.
+/// Parse + validate a `game_iso_v1` manifest (single-state or multi-state).
 pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
     let m: ManifestDef = serde_json::from_str(json).map_err(|e| format!("manifest JSON: {e}"))?;
     if m.camera.id != FORMAT_ID {
         return Err(format!("camera.id must be \"{FORMAT_ID}\" (got \"{}\")", m.camera.id));
     }
-    if m.direction_count == 0 {
+    let dc = m.direction_count;
+    if dc == 0 {
         return Err("direction_count must be > 0".to_string());
     }
     let [fcw, fch] = m.frame_canvas;
     if fcw == 0 || fch == 0 {
         return Err("frame_canvas dimensions must be > 0".to_string());
     }
-    if m.frames.len() != m.direction_count {
-        return Err(format!(
-            "frames ({}) must equal direction_count ({})",
-            m.frames.len(),
-            m.direction_count
-        ));
-    }
-    // Atlas dimensions, parsed up front so each frame's rect can be bounds-checked below.
     let [aw, ah] = m.atlases.color.size;
     if aw == 0 || ah == 0 {
         return Err("atlases.color.size dimensions must be > 0".to_string());
     }
-    let mut slots: Vec<Option<FrameDef>> = vec![None; m.direction_count];
+    // Every frame's rect: nonzero + within the atlas (u64 avoids overflow on a hostile rect).
     for fr in &m.frames {
-        if fr.direction >= m.direction_count {
-            return Err(format!(
-                "frame.direction {} out of range 0..{}",
-                fr.direction, m.direction_count
-            ));
-        }
         let [x, y, w, h] = fr.rect;
         if w == 0 || h == 0 {
-            return Err(format!("frame {} has a zero-size rect", fr.direction));
+            return Err(format!("frame (dir {}) has a zero-size rect", fr.direction));
         }
-        // The rect must lie within the declared atlas, else Bevy's TextureAtlasLayout
-        // clamps it or samples padding/garbage. (u64 avoids u32 overflow on a hostile rect.)
         if x as u64 + w as u64 > aw as u64 || y as u64 + h as u64 > ah as u64 {
-            return Err(format!(
-                "frame {} rect [{x}, {y}, {w}, {h}] exceeds the atlas {aw}x{ah}",
-                fr.direction
-            ));
+            return Err(format!("frame (dir {}) rect [{x}, {y}, {w}, {h}] exceeds the atlas {aw}x{ah}", fr.direction));
         }
-        if slots[fr.direction].is_some() {
-            return Err(format!("duplicate frame for direction {}", fr.direction));
-        }
-        slots[fr.direction] = Some(FrameDef {
-            direction: fr.direction,
-            x,
-            y,
-            w,
-            h,
-            anchor_x: fr.anchor[0] / fcw as f32,
-            anchor_y: fr.anchor[1] / fch as f32,
-        });
     }
-    let frames: Vec<FrameDef> = slots
-        .into_iter()
-        .enumerate()
-        .map(|(i, f)| f.ok_or_else(|| format!("missing frame for direction {i}")))
-        .collect::<Result<_, _>>()?;
+
+    // Anchor is expressed in LOGICAL frame coordinates (== frame_canvas when uncropped).
+    let [lw, lh] = m.logical_frame_canvas.unwrap_or(m.frame_canvas);
+    let (lw, lh) = (lw as f32, lh as f32);
+
+    let (frames, states, default_state) = match &m.animations {
+        Some(anims) if !anims.is_empty() => build_multistate(&m, anims, dc, lw, lh)?,
+        _ => (build_single(&m, dc, lw, lh)?, vec!["idle".to_string()], "idle".to_string()),
+    };
 
     let metrics = if m.variant_class == "probe" {
         WorldMetrics {
@@ -206,14 +201,107 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
     };
 
     Ok(LoadedSprite {
-        variant: SpriteVariant {
-            directions: m.direction_count,
-            atlas_w: aw,
-            atlas_h: ah,
-            frames,
-            metrics,
-        },
+        variant: SpriteVariant { directions: dc, atlas_w: aw, atlas_h: ah, frames, metrics, states, default_state },
         atlas: m.atlases.color.path,
         name: m.variant_id,
     })
+}
+
+/// Legacy single-state: exactly one frame per direction (the shipped engine rule).
+fn build_single(m: &ManifestDef, dc: usize, lw: f32, lh: f32) -> Result<Vec<FrameDef>, String> {
+    if m.frames.len() != dc {
+        return Err(format!("frames ({}) must equal direction_count ({dc})", m.frames.len()));
+    }
+    let mut slots: Vec<Option<FrameDef>> = vec![None; dc];
+    for fr in &m.frames {
+        if fr.direction >= dc {
+            return Err(format!("frame.direction {} out of range 0..{dc}", fr.direction));
+        }
+        if slots[fr.direction].is_some() {
+            return Err(format!("duplicate frame for direction {}", fr.direction));
+        }
+        slots[fr.direction] = Some(frame_def(fr, lw, lh));
+    }
+    slots.into_iter().enumerate().map(|(i, f)| f.ok_or_else(|| format!("missing frame for direction {i}"))).collect()
+}
+
+/// Multi-state contract: validate full `(state, direction, frame_index)` coverage and return
+/// the default state's frame 0 per direction.
+fn build_multistate(
+    m: &ManifestDef,
+    anims: &BTreeMap<String, AnimDef>,
+    dc: usize,
+    lw: f32,
+    lh: f32,
+) -> Result<(Vec<FrameDef>, Vec<String>, String), String> {
+    for (state, a) in anims {
+        if a.directions != dc {
+            return Err(format!("animations.{state}.directions ({}) must equal direction_count ({dc})", a.directions));
+        }
+        if a.frames == 0 {
+            return Err(format!("animations.{state}.frames must be > 0"));
+        }
+        if !matches!(a.playback.as_str(), "loop" | "once" | "hold") {
+            return Err(format!("animations.{state}.playback must be loop|once|hold (got {:?})", a.playback));
+        }
+    }
+    let default_state = match &m.default_state {
+        Some(ds) => {
+            if !anims.contains_key(ds) {
+                return Err(format!("default_state {ds:?} is not an animations key"));
+            }
+            ds.clone()
+        }
+        None => {
+            if anims.contains_key("idle") {
+                "idle".to_string()
+            } else {
+                anims.keys().next().expect("non-empty animations").clone()
+            }
+        }
+    };
+
+    // coverage[(state, direction)] = bitset over frame_index 0..frames-1
+    let mut covered: BTreeMap<(&str, usize), Vec<bool>> = BTreeMap::new();
+    for (state, a) in anims {
+        for d in 0..dc {
+            covered.insert((state.as_str(), d), vec![false; a.frames]);
+        }
+    }
+    let mut default_frames: Vec<Option<FrameDef>> = vec![None; dc];
+    for fr in &m.frames {
+        let state = fr.state.as_deref().ok_or("multi-state frame missing `state`")?;
+        let a = anims.get(state).ok_or_else(|| format!("frame references unknown state {state:?}"))?;
+        let fi = fr.frame_index.ok_or_else(|| format!("frame ({state}) missing `frame_index`"))?;
+        if fr.direction >= dc {
+            return Err(format!("frame ({state}) direction {} out of range 0..{dc}", fr.direction));
+        }
+        if fi >= a.frames {
+            return Err(format!("frame ({state}, dir {}) frame_index {fi} out of range 0..{}", fr.direction, a.frames));
+        }
+        let slot = covered.get_mut(&(state, fr.direction)).expect("seeded");
+        if slot[fi] {
+            return Err(format!("duplicate frame ({state}, dir {}, f{fi})", fr.direction));
+        }
+        slot[fi] = true;
+        if state == default_state && fi == 0 {
+            default_frames[fr.direction] = Some(frame_def(fr, lw, lh));
+        }
+    }
+    for ((state, d), got) in &covered {
+        if got.iter().any(|b| !b) {
+            return Err(format!("state {state:?} dir {d}: incomplete frame_index coverage"));
+        }
+    }
+    let frames: Vec<FrameDef> = default_frames
+        .into_iter()
+        .enumerate()
+        .map(|(d, f)| f.ok_or_else(|| format!("missing default-state \"{default_state}\" frame 0 for direction {d}")))
+        .collect::<Result<_, _>>()?;
+    Ok((frames, anims.keys().cloned().collect(), default_state))
+}
+
+fn frame_def(fr: &FrameEntry, lw: f32, lh: f32) -> FrameDef {
+    let [x, y, w, h] = fr.rect;
+    FrameDef { direction: fr.direction, x, y, w, h, anchor_x: fr.anchor[0] / lw, anchor_y: fr.anchor[1] / lh }
 }

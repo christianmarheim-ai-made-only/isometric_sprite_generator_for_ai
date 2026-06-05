@@ -28,7 +28,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 import meshes  # noqa: E402
-from render3d import render_directions, ground_screen_direction  # noqa: E402
+from render3d import render_directions, ground_screen_direction, compute_fit  # noqa: E402
 from gate_engine_accept import engine_accept  # noqa: E402
 from measure_metrics import compute_world_metrics  # noqa: E402
 
@@ -74,6 +74,35 @@ def pack_region(frames, canvas, pad=PAD):
     extrusion keeps region ids discrete -- no anti-aliased in-between values)."""
     from PIL import Image as _Image
     return _pack([_Image.fromarray(fr.region, "L") for fr in frames], canvas, "L", pad)
+
+
+def shelf_place(sizes, max_w=2048, pad=PAD):
+    """Shelf/row bin-pack variable-size TIGHT frames -> (placements, atlas_size)."""
+    x = y = pad
+    row_h = 0
+    width = pad
+    placements = []
+    for (w, h) in sizes:
+        if x + w + pad > max_w and x > pad:
+            x = pad
+            y += row_h + pad
+            row_h = 0
+        placements.append((x, y))
+        x += w + pad
+        row_h = max(row_h, h)
+        width = max(width, x)
+    return placements, (width + pad, y + row_h + pad)
+
+
+def place_into(images, placements, atlas_size, mode, pad=PAD):
+    """Place images at given placements into one atlas (color + mask share placements ->
+    mask_rect == rect)."""
+    atlas = Image.new(mode, atlas_size, (0, 0, 0, 0) if mode == "RGBA" else 0)
+    rects = []
+    for im, (x, y) in zip(images, placements):
+        _extrude_paste(atlas, im, x, y, pad)
+        rects.append([x, y, im.size[0], im.size[1]])
+    return atlas, rects
 
 
 def bake(mesh: str, out: Path, canvas_px: int = 256, variant_id: str | None = None) -> dict:
@@ -190,9 +219,97 @@ def bake_character(out: Path, canvas_px: int = 256, variant_id: str = "humanoid_
     return manifest
 
 
+def bake_character_anim(out: Path, canvas_px: int = 256, variant_id: str = "humanoid_anim") -> dict:
+    """Bake a MULTI-STATE, TIGHT-CROPPED humanoid (R5A + R5B) per multistate_sprite_contract.md:
+    a top-level `animations` map + per-frame `(state, direction, frame_index)` + `default_state`,
+    with tight `rect` + `trim` + `logical_frame_canvas` and a logical-coords `anchor`. One render
+    scale across every frame (no resize); the root anchor is constant (root-XY stable)."""
+    out.mkdir(parents=True, exist_ok=True)
+    canvas = (canvas_px, canvas_px)
+    states = json.loads((PIPELINE_ROOT / "lockfiles" / "sprite_states.lock.json").read_text(encoding="utf-8"))["states"]
+
+    swing = 0.35
+    posed = {}
+    for state, spec in states.items():
+        for fi in range(spec["frames"]):
+            ang = swing * math.sin(2 * math.pi * fi / spec["frames"]) if state == "walk" else 0.0
+            posed[(state, fi)] = meshes.humanoid(leg_swing=ang, arm_swing=ang)
+    rest_verts = meshes.humanoid()[0]
+    fit = compute_fit([v for (v, _, _) in posed.values()], n=DIRS, canvas=canvas)
+
+    color_imgs, region_imgs, fmeta = [], [], []
+    for (state, fi), (verts, faces, region) in sorted(posed.items()):
+        frames = render_directions(verts, faces, n=DIRS, canvas=canvas, face_region=region, fit=fit)
+        for d, fr in enumerate(frames):
+            bx, by, bw, bh = fr.bbox
+            color_imgs.append(fr.rgba.crop((bx, by, bx + bw, by + bh)))
+            region_imgs.append(Image.fromarray(fr.region[by:by + bh, bx:bx + bw], "L"))
+            fmeta.append((state, d, fi, [bx, by], (round(fr.anchor[0], 3), round(fr.anchor[1], 3))))
+
+    placements, atlas_size = shelf_place([im.size for im in color_imgs])
+    color_atlas, rects = place_into(color_imgs, placements, atlas_size, "RGBA")
+    mask_atlas, _ = place_into(region_imgs, placements, atlas_size, "L")
+    color_atlas.save(out / "color_atlas.png")
+    mask_atlas.save(out / "hitmask_atlas.png")
+
+    height = float(rest_verts[:, 2].max())
+    z_floor = float(rest_verts[:, 2].min())
+    ground = rest_verts[rest_verts[:, 2] <= z_floor + 0.15 * height]
+    foot_r = float(np.max(np.abs(ground[:, :2])))
+    metrics = compute_world_metrics((-foot_r, -foot_r, 0.0), (foot_r, foot_r, height),
+                                    eye_z=round(height * 0.9, 4))
+
+    tip_len = canvas_px * 0.1
+    manifest_frames, expected = [], []
+    for (state, d, fi, trim, (ax, ay)), rect in zip(fmeta, rects):
+        yaw = d * (2 * math.pi / DIRS)
+        sdv = [round(v, 6) for v in ground_screen_direction(yaw).tolist()]
+        manifest_frames.append({
+            "state": state, "direction": d, "frame_index": fi,
+            "rect": rect, "mask_rect": rect, "trim": trim, "logical_frame_canvas": list(canvas),
+            "anchor": [ax, ay], "world_yaw_degrees": round(math.degrees(yaw), 6),
+            "screen_direction_vector": sdv,
+            "sockets": {"origin": [ax, ay],
+                        "direction_tip": [round(ax + sdv[0] * tip_len, 3), round(ay + sdv[1] * tip_len, 3)]},
+        })
+        if state == "idle" and fi == 0:
+            expected.append({"direction": d, "world_yaw_degrees": round(math.degrees(yaw), 6),
+                             "screen_direction_vector": sdv})
+
+    animations = {s: {"directions": DIRS, "fps": spec["fps"], "frames": spec["frames"],
+                      "playback": spec["playback"]} for s, spec in states.items()}
+    manifest = {
+        "manifest_version": "sprite_manifest_multistate_v1",
+        "camera": {"id": "game_iso_v1", "azimuth_degrees": 45, "camera_elevation_degrees": 30,
+                   "projection": "orthographic_pixel_iso_dimetric_2_to_1", "screen_y": "down",
+                   "tile_px": [64, 32]},
+        "variant_id": variant_id,
+        "variant_class": "character",
+        "direction_count": DIRS,
+        "frame_canvas": list(canvas),
+        "logical_frame_canvas": list(canvas),
+        "default_state": "idle",
+        "animations": animations,
+        "atlases": {
+            "color": {"path": "color_atlas.png", "size": list(color_atlas.size)},
+            "hitmask": {"path": "hitmask_atlas.png", "size": list(mask_atlas.size),
+                        "format": "PNG_R8_UINT_linear_no_antialias", "sampling": "nearest",
+                        "palette": {"none": 0, "head": 1, "torso": 2, "arms": 3, "legs": 4}},
+        },
+        "frames": manifest_frames,
+        "expected_facing": expected,
+        "world_metrics": metrics,
+        "build": {"generator": "pipeline/tools/bake.py", "mesh": "humanoid",
+                  "renderer": "render3d_software", "states": sorted(states)},
+    }
+    (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (out / "expected_facing_table.json").write_text(json.dumps(expected, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return manifest
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Bake a procedural mesh into an engine-shaped package.")
-    ap.add_argument("--mesh", choices=list(MESHES) + ["humanoid"], default="cube")
+    ap.add_argument("--mesh", choices=list(MESHES) + ["humanoid", "humanoid_anim"], default="cube")
     ap.add_argument("--variant-id", default=None)
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--canvas", type=int, default=256)
@@ -201,6 +318,10 @@ def main() -> int:
         variant_id = args.variant_id or "humanoid_ref"
         out = (args.out or (PIPELINE_ROOT / "output" / variant_id)).resolve()
         manifest = bake_character(out, args.canvas, variant_id)
+    elif args.mesh == "humanoid_anim":
+        variant_id = args.variant_id or "humanoid_anim"
+        out = (args.out or (PIPELINE_ROOT / "output" / variant_id)).resolve()
+        manifest = bake_character_anim(out, args.canvas, variant_id)
     else:
         variant_id = args.variant_id or f"{args.mesh}_probe"
         out = (args.out or (PIPELINE_ROOT / "output" / variant_id)).resolve()

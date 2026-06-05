@@ -112,7 +112,20 @@ def _rasterize(p2d, depth, faces, face_shade, w, h, face_region=None):
     return color, region
 
 
-def render_directions(verts, faces, n=16, canvas=(256, 256), margin=16, light=None, face_region=None):
+def compute_fit(verts_list, n=16, canvas=(256, 256), margin=16):
+    """Common (scale, ox, oy) over MANY meshes' n directions, so multi-state/multi-frame
+    bakes share ONE world->pixel scale + foot anchor (the character never resizes, and the
+    logical frame consistently maps to world height)."""
+    w, h = canvas
+    raws = []
+    for verts in verts_list:
+        v = np.asarray(verts, dtype=float)
+        for i in range(n):
+            raws.append(project_raw(rotate_z(v, i * (2 * math.pi / n)))[0])
+    return _fit(np.concatenate(raws, axis=0), w, h, margin)
+
+
+def render_directions(verts, faces, n=16, canvas=(256, 256), margin=16, light=None, face_region=None, fit=None):
     """Render `n` game_iso_v1 direction frames of a mesh. Returns a list of Frame.
 
     If `face_region` (one HIT region id per face) is given, each Frame also carries a
@@ -128,8 +141,9 @@ def render_directions(verts, faces, n=16, canvas=(256, 256), margin=16, light=No
         light = light / np.linalg.norm(light)
 
     rots = [rotate_z(verts, i * (2 * math.pi / n)) for i in range(n)]
-    all_raw = np.concatenate([project_raw(r)[0] for r in rots], axis=0)
-    s, ox, oy = _fit(all_raw, w, h, margin)
+    if fit is None:
+        fit = _fit(np.concatenate([project_raw(r)[0] for r in rots], axis=0), w, h, margin)
+    s, ox, oy = fit
 
     frames = []
     for r in rots:

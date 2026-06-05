@@ -17,9 +17,12 @@ blended mask value).
   (direction, rendered-pixel based; elevation/foreshortening). **R4 ✓** real-mesh humanoid +
   hit-proxy R8 hitmask + measured metrics. **R6 ✓** first reference character
   (`pipeline/reference/humanoid_ref/`) + a real `cargo` engine load-test (`bevy_reference`,
-  the vendored engine `parse_manifest` accept/reject). **R5** (multi-state animation,
-  tight-crop) is deferred — blocked on the engine (one frame per direction) + a frame-canvas
-  sizing decision. **R7 ✓** Blender production renderer (`pipeline/reference/humanoid_blender/`):
+  the vendored engine `parse_manifest` accept/reject). **R5 ✓** multi-state (`animations` +
+  per-frame `(state, frame_index)` + `default_state`) + tight-crop (`logical_frame_canvas` /
+  `rect` / `trim`) per **[docs/multistate_sprite_contract.md](docs/multistate_sprite_contract.md)** —
+  reference `pipeline/reference/humanoid_anim/` (idle + 4-frame walk), engine-loadable via the
+  multi-state reference loader, single-state stays loadable.
+  **R7 ✓** Blender production renderer (`pipeline/reference/humanoid_blender/`):
   the exact game_iso_v1 camera (render3d↔Blender parity 0.0), engine-loadable, same R8 hitmask. Plan:
   **[docs/build_plan_R1_R6_review.md](docs/build_plan_R1_R6_review.md)**.
 

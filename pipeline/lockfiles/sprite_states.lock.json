@@ -1,10 +1,20 @@
 {
-  "state_contract_version": "sprite_states_debug_v1",
+  "state_contract_version": "sprite_states_multistate_v1",
   "states": {
     "idle": {
       "directions": 16,
       "fps": 1,
       "frames": 1,
+      "playback": "loop",
+      "required_markers": [],
+      "required_sockets": [
+        "origin"
+      ]
+    },
+    "walk": {
+      "directions": 16,
+      "fps": 8,
+      "frames": 4,
       "playback": "loop",
       "required_markers": [],
       "required_sockets": [
