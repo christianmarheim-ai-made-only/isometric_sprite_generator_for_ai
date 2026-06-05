@@ -26,7 +26,7 @@ iteration (no weapons/equipment). Everything below is gated by
 ## A new STATE (e.g. run, jump, death)
 
 1. Declare it in `pipeline/lockfiles/sprite_states.lock.json`: `directions` (== `direction_count`),
-   `frames` (per direction), `fps`, `playback` (`loop` | `once` | `hold`). The engine reads
+   `frames` (per direction), `fps`, `playback` (`loop` | `once`). The engine reads
    whatever `animations` declares — there is no engine-side state list to edit.
 2. Add its pose in `bake.bake_character_anim` (how the limbs move per `frame_index`; the root stays
    fixed so the foot anchor is stable — root-XY stability is gated).

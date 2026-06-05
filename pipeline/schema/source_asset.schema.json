@@ -67,7 +67,7 @@
         "properties": {
           "state": {"type": "string", "minLength": 1},
           "frames": {"type": "integer", "minimum": 1},
-          "playback": {"type": "string", "enum": ["loop", "once", "hold"]},
+          "playback": {"type": "string", "enum": ["loop", "once"]},
           "clip": {"type": ["string", "null"]},
           "directional": {"type": "boolean"}
         }

@@ -4,7 +4,16 @@
 A model producer authors **none** of it; it documents what comes back. (Producers deliver a
 `*.asset.json` — see `external_asset_contract.md`.)
 
-**Status:** engine *consumption* designed (verified against the current loader). This is the
+**Status:** ✅ **LANDED** — the engine multi-state loader shipped (engine **ADR-044**, Arc 5; the
+amended `docs/pipeline/manifest.schema.json` is the contract to target). The engine now plays our
+clips on a real-time frame timer, selected from disclosed entity state; the reference loader here is
+backstopped by the real engine. Keep emitting the `animations` block + per-frame `state`/`frame_index`
+— the engine consumes exactly that. Frame key = **(state, frame_index, direction)**. Canonical clip
+names that "light up": `idle` (required + fallback), `walk`, `crouch_idle`, `crouch_walk`, `jump`,
+`fall`, `hit`, + future `punch`/`death` (ADR-040/041). Atlas **paging is NOT engine-consumed yet**
+(TASK-018, deferred — emit single-page for engine playback).
+
+**(historical)** engine *consumption* designed (verified against the current loader). This is the
 contract the pipeline emits to **now** so R5/R5A can proceed; the engine loader implementation
 lands as a dedicated engine slice (its own branch). **Backward-compatible:** the single-state
 arrow probe loads byte-for-byte unchanged.
@@ -22,7 +31,7 @@ No new field names except one optional scalar. The engine will **consume**:
 **(A) Top-level `animations` map** (already emitted):
 ```json
 "animations": { "<state>": { "directions": <==direction_count>, "fps": <num>,
-                             "frames": <count per direction>, "playback": "loop|once|hold" } }
+                             "frames": <count per direction>, "playback": "loop|once" } }
 ```
 - `<state>` = the state key (`idle`, `walk`, `attack`, …); `frames` = animation-frame count for
   that state **per direction**; `directions` MUST equal top-level `direction_count`.
@@ -85,7 +94,7 @@ the single sizing/anchoring reference, the `rect` is just where the pixels live.
   state's frame 0** at the binned direction. A multi-state, tight-cropped manifest stops being
   rejected and renders (as its default pose) — you can emit + verify against the engine
   immediately.
-- **FULL (follow-up, same contract, no re-emit):** per-proxy animation clock (loop/once/hold over
+- **FULL (follow-up, same contract, no re-emit):** per-proxy animation clock (loop/once over
   `fps`) + a client-side state selector mapping sim signals (`z>0`→jump, motion→walk,
   stance→crouch, else default) to playback + state switching. No sim/`Entity` changes — state
   stays derived at the client edge.
@@ -94,8 +103,8 @@ the single sizing/anchoring reference, the `rect` is just where the pixels live.
 - The canonical **state set** + per-state `frames`/`fps`/`playback` live in your
   `sprite_states.lock.json` (hash-pinned, not vendored). The engine will **not** hardcode a state
   list — it reads whatever `animations` declares. Confirm names + counts there.
-- `playback` vocabulary = `{loop, once, hold}`; non-looping states (attack/death) **hold** the
-  terminal frame.
+- `playback` vocabulary = `{loop, once}` (engine ADR-044). `once` **holds the terminal frame** (the
+  engine's one-shot — hit/punch/death); `loop` wraps. There is no separate `hold`.
 - Per-state `directions` == top-level `direction_count` (engine rejects mismatches).
 - Whether you emit `default_state`, or guarantee `idle` is always present.
 - Tight-crop: emit `logical_frame_canvas` + per-frame `trim`; keep `anchor` in logical coords.

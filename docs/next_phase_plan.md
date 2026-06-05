@@ -13,10 +13,13 @@ model-authoring package (`dist/model_authoring_contract_v1.zip`, GO-reviewed).
 
 - **Open in-repo:** only task #21 — `generate_arrow_pilot.py` still emits a debug-subset
   `manifest_version` + a small `frame_canvas` vs the 256² production target.
-- **Blocked on the engine team (cannot fix here):** real multi-state **playback** (the shipped
-  engine loader is single-state, so our rich states are loaded-but-ignored — R6 proves the
-  *contract*, not playback) and R5B tight-crop of engine-consumed frames (needs an engine
-  `logical_frame_canvas` sizing field).
+- **UNBLOCKED (engine ADR-044 landed, Arc 5):** the engine multi-state loader shipped — it plays our
+  clips on a real-time frame timer, selected from disclosed entity state. Our multi-state packages
+  now animate in-engine (not only in the reference loader). We aligned to it: clip vocabulary
+  (`move`→`walk`; `idle/walk/crouch_idle/crouch_walk/jump/fall/hit` play now; `punch`/`death` load and
+  play when ADR-040/041 land) and `playback ∈ {loop, once}` (`once` holds the last frame — `hold`
+  removed). Still engine-side: R5B tight-crop (needs an engine `logical_frame_canvas` field) and
+  atlas paging consumption (TASK-018, deferred — emit single-page for engine playback).
 - **Next milestone:** M2A (weapons/equipment). Fully *reserved* in the contract, entirely unbuilt.
 
 ## 2. Housekeeping backlog (prioritized)
@@ -145,9 +148,10 @@ path, zero deps, emits AI-readable PNGs+JSON, leaves the locked iso render untou
   a runtime equipment-overlay (separate atlas + synced hardpoints + per-direction z-order flags)?
 - **D2 — `frame_canvas` target:** confirm 256² is the engine-facing logical canvas and that bumping
   it only needs a `contract_hash` regen (not a fixture rewrite beyond arrow-pilot smoke).
-- **D3 — Engine coordination (external):** is the multi-state engine loader slice scheduled, and
-  will the engine add a `logical_frame_canvas` field to unblock R5B tight-crop — or do
-  engine-consumed frames stay full-canvas permanently?
+- **D3 — Engine coordination (external):** ✅ multi-state loader LANDED (ADR-044) — packages play
+  in-engine. STILL OPEN: will the engine add a `logical_frame_canvas` field to unblock R5B tight-crop
+  (else engine-consumed frames stay full-canvas), and TASK-018 atlas paging consumption (deferred —
+  single-page only for engine playback today)?
 - **D4 — Mask semantics (ADR-0006):** when gear covers the torso, accept no-damage-there (single
   topmost mask), emit a **second body-damage mask**, or per-region passthrough engine-side?
 - **D5 — `manifest_version` convergence:** collapse the 4 strings into one schema with optional

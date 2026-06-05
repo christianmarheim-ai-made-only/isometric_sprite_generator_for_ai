@@ -46,7 +46,7 @@
         "type": "object",
         "required": ["playback", "directions", "frames", "fps"],
         "properties": {
-          "playback": {"type": "string", "enum": ["loop", "once", "hold"]},
+          "playback": {"type": "string", "enum": ["loop", "once"]},
           "directions": {"type": "integer", "enum": [1, 2, 4, 8, 16]},
           "frames": {"type": "integer", "minimum": 1},
           "fps": {"type": "number", "exclusiveMinimum": 0},

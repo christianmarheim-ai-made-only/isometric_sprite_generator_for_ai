@@ -147,8 +147,10 @@ read/write:
   job. (Prose-only rule; not enforced by tooling yet.)
 - **Naming → states:** clip names become animation states. Declare each in the manifest with
   `frames` (how many sprite frames to sample per direction), `fps`, and `playback`
-  (`loop` | `once` | `hold`). The pipeline samples the clip uniformly across its duration into
-  `frames` poses and renders 16 directions of each. `once`/`hold` are non-looping (attack/death);
+  (`loop` | `once`). The pipeline samples the clip uniformly across its duration into
+  `frames` poses and renders 16 directions of each. `once` is non-looping — the engine holds the last
+  frame (one-shot hit/punch/death). Clip names target the engine's canonical vocabulary
+  (idle/walk/crouch_idle/crouch_walk/jump/fall/hit + future punch/death; engine ADR-044);
   `loop` wraps. A state whose `clip` is **absent from the glb** renders the static rest pose (NOT an
   error) — so every declared clip must exist in the glb, or be embedded via `files.animation_clips`.
 - **Reuse:** because channels target bone **names**, the same clip plays on any mesh skinned to the
@@ -218,7 +220,7 @@ at bake). `crow.glb` reuses `sparrow`'s rig + animation — the reuse case.
 ## 9. Validation + acceptance
 
 Run `python pipeline/tools/lint_external_asset.py <variant>.asset.json`. It checks: schema (contract
-version, required fields, `archetype`/`forward`/`up`/`unit`, `playback ∈ {loop, once, hold}`,
+version, required fields, `archetype`/`forward`/`up`/`unit`, `playback ∈ {loop, once}`,
 `frames ≥ 1`), that declared files exist, `rig` matches a known profile NAME, `region_source` is
 supported, and — if `files.animation_clips` is present — that the `anim_clips_v1` JSON is valid.
 **lint does NOT open the glb:** bone-name coverage and clip existence are validated only at **bake

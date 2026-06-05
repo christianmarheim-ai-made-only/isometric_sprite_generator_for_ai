@@ -30,10 +30,10 @@
     "thigh.R": "legs", "shin.R": "legs", "foot.R": "legs"
   },
   "states": {
-    "_note": "Canonical biped COMBAT set for RIGGED variants (clips authored as anim_clips_v1 -- see examples/animation/combat_biped_anim.json + examples/grunt.asset.json). A variant MUST deliver `idle`; move/punch/death are the standard actions, all 16-direction. `death` uses playback `hold` so its FINAL frame is the held, non-animated corpse -- no separate dead state needed. A NO-RIG biped instead gets the simpler procedural set idle/walk/attack from bake.bake_character_anim. Extra states beyond this list are allowed.",
+    "_note": "Clip names target the ENGINE's canonical animation vocabulary (engine ADR-044: the multi-state loader plays clips from disclosed entity state; frame key = (state, frame_index, direction); playback loop|once where `once` HOLDS the last frame; `idle` is required + the universal fallback). PLAYABLE in-engine today: idle, walk, crouch_idle, crouch_walk, jump, fall, hit(once). FUTURE-TRIGGER (load now, play the instant the sim trigger lands): punch (== attack, gated on ADR-040), death (gated on ADR-041; plays once -> holds the dead pose). A NO-RIG biped instead gets the procedural idle/walk/attack from bake.bake_character_anim. Extra clip names load but only show if the engine selects them; a missing clip falls back to idle. Below = the combat subset we author today.",
     "idle":  { "required": true,  "frames": 1, "fps": 1,  "playback": "loop" },
-    "move":  { "required": false, "frames": 6, "fps": 10, "playback": "loop" },
+    "walk":  { "required": false, "frames": 6, "fps": 10, "playback": "loop" },
     "punch": { "required": false, "frames": 4, "fps": 12, "playback": "once" },
-    "death": { "required": false, "frames": 6, "fps": 10, "playback": "hold" }
+    "death": { "required": false, "frames": 6, "fps": 10, "playback": "once" }
   }
 }

@@ -9,9 +9,9 @@
   "default_state": "idle",
   "animations": {
     "idle":  { "clip": "idle",  "frames": 1, "fps": 1,  "playback": "loop" },
-    "move":  { "clip": "move",  "frames": 6, "fps": 10, "playback": "loop" },
+    "walk":  { "clip": "walk",  "frames": 6, "fps": 10, "playback": "loop" },
     "punch": { "clip": "punch", "frames": 4, "fps": 12, "playback": "once" },
-    "death": { "clip": "death", "frames": 6, "fps": 10, "playback": "hold" }
+    "death": { "clip": "death", "frames": 6, "fps": 10, "playback": "once" }
   },
-  "notes": "CANONICAL rigged biped combat-unit template. Clone per unit: swap files.mesh for your biped (skinned to biped_v1, materials named head/torso/arms/legs) and keep animation_clips -- the clips target bone NAMES so one combat_biped_anim.json drives every biped. death playback=hold means its final frame is the non-animated corpse. bake_asset.py embeds the clips and bakes in one command."
+  "notes": "CANONICAL rigged biped combat-unit template; clip names = engine ADR-044 vocabulary (walk plays now; punch/death play when the ADR-040/041 triggers land). Clone per unit: swap files.mesh for your biped (skinned to biped_v1, materials named head/torso/arms/legs) and keep animation_clips -- clips target bone NAMES so one combat_biped_anim.json drives every biped. death playback=once: the engine holds its final frame as the corpse. bake_asset.py embeds the clips and bakes in one command."
 }

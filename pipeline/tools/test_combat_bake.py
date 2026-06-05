@@ -39,8 +39,10 @@ def main() -> int:
         out = Path(td) / "grunt"
         m = bake_asset(PIPELINE_ROOT / "examples" / "grunt.asset.json", out)
         anims = m["animations"]
-        ok &= check("states are idle/move/punch/death", set(anims) == {"idle", "move", "punch", "death"})
-        ok &= check("death playback=hold (final frame is the held corpse)", anims["death"]["playback"] == "hold")
+        ok &= check("states are idle/walk/punch/death (engine ADR-044 vocabulary)",
+                    set(anims) == {"idle", "walk", "punch", "death"})
+        ok &= check("death playback=once (engine holds the final frame as the corpse)",
+                    anims["death"]["playback"] == "once")
 
         atlas = Image.open(out / "color_atlas.png").convert("RGBA")
 

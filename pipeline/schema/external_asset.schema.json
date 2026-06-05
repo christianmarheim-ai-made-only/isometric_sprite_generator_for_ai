@@ -52,7 +52,7 @@
           "clip": { "type": "string", "description": "glTF animation clip name embedded in the glb (defaults to the state key)" },
           "frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction (the same value as the matching anim_clips_v1 clip's `frames`)" },
           "fps": { "type": "number", "exclusiveMinimum": 0 },
-          "playback": { "enum": ["loop", "once", "hold"] }
+          "playback": { "enum": ["loop", "once"], "description": "loop wraps; once holds the last frame (engine ADR-044)" }
         }
       },
       "description": "state name -> clip sampling. The pipeline samples each named glb clip into `frames` poses x direction_count directions."

@@ -40,14 +40,14 @@ A small JSON. Schema: `pipeline/schema/animation_clips.schema.json`. Example:
   don't list stay at the bind pose** — a flap is just the two wing bones; everything else holds. (For
   the shipped rigs the major bones are axis-aligned at bind, so local ≈ world — verify per rig.)
 - **`frames`** — how many sprite frames to sample per direction. **`fps`** + **`playback`**
-  (`loop`/`once`/`hold`) carry the timing. These three map 1:1 to the asset manifest's `animations`
+  (`loop`/`once`; `once` holds the last frame) carry the timing. These three map 1:1 to the asset manifest's `animations`
   block (same field names). `duration_frames` is authoring-only.
 
 ### The rules that keep it valid
 
 - **Radians / metres**, matching the rig's rest orientation (forward +X, +Z up).
 - **States**: each rig profile's `states` block lists what a variant may deliver (required `idle` +
-  optional extras — biped `move`/`punch`/`death`, bird `fly`); whatever `clips` declares is what bakes.
+  optional extras — biped `walk`/`punch`/`death`, bird `fly`); whatever `clips` declares is what bakes.
 - **Reuse:** target bone **names** only. The same file animates `sparrow`, `crow`, … on `bird_v1`.
 
 ### Keyframe timeline & sampling (exact)
@@ -80,10 +80,10 @@ per bone and write a few keyframes — then iterate the numbers:
    you want, and pick `fps`/`playback`.
 4. Bake, look at it, adjust the angles. It is just numbers — iterate.
 
-A biped **`move`** (walk cycle), same idea — the full canonical combat library
-(`move`/`punch`/`death`) is `pipeline/examples/animation/combat_biped_anim.json`:
+A biped **`walk`** cycle, same idea — the full canonical combat library
+(`walk`/`punch`/`death`, clip names per engine ADR-044) is `pipeline/examples/animation/combat_biped_anim.json`:
 ```json
-"move": { "playback":"loop","frames":6,"fps":10,"duration_frames":8, "bones": {
+"walk": { "playback":"loop","frames":6,"fps":10,"duration_frames":8, "bones": {
   "thigh.L": { "rotation_euler": [[1,[ 0.5,0,0]],[5,[-0.5,0,0]],[9,[ 0.5,0,0]]] },
   "thigh.R": { "rotation_euler": [[1,[-0.5,0,0]],[5,[ 0.5,0,0]],[9,[-0.5,0,0]]] },
   "arm.L":   { "rotation_euler": [[1,[-0.4,0,0]],[5,[ 0.4,0,0]],[9,[-0.4,0,0]]] },

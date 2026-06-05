@@ -365,8 +365,8 @@ fn build_multistate(m: &ManifestDef, anims: &BTreeMap<String, AnimDef>, dc: usiz
         if a.frames == 0 {
             return Err(format!("animations.{state}.frames must be > 0"));
         }
-        if !matches!(a.playback.as_str(), "loop" | "once" | "hold") {
-            return Err(format!("animations.{state}.playback must be loop|once|hold (got {:?})", a.playback));
+        if !matches!(a.playback.as_str(), "loop" | "once") {
+            return Err(format!("animations.{state}.playback must be loop|once (got {:?})", a.playback));
         }
     }
     let default_state = match &m.default_state {

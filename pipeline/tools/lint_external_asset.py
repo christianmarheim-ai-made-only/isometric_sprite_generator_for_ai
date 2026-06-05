@@ -66,8 +66,8 @@ def lint(path: Path, check_files: bool = True) -> list[str]:
               "only material_name bakes today.")
 
     for state, spec in (asset.get("animations") or {}).items():
-        if spec.get("playback") not in ("loop", "once", "hold"):
-            errs.append(f"animations.{state}.playback must be loop|once|hold")
+        if spec.get("playback") not in ("loop", "once"):
+            errs.append(f"animations.{state}.playback must be loop|once")
         if not (isinstance(spec.get("frames"), int) and spec["frames"] >= 1):
             errs.append(f"animations.{state}.frames must be an integer >= 1")
     return errs

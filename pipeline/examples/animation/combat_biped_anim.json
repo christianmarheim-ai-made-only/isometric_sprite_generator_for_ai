@@ -1,10 +1,10 @@
 {
   "anim_spec_version": "anim_clips_v1",
   "rig": "biped_v1",
-  "notes": "Canonical biped combat clips authored as text, targeting biped_v1 bone names so this ONE file drives every biped variant. idle = bind pose; move = walk cycle (contralateral anti-phase legs+arms); punch = right jab (plays once); death = collapse forward, playback `hold` so the final frame is the held corpse (no separate dead state).",
+  "notes": "Canonical biped combat clips authored as text, targeting biped_v1 bone names so this ONE file drives every biped variant. Clip names = the engine's ADR-044 vocabulary. idle = bind pose; walk = walk cycle (contralateral anti-phase legs+arms; engine plays it now); punch = right jab (once); death = collapse forward, playback `once` so the engine holds the final frame as the corpse (punch/death play when the ADR-040/041 triggers land).",
   "clips": {
     "idle": { "playback": "loop", "frames": 1, "fps": 1, "duration_frames": 1, "bones": {} },
-    "move": {
+    "walk": {
       "playback": "loop", "frames": 6, "fps": 10, "duration_frames": 8,
       "bones": {
         "thigh.L":   { "rotation_euler": [[1, [0.5, 0, 0]], [5, [-0.5, 0, 0]], [9, [0.5, 0, 0]]] },
@@ -25,7 +25,7 @@
       }
     },
     "death": {
-      "playback": "hold", "frames": 6, "fps": 10, "duration_frames": 6,
+      "playback": "once", "frames": 6, "fps": 10, "duration_frames": 6,
       "bones": {
         "hips":    { "rotation_euler": [[1, [0, 0, 0]], [6, [1.3, 0, 0]]] },
         "spine":   { "rotation_euler": [[1, [0, 0, 0]], [6, [0.5, 0, 0]]] },

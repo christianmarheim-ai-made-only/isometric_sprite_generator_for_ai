@@ -41,7 +41,7 @@
         "additionalProperties": false,
         "required": ["playback", "frames", "fps", "duration_frames"],
         "properties": {
-          "playback": { "enum": ["loop", "once", "hold"] },
+          "playback": { "enum": ["loop", "once"], "description": "loop wraps; once holds the last frame (one-shot: hit/punch/death) -- engine ADR-044 vocabulary" },
           "frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction; equals the asset.json animations[state].frames" },
           "fps": { "type": "number", "exclusiveMinimum": 0 },
           "duration_frames": { "type": "integer", "minimum": 1, "description": "length of the 1-based authoring timeline the clip is sampled across; authoring-only, NOT carried into the asset manifest" },
