@@ -47,7 +47,7 @@ A small JSON. Schema: `pipeline/schema/animation_clips.schema.json`. Example:
 
 - **Radians / metres**, matching the rig's rest orientation (forward +X, +Z up).
 - **States**: each rig profile's `states` block lists what a variant may deliver (required `idle` +
-  optional extras — biped `walk`/`attack`, bird `fly`); whatever `clips` declares is what bakes.
+  optional extras — biped `move`/`punch`/`death`, bird `fly`); whatever `clips` declares is what bakes.
 - **Reuse:** target bone **names** only. The same file animates `sparrow`, `crow`, … on `bird_v1`.
 
 ### Keyframe timeline & sampling (exact)
@@ -80,15 +80,17 @@ per bone and write a few keyframes — then iterate the numbers:
    you want, and pick `fps`/`playback`.
 4. Bake, look at it, adjust the angles. It is just numbers — iterate.
 
-A biped walk, same idea:
+A biped **`move`** (walk cycle), same idea — the full canonical combat library
+(`move`/`punch`/`death`) is `pipeline/examples/animation/combat_biped_anim.json`:
 ```json
-"walk": { "playback":"loop","frames":4,"fps":8,"duration_frames":8, "bones": {
-  "thigh.L": { "rotation_euler": [[1,[ 0.5,0,0]],[5,[-0.5,0,0]]] },
-  "thigh.R": { "rotation_euler": [[1,[-0.5,0,0]],[5,[ 0.5,0,0]]] },
-  "arm.L":   { "rotation_euler": [[1,[-0.4,0,0]],[5,[ 0.4,0,0]]] },
-  "arm.R":   { "rotation_euler": [[1,[ 0.4,0,0]],[5,[-0.4,0,0]]] }
+"move": { "playback":"loop","frames":6,"fps":10,"duration_frames":8, "bones": {
+  "thigh.L": { "rotation_euler": [[1,[ 0.5,0,0]],[5,[-0.5,0,0]],[9,[ 0.5,0,0]]] },
+  "thigh.R": { "rotation_euler": [[1,[-0.5,0,0]],[5,[ 0.5,0,0]],[9,[-0.5,0,0]]] },
+  "arm.L":   { "rotation_euler": [[1,[-0.4,0,0]],[5,[ 0.4,0,0]],[9,[-0.4,0,0]]] },
+  "arm.R":   { "rotation_euler": [[1,[ 0.4,0,0]],[5,[-0.4,0,0]],[9,[ 0.4,0,0]]] }
 }}
 ```
+Keys 1 and 9 share a pose so the cycle closes seamlessly (half-open sampling skips frame 9).
 
 ---
 

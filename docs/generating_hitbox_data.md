@@ -50,7 +50,7 @@ Two rules that matter:
 - **Footprint = ground contact, not the widest cross-section.** Use only the verts near the floor
   (`z <= zmin + 0.15*(zmax−zmin)`, with `zmin=0` after normalizing). An out-flung arm or a wing must **not** inflate the collision radius — the
   capsule is what the body stands in, not its silhouette. (See
-  [`world_metrics_policy.md`](world_metrics_policy.md).)
+  the world-metrics policy, `docs/world_metrics_policy.md` in the pipeline repo.)
 - **Exclude equipment** from the proxy — held weapons, shields, capes, backpacks, VFX. Body-only
   this iteration, so this is automatic, but the rule stays (ADR-0007).
 

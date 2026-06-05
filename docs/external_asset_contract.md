@@ -7,7 +7,7 @@ to deliver so it drops in. Validate your delivery with
 `python pipeline/tools/lint_external_asset.py your_asset.asset.json`.
 
 What you get back: an engine-loadable sprite package (see `docs/multistate_sprite_contract.md`
-and `pipeline/docs/BEVY_LOADER_INTEGRATION.md`). You do **not** produce sprites — you produce
+and, in the pipeline repo, `pipeline/docs/BEVY_LOADER_INTEGRATION.md`). You do **not** produce sprites — you produce
 the **3D source**, and a small `*.asset.json` manifest that tells the pipeline how to read it.
 
 ---

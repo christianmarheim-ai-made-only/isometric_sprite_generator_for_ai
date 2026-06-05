@@ -36,8 +36,14 @@ def _rewrite(text: str) -> str:
     left as-is -- those live in the repo, not the package (the README says so)."""
     return (text.replace("pipeline/schema/", "schema/")
                 .replace("pipeline/examples/", "examples/")
-                .replace("pipeline/test_meshes/", "test_meshes/")
-                .replace("pipeline/lockfiles/", "schema/../lockfiles/"))  # rare; keep recognizable
+                .replace("pipeline/test_meshes/", "test_meshes/"))
+
+
+def _rewrite_tree(d: Path) -> None:
+    """Rewrite pipeline/ path prefixes in every text file (json/md/txt) under d; binaries untouched."""
+    for p in d.rglob("*"):
+        if p.is_file() and p.suffix.lower() in (".json", ".md", ".txt"):
+            p.write_text(_rewrite(p.read_text(encoding="utf-8")), encoding="utf-8")
 
 
 def stage(dst: Path) -> None:
@@ -50,10 +56,12 @@ def stage(dst: Path) -> None:
 
     (dst / "schema").mkdir()
     for f in SCHEMA_FILES:
-        shutil.copy(PIPELINE_ROOT / "schema" / f, dst / "schema" / f)
+        (dst / "schema" / f).write_text(_rewrite((PIPELINE_ROOT / "schema" / f).read_text(encoding="utf-8")), encoding="utf-8")
     shutil.copytree(PIPELINE_ROOT / "schema" / "rig_profiles", dst / "schema" / "rig_profiles")
+    _rewrite_tree(dst / "schema" / "rig_profiles")
 
     shutil.copytree(PIPELINE_ROOT / "examples", dst / "examples")  # all examples incl. texture_starter glb
+    _rewrite_tree(dst / "examples")  # rewrite pipeline/ refs in *.json/*.md notes; binaries untouched
     (dst / "test_meshes").mkdir()
     for f in MESH_FILES:
         shutil.copy(PIPELINE_ROOT / "test_meshes" / f, dst / "test_meshes" / f)
