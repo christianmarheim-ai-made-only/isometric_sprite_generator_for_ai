@@ -166,13 +166,15 @@ def bake(mesh: str, out: Path, canvas_px: int = 256, variant_id: str | None = No
     return manifest
 
 
-def bake_character(out: Path, canvas_px: int = 256, variant_id: str = "humanoid_ref") -> dict:
-    """Bake a body-only humanoid: color + R8 HIT-proxy hitmask + measured world_metrics
-    -> an engine-shaped CHARACTER package (R4). variant_class=character, so the engine
-    requires valid world_metrics (height/footprint > 0, eye <= height)."""
+def _bake_mesh_character(verts, faces, face_region, out: Path, canvas_px: int, variant_id: str,
+                         mesh_name: str) -> dict:
+    """Shared core: render a `(verts, faces, face_region)` mesh into an engine-shaped CHARACTER
+    package (color + R8 HIT-proxy hitmask + measured ground-footprint metrics). Used by
+    `bake_character` (procedural humanoid) and `bake_mesh` (a loaded OBJ). variant_class=character,
+    so the engine requires valid world_metrics (height/footprint > 0, eye <= height)."""
     out.mkdir(parents=True, exist_ok=True)
     canvas = (canvas_px, canvas_px)
-    verts, faces, face_region = meshes.humanoid()
+    verts = np.asarray(verts, dtype=float)
     frames = render_directions(verts, faces, n=DIRS, canvas=canvas, face_region=face_region)
     color_atlas, rects = pack(frames, canvas)
     mask_atlas, _ = pack_region(frames, canvas)
@@ -222,13 +224,29 @@ def bake_character(out: Path, canvas_px: int = 256, variant_id: str = "humanoid_
         "frames": manifest_frames,
         "expected_facing": expected,
         "world_metrics": metrics,
-        "build": {"generator": "pipeline/tools/bake.py", "mesh": "humanoid",
+        "build": {"generator": "pipeline/tools/bake.py", "mesh": mesh_name,
                   "renderer": "render3d_software"},
     }
     manifest.update(_contract_fields())
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (out / "expected_facing_table.json").write_text(json.dumps(expected, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return manifest
+
+
+def bake_character(out: Path, canvas_px: int = 256, variant_id: str = "humanoid_ref") -> dict:
+    """Bake the procedural body-only humanoid -> engine-shaped CHARACTER package (R4)."""
+    verts, faces, face_region = meshes.humanoid()
+    return _bake_mesh_character(verts, faces, face_region, out, canvas_px, variant_id, "humanoid")
+
+
+def bake_mesh(mesh_path, out: Path, canvas_px: int = 256, variant_id: str | None = None,
+              up: str = "z") -> dict:
+    """Bake a REAL external mesh (OBJ; HIT regions by material/group name) -> CHARACTER package (R8).
+    The mesh is normalized to the contract (foot at origin, +Z up; up='y' rotates a Y-up file)."""
+    from mesh_io import load_obj
+    verts, faces, face_region = load_obj(mesh_path, up=up)
+    variant_id = variant_id or Path(mesh_path).stem
+    return _bake_mesh_character(verts, faces, face_region, out, canvas_px, variant_id, Path(mesh_path).name)
 
 
 def bake_character_anim(out: Path, canvas_px: int = 256, variant_id: str = "humanoid_anim") -> dict:
@@ -330,11 +348,17 @@ def bake_character_anim(out: Path, canvas_px: int = 256, variant_id: str = "huma
 def main() -> int:
     ap = argparse.ArgumentParser(description="Bake a procedural mesh into an engine-shaped package.")
     ap.add_argument("--mesh", choices=list(MESHES) + ["humanoid", "humanoid_anim"], default="cube")
+    ap.add_argument("--mesh-file", default=None, help="bake a real OBJ mesh (HIT regions by material name)")
+    ap.add_argument("--up", default="z", choices=["z", "y"], help="up axis of --mesh-file (y rotates to +Z)")
     ap.add_argument("--variant-id", default=None)
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--canvas", type=int, default=256)
     args = ap.parse_args()
-    if args.mesh == "humanoid":
+    if args.mesh_file:
+        variant_id = args.variant_id or Path(args.mesh_file).stem
+        out = (args.out or (PIPELINE_ROOT / "output" / variant_id)).resolve()
+        manifest = bake_mesh(args.mesh_file, out, args.canvas, variant_id, args.up)
+    elif args.mesh == "humanoid":
         variant_id = args.variant_id or "humanoid_ref"
         out = (args.out or (PIPELINE_ROOT / "output" / variant_id)).resolve()
         manifest = bake_character(out, args.canvas, variant_id)

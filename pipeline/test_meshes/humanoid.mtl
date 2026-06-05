@@ -1,0 +1,12 @@
+newmtl head
+Kd 0.6 0.6 0.6
+
+newmtl torso
+Kd 0.6 0.6 0.6
+
+newmtl arms
+Kd 0.6 0.6 0.6
+
+newmtl legs
+Kd 0.6 0.6 0.6
+
