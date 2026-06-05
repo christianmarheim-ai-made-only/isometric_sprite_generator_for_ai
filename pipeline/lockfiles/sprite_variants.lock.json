@@ -15,7 +15,7 @@
       "supported_states": [
         "idle"
       ],
-      "variant_class": "debug_direction_pilot"
+      "variant_class": "probe"
     }
   }
 }

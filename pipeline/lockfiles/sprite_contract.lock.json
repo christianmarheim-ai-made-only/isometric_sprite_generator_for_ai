@@ -1,7 +1,10 @@
 {
   "camera": {
+    "azimuth_degrees": 45,
+    "camera_elevation_degrees": 30,
     "diagnostic": "dir02 points down; dir10 points up",
     "height_axis": "up",
+    "height_screen_scale": 24,
     "id": "game_iso_v1",
     "projection": "2_to_1_pixel_isometric_debug_ground_plane",
     "screen_projection_formula": {
@@ -31,9 +34,9 @@
       8,
       16
     ],
-    "bin16_formula": "floor(angle_rad / (TAU/16)) modulo 16",
     "positive": "CCW_toward_+Y",
-    "render_yaw": "direction_index * TAU / N; lower edge, never center",
+    "render_yaw": "direction_index * TAU / N; bin center under round-binning",
+    "runtime_binning": "round(facing_rad / (TAU / N)) modulo N",
     "space": "world",
     "zero": "+X_East"
   },

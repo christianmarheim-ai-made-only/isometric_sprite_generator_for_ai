@@ -42,16 +42,29 @@
       "Blender camera and real rig-derived proxy rendering are deferred.",
       "Weapons/equipment/arms are deferred to M2A/M3 ADR review."
     ],
-    "generated_at_utc": "2026-06-05T04:40:30.878222+00:00",
+    "generated_at_utc": "2026-06-05T05:10:33.317917+00:00",
     "generator": "pipeline/tools/generate_arrow_pilot.py",
     "generator_mode": "deterministic_python_no_blender",
     "lockfile_hashes": {
-      "sprite_contract.lock.json": "sha256:87ceec8b51cfe3932eeb7d6201e603e44a5bd01c39009b2a8209b2090ae7535f",
+      "sprite_contract.lock.json": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
       "sprite_states.lock.json": "sha256:724e3fc3dd0fe9dbcdb6849729fa9a7bff2d013a53488f62baf5c416202ec8d1",
-      "sprite_variants.lock.json": "sha256:339510ff8bed9d16c354f310bddd0cd8a15a672ab74e7579889a6cb4f16fc53e"
+      "sprite_variants.lock.json": "sha256:eb9a206bbab46887b2203cf91819f293a0fc340adfeb52da18c8338587268bd1"
     }
   },
-  "contract_hash": "sha256:87ceec8b51cfe3932eeb7d6201e603e44a5bd01c39009b2a8209b2090ae7535f",
+  "camera": {
+    "azimuth_degrees": 45,
+    "camera_elevation_definition": "angle of the orthographic camera ray above the ground plane; not the screen tile-edge angle",
+    "camera_elevation_degrees": 30,
+    "camera_geometry_note": "2:1 ground tile => sin(camera_elevation)=0.5 => 30 deg; arctan(0.5)~=26.565 is the screen tile-edge angle, not the camera elevation. Engine applies on-screen height = height_world * 24 (render.rs::sprite_size).",
+    "id": "game_iso_v1",
+    "projection": "orthographic_pixel_iso_dimetric_2_to_1",
+    "screen_y": "down",
+    "tile_px": [
+      64,
+      32
+    ]
+  },
+  "contract_hash": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
   "direction_count": 16,
   "expected_facing": [
     {
@@ -382,6 +395,10 @@
       ],
       "screen_label": "down_right",
       "sockets": {
+        "direction_tip": [
+          77.416,
+          118.708
+        ],
         "origin": [
           64.0,
           112.0
@@ -424,6 +441,10 @@
       ],
       "screen_label": "down_right",
       "sockets": {
+        "direction_tip": [
+          73.569,
+          123.551
+        ],
         "origin": [
           64.0,
           112.0
@@ -466,6 +487,10 @@
       ],
       "screen_label": "down",
       "sockets": {
+        "direction_tip": [
+          64.0,
+          127.0
+        ],
         "origin": [
           64.0,
           112.0
@@ -508,6 +533,10 @@
       ],
       "screen_label": "down_left",
       "sockets": {
+        "direction_tip": [
+          54.431,
+          123.551
+        ],
         "origin": [
           64.0,
           112.0
@@ -550,6 +579,10 @@
       ],
       "screen_label": "down_left",
       "sockets": {
+        "direction_tip": [
+          50.584,
+          118.708
+        ],
         "origin": [
           64.0,
           112.0
@@ -592,6 +625,10 @@
       ],
       "screen_label": "down_left",
       "sockets": {
+        "direction_tip": [
+          49.312,
+          115.042
+        ],
         "origin": [
           64.0,
           112.0
@@ -634,6 +671,10 @@
       ],
       "screen_label": "left",
       "sockets": {
+        "direction_tip": [
+          49.0,
+          112.0
+        ],
         "origin": [
           64.0,
           112.0
@@ -676,6 +717,10 @@
       ],
       "screen_label": "up_left",
       "sockets": {
+        "direction_tip": [
+          49.312,
+          108.958
+        ],
         "origin": [
           64.0,
           112.0
@@ -718,6 +763,10 @@
       ],
       "screen_label": "up_left",
       "sockets": {
+        "direction_tip": [
+          50.584,
+          105.292
+        ],
         "origin": [
           64.0,
           112.0
@@ -760,6 +809,10 @@
       ],
       "screen_label": "up_left",
       "sockets": {
+        "direction_tip": [
+          54.431,
+          100.449
+        ],
         "origin": [
           64.0,
           112.0
@@ -802,6 +855,10 @@
       ],
       "screen_label": "up",
       "sockets": {
+        "direction_tip": [
+          64.0,
+          97.0
+        ],
         "origin": [
           64.0,
           112.0
@@ -844,6 +901,10 @@
       ],
       "screen_label": "up_right",
       "sockets": {
+        "direction_tip": [
+          73.569,
+          100.449
+        ],
         "origin": [
           64.0,
           112.0
@@ -886,6 +947,10 @@
       ],
       "screen_label": "up_right",
       "sockets": {
+        "direction_tip": [
+          77.416,
+          105.292
+        ],
         "origin": [
           64.0,
           112.0
@@ -928,6 +993,10 @@
       ],
       "screen_label": "up_right",
       "sockets": {
+        "direction_tip": [
+          78.688,
+          108.958
+        ],
         "origin": [
           64.0,
           112.0
@@ -970,6 +1039,10 @@
       ],
       "screen_label": "right",
       "sockets": {
+        "direction_tip": [
+          79.0,
+          112.0
+        ],
         "origin": [
           64.0,
           112.0
@@ -1012,6 +1085,10 @@
       ],
       "screen_label": "down_right",
       "sockets": {
+        "direction_tip": [
+          78.688,
+          115.042
+        ],
         "origin": [
           64.0,
           112.0
@@ -1028,7 +1105,7 @@
     "mask_semantics": "debug_single_foreground_region; see ADR-0015",
     "selection": "any_nonzero_region_selects_owner"
   },
-  "variant_class": "debug_direction_pilot",
+  "variant_class": "probe",
   "variant_id": "pilot_arrow",
   "world_metrics": {
     "footprint_radius_world": 0.25,

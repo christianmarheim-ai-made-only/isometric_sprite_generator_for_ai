@@ -31,6 +31,9 @@ DRAW_CENTER = (64.0, 72.0)
 PAD = 4
 DIRS = 16
 REGION_TORSO = 2
+# direction_tip = origin + screen_direction_vector * this (frame px); 15 keeps the
+# tip in-bounds for all 16 directions at anchor [64,112] (down-most: 112+15=127<128).
+DIRECTION_TIP_LEN = 15.0
 
 
 def load_json(path: Path) -> Any:
@@ -290,7 +293,11 @@ def main() -> int:
             "mask_rect": rect,
             "anchor": [ANCHOR[0], ANCHOR[1]],
             "sockets": {
-                "origin": [ANCHOR[0], ANCHOR[1]]
+                "origin": [ANCHOR[0], ANCHOR[1]],
+                "direction_tip": [
+                    round(ANCHOR[0] + meta["screen_direction_vector"][0] * DIRECTION_TIP_LEN, 3),
+                    round(ANCHOR[1] + meta["screen_direction_vector"][1] * DIRECTION_TIP_LEN, 3),
+                ]
             },
             "boxes": meta["boxes"],
             "debug_source_frame": f"frames/color/arrow_idle_dir{direction:02d}_frame00.png"
@@ -298,6 +305,16 @@ def main() -> int:
 
     manifest = {
         "manifest_version": "sprite_manifest_debug_subset_v1",
+        "camera": {
+            "id": "game_iso_v1",
+            "azimuth_degrees": 45,
+            "camera_elevation_degrees": 30,
+            "camera_elevation_definition": "angle of the orthographic camera ray above the ground plane; not the screen tile-edge angle",
+            "camera_geometry_note": "2:1 ground tile => sin(camera_elevation)=0.5 => 30 deg; arctan(0.5)~=26.565 is the screen tile-edge angle, not the camera elevation. Engine applies on-screen height = height_world * 24 (render.rs::sprite_size).",
+            "projection": "orthographic_pixel_iso_dimetric_2_to_1",
+            "screen_y": "down",
+            "tile_px": [64, 32]
+        },
         "contract_hash": contract_hash,
         "state_contract_version": states_lock["state_contract_version"],
         "variant_id": "pilot_arrow",

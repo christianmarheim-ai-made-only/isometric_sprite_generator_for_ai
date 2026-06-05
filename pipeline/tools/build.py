@@ -35,6 +35,8 @@ STEPS = [
         str(OUTPUT / "manifest.json"),
         "--report", str(OUTPUT / "validation_report.json"),
     ]),
+    ("gate1_engine_accept", [str(SCRIPT_DIR / "gate_engine_accept.py"), str(OUTPUT / "manifest.json")]),
+    ("test_bake", [str(SCRIPT_DIR / "test_bake.py")]),
 ]
 
 

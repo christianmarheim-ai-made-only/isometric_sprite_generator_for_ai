@@ -16,7 +16,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from contract_hash import compute_contract_hash  # noqa: E402
+from contract_hash import compute_contract_hash, compute_individual_hashes  # noqa: E402
 
 ALLOWED_MASK_VALUES = {0, 1, 2, 3, 4, 5, 6, 7}
 TAU = 2 * math.pi
@@ -79,6 +79,9 @@ def validate_lockfiles(manifest: dict[str, Any], lockfiles_dir: Path, reporter: 
     reporter.assert_true(manifest.get("state_contract_version") == states.get("state_contract_version"), "state_contract_version matches states lockfile")
     variant_id = manifest.get("variant_id")
     reporter.assert_true(variant_id in variants.get("variants", {}), f"variant_id {variant_id!r} exists in variants lockfile")
+    actual_hashes = compute_individual_hashes(lockfiles_dir)
+    manifest_hashes = manifest.get("build", {}).get("lockfile_hashes", {})
+    reporter.assert_true(manifest_hashes == actual_hashes, "build.lockfile_hashes match recomputed lockfile hashes")
     return contract, states, variants
 
 
@@ -236,12 +239,27 @@ def validate_world_metrics(manifest: dict[str, Any], reporter: Reporter) -> None
         reporter.assert_true(eye <= height, "eye_height_world <= height_world")
 
 
+def validate_camera(manifest: dict[str, Any], reporter: Reporter) -> None:
+    """Engine camera-contract checks (game_iso_v1): id, azimuth 45, elevation 30
+    (reject the 26.565 tile-edge angle), tile 64x32, screen_y down."""
+    cam = manifest.get("camera", {})
+    reporter.assert_true(cam.get("id") == "game_iso_v1", "camera.id == game_iso_v1")
+    reporter.assert_true(cam.get("azimuth_degrees") == 45, "camera.azimuth_degrees == 45")
+    elev = cam.get("camera_elevation_degrees")
+    reporter.assert_true(elev == 30, "camera.camera_elevation_degrees == 30")
+    reporter.assert_true(not (isinstance(elev, (int, float)) and abs(elev - 26.565) < 0.5),
+                         "camera elevation is NOT 26.565 (that is the screen tile-edge angle)")
+    reporter.assert_true(cam.get("tile_px") == [64, 32], "camera.tile_px == [64, 32]")
+    reporter.assert_true(cam.get("screen_y") == "down", "camera.screen_y == down")
+
+
 def validate_manifest(manifest_path: Path, pipeline_root: Path) -> dict[str, Any]:
     reporter = Reporter()
     manifest = load_json(manifest_path)
     schema_path = pipeline_root / "schema" / "sprite_manifest.schema.json"
     lockfiles_dir = pipeline_root / "lockfiles"
     validate_schema(manifest, schema_path, reporter)
+    validate_camera(manifest, reporter)
     _, states, variants = validate_lockfiles(manifest, lockfiles_dir, reporter)
     validate_variant_and_states(manifest, states, variants, reporter)
     color, mask = validate_images(manifest_path, manifest, reporter)
