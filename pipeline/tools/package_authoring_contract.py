@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Assemble the self-contained "Model Authoring Contract" package (README + docs + schemas +
-examples + rig profiles) and zip it. Reproducible: stages a clean tree then archives it.
+examples + the small fixture meshes the examples reference) and zip it. Reproducible: stages a clean
+tree then archives it. In-doc `pipeline/schema|examples|test_meshes/...` paths are rewritten to the
+package-relative form so the docs match what ships (tool paths `pipeline/tools/...` are left as-is --
+the tools live in the repo, noted in the README).
 
   python pipeline/tools/package_authoring_contract.py [--out dist/model_authoring_contract_v1.zip]
 """
@@ -16,22 +19,25 @@ REPO = PIPELINE_ROOT.parent
 DOCS = REPO / "docs"
 
 DOC_FILES = [
-    "authoring_overview.md",
-    "modeling_the_body.md",
-    "texturing_the_body.md",
-    "generating_animation_data.md",
-    "generating_hitbox_data.md",
-    "external_asset_contract.md",
-    "multistate_sprite_contract.md",
-    "atlas_paging_contract.md",
+    "authoring_overview.md", "modeling_the_body.md", "texturing_the_body.md",
+    "generating_animation_data.md", "generating_hitbox_data.md", "external_asset_contract.md",
+    "multistate_sprite_contract.md", "atlas_paging_contract.md",
 ]
 SCHEMA_FILES = [
-    "external_asset.schema.json",
-    "animation_clips.schema.json",
-    "hitbox_spec.schema.json",
-    "sprite_manifest.schema.json",
-    "source_asset.schema.json",
+    "external_asset.schema.json", "animation_clips.schema.json", "hitbox_spec.schema.json",
+    "sprite_manifest.schema.json", "source_asset.schema.json",
 ]
+# the small box-fixture meshes the example *.asset.json files reference (relative to examples/)
+MESH_FILES = ["humanoid.obj", "humanoid.mtl", "humanoid.glb", "sparrow.glb", "crow.glb", "grunt.glb"]
+
+
+def _rewrite(text: str) -> str:
+    """Make in-doc paths package-relative. Tool paths (pipeline/tools, pipeline/bevy_reference) are
+    left as-is -- those live in the repo, not the package (the README says so)."""
+    return (text.replace("pipeline/schema/", "schema/")
+                .replace("pipeline/examples/", "examples/")
+                .replace("pipeline/test_meshes/", "test_meshes/")
+                .replace("pipeline/lockfiles/", "schema/../lockfiles/"))  # rare; keep recognizable
 
 
 def stage(dst: Path) -> None:
@@ -39,18 +45,18 @@ def stage(dst: Path) -> None:
         shutil.rmtree(dst)
     (dst / "docs").mkdir(parents=True)
     for f in DOC_FILES:
-        shutil.copy(DOCS / f, dst / "docs" / f)
-    shutil.copy(DOCS / "PACKAGE_README.md", dst / "README.md")
+        (dst / "docs" / f).write_text(_rewrite((DOCS / f).read_text(encoding="utf-8")), encoding="utf-8")
+    (dst / "README.md").write_text(_rewrite((DOCS / "PACKAGE_README.md").read_text(encoding="utf-8")), encoding="utf-8")
 
     (dst / "schema").mkdir()
     for f in SCHEMA_FILES:
         shutil.copy(PIPELINE_ROOT / "schema" / f, dst / "schema" / f)
     shutil.copytree(PIPELINE_ROOT / "schema" / "rig_profiles", dst / "schema" / "rig_profiles")
 
-    # examples: include all JSON + the small texture-starter PNGs; exclude heavy .glb (they live in
-    # the repo's test_meshes and are referenced illustratively).
-    shutil.copytree(PIPELINE_ROOT / "examples", dst / "examples",
-                    ignore=shutil.ignore_patterns("*.glb"))
+    shutil.copytree(PIPELINE_ROOT / "examples", dst / "examples")  # all examples incl. texture_starter glb
+    (dst / "test_meshes").mkdir()
+    for f in MESH_FILES:
+        shutil.copy(PIPELINE_ROOT / "test_meshes" / f, dst / "test_meshes" / f)
 
 
 def main() -> int:

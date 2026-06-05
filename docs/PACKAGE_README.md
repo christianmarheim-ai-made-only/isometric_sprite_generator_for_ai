@@ -40,8 +40,13 @@ python pipeline/tools/make_contact_sheet.py   pipeline/output/<variant_id>   # e
 
 `bake_asset.py` routes by file type (`.obj` → numpy; static `.glb` → Blender; rigged `.glb` +
 `animations` → Blender animation baker; add `files.animation_clips` to embed text-authored clips
-first). The tools live in the pipeline repo; this package is the **spec + instructions + examples**
-they consume.
+first). The tools live in the pipeline repo (`pipeline/tools/`), not this package — this package is
+the **spec + instructions + examples** they consume.
+
+Every shipped example **lints clean with full file checks straight from this folder** (the meshes
+they reference are in `test_meshes/`) — e.g. `lint_external_asset.py examples/grunt.asset.json`. The
+one exception is `examples/bird_v1.asset.json`, a reuse **template** that points at an illustrative
+(not-shipped) texture; lint it with `--no-files`.
 
 ## What comes back (output format)
 
@@ -74,6 +79,7 @@ schema/                       JSON Schemas (Draft 2020-12):
   rig_profiles/                 biped_v1, bird_v1 — bone names, parents, bind-pose
                                 positions, region map, and per-archetype states
 examples/                     worked *.asset.json, animation/, hitbox/, atlas_paging/, texture_starter/
+test_meshes/                  the small box-fixture meshes the examples reference (.obj/.mtl/.glb)
 ```
 
 ## Versions

@@ -25,6 +25,8 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from bake import shelf_place, place_into  # noqa: E402
 
+MAX_PAGE_PX = 4096  # per-page width cap (height grows to fit a state; see atlas_paging_contract.md §5)
+
 
 def _box(rect):
     x, y, w, h = rect
@@ -51,9 +53,12 @@ def shard(pkg: Path, out: Path, policy: str = "per_state") -> dict:
         sfr = [f for f in frames if f.get("state", "idle") == state]
         cims = [color.crop(_box(f["rect"])) for f in sfr]
         mims = [hit.crop(_box(f.get("mask_rect", f["rect"]))) for f in sfr]
-        placements, atlas_size = shelf_place([im.size for im in cims])
+        placements, atlas_size = shelf_place([im.size for im in cims], max_w=MAX_PAGE_PX)
         cpage, rects = place_into(cims, placements, atlas_size, "RGBA")
         mpage, _ = place_into(mims, placements, atlas_size, "L")
+        if cpage.width > MAX_PAGE_PX or cpage.height > MAX_PAGE_PX:
+            print(f"WARN: page '{state}' is {cpage.size} (> {MAX_PAGE_PX} px). A single state exceeding "
+                  f"one max page needs the greedy-within-state split (FUTURE; see atlas_paging_contract.md §7).")
         cpage.save(out / f"color.{state}.png")
         mpage.save(out / f"mask.{state}.png")
         color_pages.append({"path": f"color.{state}.png", "size": list(cpage.size)})

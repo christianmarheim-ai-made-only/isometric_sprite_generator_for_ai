@@ -13,11 +13,14 @@ The pipeline packs one color atlas + one hitmask atlas per model. A model is `di
   already fills the color atlas to ~2041×1576. **One more 4-frame action overflows 2048²** at 256 px.
 - Higher resolution makes it worse: at 512 px logical canvas, even 3 states overflow.
 
-So a single model is split across **atlas pages**. Per-page budget (no rotation, PAD=4):
-`per_row = floor((page_w − PAD) / (tight_w + PAD))`, `rows = floor((page_h − PAD) / (tight_h + PAD))`,
-`capacity = per_row × rows`. With the measured median tight frame (~92×215) and **`max_page_px =
-4096`**: a 256 px-canvas character holds ~756 frames/page (so ≤3-state characters stay single-page
-after the cap is raised to 4096); paging materializes for 8+ state characters or 512 px+ canvases.
+So a single model is split across **atlas pages**. The shelf packer wraps rows at a fixed page
+**width** and grows the page **height** to fit (it has no height cap). The single-page baker packs at
+**2048** wide (legacy); the paged emitter `shard_atlas.py` packs each page at **4096** wide. Rows (no
+rotation, PAD=4): `per_row = floor((page_w − PAD)/(tight_w + PAD))` — at 4096 wide and the measured
+~92 px tight width, ~42 per row, so a 96-frame state (16 dirs × 6 frames) at ~215 px tall packs to
+roughly **4096 × 650**. Paging is worth it once a single-page (2048-wide) bake would grow
+uncomfortably tall — large multi-action characters, or 512 px+ canvases (3 states already overflow
+2048² at 512 px).
 
 ## 2. The format (additive)
 
@@ -63,18 +66,23 @@ State coverage (`(state, direction, frame_index)` complete + unique) and all siz
   on it, so `page` == the state's ordinal. This lets the engine **lazy/partial-load by state** (load
   `idle` at spawn, stream `walk`/`attack` on first transition, evict unused states) and gives one
   draw batch per active state.
-- **greedy-within-state fallback.** If a single state's frames exceed one page (e.g. a 60-frame
-  death at 512 px), split that state across consecutive pages and record the span as
-  `animations[state].pages = [start, end]` so load-by-state still works.
+- **greedy-within-state fallback (FUTURE — not yet implemented).** When a single state's frames would
+  exceed one max page, the plan is to split that state across consecutive pages and record the span as
+  `animations[state].pages = [start, end]` so load-by-state still works. **Today** `shard_atlas.py`
+  emits exactly one page per state and the loader reads only the per-FRAME `page` (not the per-state
+  span); a state that overflows currently produces one over-tall page (and `shard_atlas.py` warns).
+  See §7.
 - **`greedy`.** Pure bin-packing ignoring state — reserved for one-shot effect sets; flagged
   `atlas_page_policy: "greedy"`. Avoid for characters (frames of every state scatter across pages,
   making pages un-evictable).
 
 ## 5. Page size
 
-`max_page_px = 4096` per page (default; well under the conservative 8192 GPU 2D limit, so portable).
-Recommended cap of **≤ 32 pages per variant** as a runaway guard. Keep PAD=4 + 4 px extrusion per
-page, no rotation (ADR-0017).
+`shard_atlas.py` packs each page **4096 px wide** (well under the conservative 8192 GPU 2D limit, so
+portable); page **height grows to fit** the state's frames (the shelf packer has no height cap, so a
+very large single state yields a tall page — `shard_atlas.py` warns if a page exceeds 4096 in either
+dimension, the trigger for the FUTURE greedy-within-state split, §4/§7). Recommended cap of **≤ 32
+pages per variant** as a runaway guard. PAD=4 + 4 px extrusion per page, no rotation (ADR-0017).
 
 ## 6. Reference implementation
 
@@ -91,7 +99,13 @@ page, no rotation (ADR-0017).
 
 ## 7. Status of pipeline emission
 
-The baker emits **single-page** packages today; `shard_atlas.py` converts to multi-page on demand.
-Folding per-state paging into `bake_character_anim`/`bake_animated` directly (so large characters
-page during the bake, not as a post-step) is a follow-up — the manifest/loader contract above does
-not change when it lands.
+Implemented today: the **per-frame `page`** field end-to-end (schema + `shard_atlas.py` emitter +
+loader parsing/validation + tests), the single-page alias + back-compat, and **`per_state`** sharding.
+
+FUTURE (not yet implemented; the manifest/loader contract above does **not** change when they land):
+- **In-baker paging** — folding `per_state` paging into `bake_animated`/`bake_character_anim` so large
+  characters page during the bake instead of via the `shard_atlas.py` post-step.
+- **greedy-within-state split** — splitting a single oversized state across pages, emitting
+  `animations[state].pages = [start, end]`, and teaching the loader to read + validate that span
+  (today `AnimDef`/`AnimMeta` ignore it). Until then a single state must fit one 4096-wide page.
+- **`greedy` policy** — bin-packing across states for one-shot effect sets.
