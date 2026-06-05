@@ -262,8 +262,8 @@ _Updated by each loop iteration._
 | Slice | Status | Notes |
 |---|---|---|
 | P0 | done | runbook.md + m1_arrow_pilot_review.md |
-| P1 | next | build.py, fixtures, stable report path |
-| C0 | todo | |
+| P1 | done | build.py + test_fixtures + repo-relative report path |
+| C0 | next | naming conventions |
 | C2 | todo | body regions only |
 | C4 | todo | body-only metrics |
 | P3 | todo | schema + body examples |

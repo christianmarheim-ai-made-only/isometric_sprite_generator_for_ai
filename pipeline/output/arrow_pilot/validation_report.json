@@ -206,7 +206,7 @@
   ],
   "checks_passed": 203,
   "errors": [],
-  "manifest": "C:\\Code\\isometric_sprite_generator_for_ai\\pipeline\\output\\arrow_pilot\\manifest.json",
+  "manifest": "pipeline/output/arrow_pilot/manifest.json",
   "ok": true,
   "warnings": []
 }

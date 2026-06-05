@@ -248,8 +248,14 @@ def validate_manifest(manifest_path: Path, pipeline_root: Path) -> dict[str, Any
     validate_frame_images(manifest, color, mask, reporter)
     validate_directions(manifest, reporter)
     validate_world_metrics(manifest, reporter)
+    # Store a stable, repo-relative manifest path so the report is reproducible
+    # and diffable across machines (not an absolute C:\... or /mnt/... path).
+    try:
+        manifest_display = manifest_path.resolve().relative_to(pipeline_root.parent.resolve()).as_posix()
+    except ValueError:
+        manifest_display = manifest_path.name
     return {
-        "manifest": str(manifest_path),
+        "manifest": manifest_display,
         "ok": not reporter.errors,
         "checks_passed": len(reporter.checks),
         "warnings": reporter.warnings,

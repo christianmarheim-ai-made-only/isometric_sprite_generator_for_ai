@@ -16,8 +16,7 @@ python pipeline/tools/build.py --ci
 ```
 
 Regenerates the pilot, validates (and writes the report), runs the smoke test and
-the regression tests, and exits nonzero if any step fails. (Delivered in slice P1;
-until then, use the step-by-step below.)
+the regression tests, and exits nonzero if any step fails.
 
 ## Step by step
 
@@ -27,6 +26,7 @@ until then, use the step-by-step below.)
 4. **Regression tests:**
    - `python pipeline/tools/test_contract_hash.py`
    - `python pipeline/tools/test_mask_discrete.py`
+   - `python pipeline/tools/test_fixtures.py`
 
 ## Human review (debug sheet)
 

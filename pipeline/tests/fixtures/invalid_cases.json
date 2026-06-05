@@ -1,0 +1,51 @@
+{
+  "description": "Invalid-manifest/atlas fixtures for the M1/M2 validator. Each case is applied to a fresh copy of the generated pilot output; the validator must reject it (ok=false) with an error containing expect_error_substring. See README.md.",
+  "cases": [
+    {
+      "name": "corrupted_contract_hash",
+      "kind": "manifest_set",
+      "path": ["contract_hash"],
+      "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "expect_error_substring": "contract_hash"
+    },
+    {
+      "name": "anchor_outside_rect",
+      "kind": "manifest_set",
+      "path": ["frames", 0, "anchor"],
+      "value": [9999, 9999],
+      "expect_error_substring": "anchor inside frame rect"
+    },
+    {
+      "name": "missing_required_socket",
+      "kind": "manifest_delete",
+      "path": ["frames", 0, "sockets", "origin"],
+      "expect_error_substring": "required socket 'origin'"
+    },
+    {
+      "name": "wrong_frame_count",
+      "kind": "manifest_delete",
+      "path": ["frames", 15],
+      "expect_error_substring": "directions*frames"
+    },
+    {
+      "name": "mask_rect_dims_mismatch",
+      "kind": "manifest_set",
+      "path": ["frames", 0, "mask_rect"],
+      "value": [4, 4, 128, 200],
+      "expect_error_substring": "mask rect dimensions equal color rect"
+    },
+    {
+      "name": "out_of_palette_mask_value",
+      "kind": "mask_region_pixel",
+      "region_value": 2,
+      "new_value": 9,
+      "expect_error_substring": "allowed palette"
+    },
+    {
+      "name": "transparent_pixel_nonzero_mask",
+      "kind": "mask_transparent_pixel",
+      "new_value": 2,
+      "expect_error_substring": "transparent pixel"
+    }
+  ]
+}
