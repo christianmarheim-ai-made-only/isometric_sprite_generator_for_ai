@@ -106,4 +106,12 @@ def humanoid(leg_swing=0.0, arm_swing=0.0):
         v, f = box(-0.08, 0.08, cy - 0.07, cy + 0.07, 0.86, 1.42)
         parts.append((_rot_y(v, (0.0, cy, 1.42), -sgn * arm_swing), f, REGION["arms"]))
     parts.append((*box(-0.12, 0.12, -0.12, 0.12, 1.46, 1.80), REGION["head"]))
+    # FRONT-OF-BODY features (+X) so the figure has a distinguishable front. Without them the whole
+    # body is symmetric under a 180-deg rotation about the vertical axis (centered torso/head +
+    # anti-phase L/R limbs), so the render of heading N is byte-identical to heading N+8 -- front
+    # cannot be told from back. A real character (or the bird's beak/tail) breaks this naturally;
+    # the procedural humanoid must too. A face/visor on the head + a chest panel on the torso make
+    # the front unmistakable from every heading.
+    parts.append((*box(0.12, 0.30, -0.11, 0.11, 1.49, 1.74), REGION["head"]))    # face / visor
+    parts.append((*box(0.16, 0.30, -0.18, 0.18, 0.92, 1.44), REGION["torso"]))   # chest plate
     return _assemble(parts)
