@@ -47,13 +47,27 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
         manifest = bake_mesh(str(mesh_path), out, variant_id=variant_id, up=up)
         route = "numpy / OBJ static"
     elif ext in (".glb", ".gltf"):
+        import subprocess
         from blender_bake import find_blender, bake_blender, bake_animated
         blender = find_blender()
         if not blender:
             raise SystemExit("Blender not found; needed to bake a glTF (set $BLENDER).")
         if asset.get("rig") and anims:
-            manifest, _ = bake_animated(out, blender, str(mesh_path), anims, variant_id)
+            mesh_for_bake = str(mesh_path)
+            clips_rel = (asset.get("files") or {}).get("animation_clips")
             route = "Blender / rigged + animated"
+            if clips_rel:
+                # embed the anim_clips_v1 JSON as glTF clips on the rigged mesh first
+                out.mkdir(parents=True, exist_ok=True)
+                animated = out / f"{variant_id}_animated.glb"
+                cmd = [blender, "--background", "--python", str(SCRIPT_DIR / "bake_anim_from_json.py"),
+                       "--", str(mesh_path), str((base / clips_rel).resolve()), str(animated)]
+                proc = subprocess.run(cmd, capture_output=True, text=True)
+                if proc.returncode != 0 or not animated.exists():
+                    raise SystemExit("bake_anim_from_json failed:\n" + (proc.stdout or "")[-1500:] + (proc.stderr or "")[-1500:])
+                mesh_for_bake = str(animated)
+                route = "Blender / rigged + animated (clips embedded from animation_clips JSON)"
+            manifest, _ = bake_animated(out, blender, mesh_for_bake, anims, variant_id)
         else:
             manifest, _ = bake_blender(out, blender, str(mesh_path), variant_id)
             route = "Blender / static"

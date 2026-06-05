@@ -1,7 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "sprite_manifest_debug_subset.schema.json",
-  "title": "Sprite Manifest Debug Subset",
+  "title": "Sprite Manifest (game_iso_v1 output)",
+  "description": "Validates the manifests the pipeline emits: single-state (bake.py: no animations/state/frame_index/boxes) AND multi-state (animations + per-frame state/frame_index). Atlas paging (pages[]) is supported additively; see docs/atlas_paging_contract.md.",
   "type": "object",
   "required": [
     "manifest_version",
@@ -11,7 +12,6 @@
     "variant_class",
     "frame_canvas",
     "direction_count",
-    "animations",
     "atlases",
     "frames",
     "world_metrics",
@@ -23,24 +23,29 @@
     "state_contract_version": {"type": "string"},
     "variant_id": {"type": "string"},
     "variant_class": {"type": "string"},
-    "frame_canvas": {
-      "type": "array",
-      "items": {"type": "integer", "minimum": 1},
-      "minItems": 2,
-      "maxItems": 2
-    },
+    "default_state": {"type": "string"},
+    "frame_canvas": {"$ref": "#/$defs/size2"},
+    "logical_frame_canvas": {"$ref": "#/$defs/size2"},
     "direction_count": {"type": "integer", "enum": [1, 2, 4, 8, 16]},
+    "atlas_page_policy": {"type": "string", "enum": ["single", "per_state", "greedy"]},
     "animations": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
         "required": ["playback", "directions", "frames", "fps"],
         "properties": {
-          "playback": {"type": "string", "enum": ["loop", "once", "once_hold"]},
+          "playback": {"type": "string", "enum": ["loop", "once", "hold"]},
           "directions": {"type": "integer", "enum": [1, 2, 4, 8, 16]},
           "frames": {"type": "integer", "minimum": 1},
           "fps": {"type": "number", "exclusiveMinimum": 0},
-          "markers": {"type": "array"}
+          "markers": {"type": "array"},
+          "pages": {
+            "type": "array",
+            "items": {"type": "integer", "minimum": 0},
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "optional [start_page, end_page] hint when a single state spans multiple atlas pages"
+          }
         },
         "additionalProperties": true
       }
@@ -49,8 +54,8 @@
       "type": "object",
       "required": ["color", "hitmask"],
       "properties": {
-        "color": {"$ref": "#/$defs/atlas"},
-        "hitmask": {"$ref": "#/$defs/atlas"}
+        "color": {"$ref": "#/$defs/color_atlas"},
+        "hitmask": {"$ref": "#/$defs/hitmask_atlas"}
       },
       "additionalProperties": false
     },
@@ -74,20 +79,43 @@
     "build": {"type": "object"}
   },
   "$defs": {
-    "atlas": {
+    "size2": {
+      "type": "array",
+      "items": {"type": "integer", "minimum": 1},
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "page": {
       "type": "object",
-      "required": ["path", "size", "format", "sampling"],
+      "required": ["path", "size"],
+      "properties": {"path": {"type": "string"}, "size": {"$ref": "#/$defs/size2"}},
+      "additionalProperties": true
+    },
+    "color_atlas": {
+      "type": "object",
+      "description": "single-page: {path,size}. multi-page: {pages:[{path,size},...]} (atlas paging).",
       "properties": {
         "path": {"type": "string"},
-        "size": {
-          "type": "array",
-          "items": {"type": "integer", "minimum": 1},
-          "minItems": 2,
-          "maxItems": 2
-        },
+        "size": {"$ref": "#/$defs/size2"},
         "format": {"type": "string"},
-        "sampling": {"type": "string"}
+        "sampling": {"type": "string"},
+        "pages": {"type": "array", "items": {"$ref": "#/$defs/page"}, "minItems": 1}
       },
+      "anyOf": [{"required": ["path", "size"]}, {"required": ["pages"]}],
+      "additionalProperties": true
+    },
+    "hitmask_atlas": {
+      "type": "object",
+      "required": ["format", "sampling", "palette"],
+      "properties": {
+        "path": {"type": "string"},
+        "size": {"$ref": "#/$defs/size2"},
+        "format": {"type": "string"},
+        "sampling": {"type": "string"},
+        "palette": {"type": "object"},
+        "pages": {"type": "array", "items": {"$ref": "#/$defs/page"}, "minItems": 1}
+      },
+      "anyOf": [{"required": ["path", "size"]}, {"required": ["pages"]}],
       "additionalProperties": true
     },
     "rect": {
@@ -105,24 +133,24 @@
     "frame": {
       "type": "object",
       "required": [
-        "state",
         "direction",
-        "frame_index",
         "world_yaw_degrees",
         "rect",
         "mask_rect",
         "anchor",
-        "sockets",
-        "boxes"
+        "sockets"
       ],
       "properties": {
         "state": {"type": "string"},
         "direction": {"type": "integer", "minimum": 0},
         "frame_index": {"type": "integer", "minimum": 0},
+        "page": {"type": "integer", "minimum": 0, "description": "atlas page index (default 0); rect/mask_rect are local to atlases.color.pages[page]/atlases.hitmask.pages[page]"},
         "world_yaw_degrees": {"type": "number"},
         "screen_direction_vector": {"$ref": "#/$defs/point"},
         "rect": {"$ref": "#/$defs/rect"},
         "mask_rect": {"$ref": "#/$defs/rect"},
+        "trim": {"$ref": "#/$defs/point"},
+        "logical_frame_canvas": {"$ref": "#/$defs/size2"},
         "anchor": {"$ref": "#/$defs/point"},
         "sockets": {
           "type": "object",

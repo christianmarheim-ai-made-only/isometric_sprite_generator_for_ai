@@ -1,27 +1,30 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "animation_clips.schema.json",
   "title": "anim_clips_v1",
-  "description": "Compact per-bone keyframe animation. Channels target rig BONE NAMES, so one file animates every body skinned to the same rig profile. Angles in radians, translations in metres; root stays in place (no horizontal locomotion).",
+  "description": "Compact per-bone keyframe animation. Channels target rig BONE NAMES, so one file animates every body skinned to the same rig profile. Angles in radians, translations in metres; root stays in place (no horizontal locomotion). See docs/generating_animation_data.md.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["anim_spec_version", "rig", "clips"],
-  "additionalProperties": true,
   "$defs": {
     "keyframe": {
       "type": "array",
-      "description": "[frame_number, [x, y, z]]",
-      "items": [
+      "description": "[frame_number (1-based integer), [x, y, z]]",
+      "prefixItems": [
         { "type": "number" },
         { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }
       ],
+      "items": false,
       "minItems": 2,
       "maxItems": 2
     },
     "channels": {
       "type": "object",
       "additionalProperties": false,
+      "minProperties": 1,
       "properties": {
-        "rotation_euler": { "type": "array", "items": { "$ref": "#/$defs/keyframe" } },
-        "location": { "type": "array", "items": { "$ref": "#/$defs/keyframe" } }
+        "rotation_euler": { "type": "array", "items": { "$ref": "#/$defs/keyframe" }, "minItems": 1 },
+        "location": { "type": "array", "items": { "$ref": "#/$defs/keyframe" }, "minItems": 1 }
       }
     }
   },
@@ -31,19 +34,20 @@
     "notes": { "type": "string" },
     "clips": {
       "type": "object",
+      "minProperties": 1,
       "description": "keyed by clip/state name (idle, walk, fly, attack, ...)",
       "additionalProperties": {
         "type": "object",
-        "required": ["playback", "sample_frames", "fps"],
-        "additionalProperties": true,
+        "additionalProperties": false,
+        "required": ["playback", "frames", "fps", "duration_frames"],
         "properties": {
           "playback": { "enum": ["loop", "once", "hold"] },
-          "sample_frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction" },
+          "frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction; equals the asset.json animations[state].frames" },
           "fps": { "type": "number", "exclusiveMinimum": 0 },
-          "duration_frames": { "type": "integer", "minimum": 1, "description": "length of the authoring timeline the clip is sampled across" },
+          "duration_frames": { "type": "integer", "minimum": 1, "description": "length of the 1-based authoring timeline the clip is sampled across; authoring-only, NOT carried into the asset manifest" },
           "bones": {
             "type": "object",
-            "description": "keyed by bone name; bones omitted stay at the bind pose",
+            "description": "keyed by bone name; bones omitted stay at the bind pose. An empty map is a valid rest clip.",
             "additionalProperties": { "$ref": "#/$defs/channels" }
           }
         }

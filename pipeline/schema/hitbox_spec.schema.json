@@ -1,10 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hitbox_spec.schema.json",
   "title": "hitbox_v1",
-  "description": "Model-derived hit/collision data: a collision capsule (world_metrics) + per-region world AABBs. Companion to the per-pixel R8 hit-mask the renderer bakes from the same region tags.",
+  "description": "Model-derived hit/collision data: a collision capsule (world_metrics) + per-region world AABBs. Companion to the per-pixel R8 hit-mask the renderer bakes from the same region tags. OPTIONAL verification-only artifact: no asset.json field references it and no baker consumes it; generate it to sanity-check the bake. See docs/generating_hitbox_data.md.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["hitbox_spec_version", "unit", "world_metrics", "regions"],
-  "additionalProperties": true,
   "properties": {
     "hitbox_spec_version": { "const": "hitbox_v1" },
     "from_mesh": { "type": "string" },
@@ -23,6 +24,8 @@
     },
     "collision_capsule": {
       "type": "object",
+      "required": ["radius_world", "height_world"],
+      "additionalProperties": false,
       "properties": {
         "radius_world": { "type": "number", "exclusiveMinimum": 0 },
         "height_world": { "type": "number", "exclusiveMinimum": 0 },

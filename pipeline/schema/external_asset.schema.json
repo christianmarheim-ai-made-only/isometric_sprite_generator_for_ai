@@ -8,30 +8,38 @@
   "required": ["asset_contract_version", "variant_id", "archetype", "files"],
   "properties": {
     "asset_contract_version": { "const": "external_asset_v1" },
-    "variant_id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
-    "archetype": { "type": "string", "description": "logical family, e.g. biped, bird; selects the shared rig + animation library" },
+    "variant_id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "unique per variant; becomes the output dir name, so two assets must not share it" },
+    "archetype": { "enum": ["biped", "bird"], "description": "logical family; selects the shared rig + animation library. Add a value here when a new archetype is introduced." },
     "files": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["mesh"],
       "properties": {
-        "mesh": { "type": "string", "description": "glb (preferred) or obj, relative to this manifest. Omit for an animation-library-only delivery." }
+        "mesh": { "type": "string", "description": ".glb (preferred) or .obj, relative to this manifest. For a rigged+animated variant this is the glb AFTER bake_anim_from_json.py has embedded the clips, OR pair a clip-less rigged glb with files.animation_clips below." },
+        "animation_clips": { "type": "string", "description": "optional path to an anim_clips_v1 JSON (schema/animation_clips.schema.json). When present, bake_asset.py runs bake_anim_from_json.py to embed these clips into files.mesh (a rigged glb) before baking." }
       }
     },
     "geometry": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "up": { "enum": ["y", "z"], "description": "source up axis (glTF=y); pipeline converts to +Z" },
-        "forward": { "enum": ["+x", "+y", "-x", "-y"], "description": "facing of the bind pose; pipeline rotates to +X = direction 0" },
+        "up": { "enum": ["y", "z"], "default": "z", "description": "source up axis. HONORED for .obj (a Y-up obj without up:\"y\" bakes sideways). For .glb/.gltf the importer reads the file's own axis and this field is currently inert -- set it correctly anyway for portability." },
+        "forward": { "const": "+x", "description": "MUST be +X this iteration: the model faces +X = direction 0. `forward` is declared-only and NOT applied by any baker yet -- a model facing another way renders wrong. (Future: pipeline-applied rotation.)" },
         "unit": { "const": "meter" }
       }
     },
     "rig": { "type": "string", "description": "rig profile id (pipeline/schema/rig_profiles/<rig>.json). Omit for a static mesh -> procedural animation." },
-    "region_source": { "enum": ["material_name", "vertex_attribute", "region_texture"], "description": "how HIT regions are tagged (material_name ships today)" },
+    "region_source": { "enum": ["material_name", "vertex_attribute", "region_texture"], "description": "how HIT regions are tagged. Only material_name bakes today; the others are documented extensions." },
     "textures": {
       "type": "object",
-      "additionalProperties": { "type": "string" },
-      "description": "named texture maps relative to this manifest, e.g. base_color, normal, roughness"
+      "additionalProperties": false,
+      "description": "named texture maps relative to this manifest. RENDER STATUS this iteration: only an embedded-glb base color renders (Workbench TEXTURE pass); base_color listed here, and normal/roughness/metallic, are RECORDED but NOT rendered. OBJ deliveries render a flat per-region color (no texture).",
+      "properties": {
+        "base_color": { "type": "string" },
+        "normal": { "type": "string" },
+        "roughness": { "type": "string" },
+        "metallic": { "type": "string" }
+      }
     },
     "animations": {
       "type": "object",
@@ -40,22 +48,23 @@
         "additionalProperties": false,
         "required": ["frames", "fps", "playback"],
         "properties": {
-          "clip": { "type": "string", "description": "glTF animation clip name (defaults to the state key)" },
-          "frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction" },
+          "clip": { "type": "string", "description": "glTF animation clip name embedded in the glb (defaults to the state key)" },
+          "frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction (this is the anim_clips_v1 `sample_frames` value)" },
           "fps": { "type": "number", "exclusiveMinimum": 0 },
           "playback": { "enum": ["loop", "once", "hold"] }
         }
       },
-      "description": "state name -> clip; the pipeline samples each clip into `frames` poses x 16 directions"
+      "description": "state name -> clip sampling. The pipeline samples each named glb clip into `frames` poses x direction_count directions."
     },
     "world_metrics": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "height_world": { "type": "number", "exclusiveMinimum": 0 },
-        "footprint_radius_world": { "type": "number", "exclusiveMinimum": 0 }
+        "footprint_radius_world": { "type": "number", "exclusiveMinimum": 0 },
+        "eye_height_world": { "type": "number", "exclusiveMinimum": 0 }
       },
-      "description": "optional override; otherwise measured from the mesh"
+      "description": "optional override; otherwise measured from the mesh AABB"
     },
     "notes": { "type": "string" }
   }

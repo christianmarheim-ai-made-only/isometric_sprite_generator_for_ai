@@ -5,14 +5,14 @@
   "clips": {
     "idle": {
       "playback": "loop",
-      "sample_frames": 1,
+      "frames": 1,
       "fps": 1,
       "duration_frames": 1,
       "bones": {}
     },
     "fly": {
       "playback": "loop",
-      "sample_frames": 4,
+      "frames": 4,
       "fps": 12,
       "duration_frames": 6,
       "bones": {

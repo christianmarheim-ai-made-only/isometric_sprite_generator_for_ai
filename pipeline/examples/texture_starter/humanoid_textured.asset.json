@@ -1,7 +1,7 @@
 {
   "asset_contract_version": "external_asset_v1",
   "variant_id": "humanoid_textured",
-  "archetype": "humanoid",
+  "archetype": "biped",
   "files": { "mesh": "humanoid_textured.glb" },
   "geometry": { "up": "y", "forward": "+x", "unit": "meter" },
   "region_source": "material_name",

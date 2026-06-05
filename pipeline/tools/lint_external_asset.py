@@ -49,6 +49,18 @@ def lint(path: Path, check_files: bool = True) -> list[str]:
         known = sorted(p.stem for p in RIG_DIR.glob("*.json"))
         errs.append(f"rig '{rig}' is not a known profile (have: {known})")
 
+    # if an anim_clips_v1 JSON is paired with the mesh, validate it against its schema too
+    clips_rel = (asset.get("files") or {}).get("animation_clips")
+    if clips_rel and check_files:
+        clips_path = base / clips_rel
+        if clips_path.exists():
+            ac_schema = json.loads((PIPELINE_ROOT / "schema" / "animation_clips.schema.json").read_text(encoding="utf-8"))
+            clips = json.loads(clips_path.read_text(encoding="utf-8"))
+            for e in sorted(Draft202012Validator(ac_schema).iter_errors(clips), key=lambda e: list(e.path)):
+                errs.append(f"files.animation_clips /{'/'.join(map(str, e.path))}: {e.message}")
+            if clips.get("rig") and rig and clips["rig"] != rig:
+                errs.append(f"files.animation_clips rig '{clips['rig']}' != asset rig '{rig}'")
+
     if asset.get("region_source", "material_name") in ("vertex_attribute", "region_texture"):
         print(f"NOTE: region_source={asset['region_source']} is a documented extension; "
               "only material_name bakes today.")

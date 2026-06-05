@@ -44,6 +44,7 @@ STEPS = [
     ("test_direction_distinctness", [str(SCRIPT_DIR / "test_direction_distinctness.py")]),
     ("test_mesh_input", [str(SCRIPT_DIR / "test_mesh_input.py")]),
     ("test_external_asset", [str(SCRIPT_DIR / "test_external_asset.py")]),
+    ("test_schemas", [str(SCRIPT_DIR / "test_schemas.py")]),
     ("test_engine_load", [str(SCRIPT_DIR / "test_engine_load.py")]),
     ("test_blender_parity", [str(SCRIPT_DIR / "test_blender_parity.py")]),
     ("test_rigged_anim", [str(SCRIPT_DIR / "test_rigged_anim.py")]),

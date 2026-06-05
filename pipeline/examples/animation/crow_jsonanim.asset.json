@@ -1,0 +1,14 @@
+{
+  "asset_contract_version": "external_asset_v1",
+  "variant_id": "crow_jsonanim",
+  "archetype": "bird",
+  "files": { "mesh": "../../test_meshes/crow.glb", "animation_clips": "bird_v1_anim.json" },
+  "geometry": { "up": "y", "forward": "+x", "unit": "meter" },
+  "rig": "bird_v1",
+  "region_source": "material_name",
+  "animations": {
+    "idle": { "clip": "idle", "frames": 1, "fps": 1,  "playback": "loop" },
+    "fly":  { "clip": "fly",  "frames": 4, "fps": 12, "playback": "loop" }
+  },
+  "notes": "End-to-end animation example: a rigged crow body + bird_v1_anim.json. bake_asset.py embeds the JSON keyframes as glTF clips (bake_anim_from_json) then bakes -- one command, no clips pre-baked into the glb."
+}
