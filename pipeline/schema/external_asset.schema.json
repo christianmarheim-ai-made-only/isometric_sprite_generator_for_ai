@@ -24,7 +24,7 @@
       "additionalProperties": false,
       "properties": {
         "up": { "enum": ["y", "z"], "default": "z", "description": "source up axis. HONORED for .obj (a Y-up obj without up:\"y\" bakes sideways). For .glb/.gltf the importer reads the file's own axis and this field is currently inert -- set it correctly anyway for portability." },
-        "forward": { "const": "+x", "description": "MUST be +X this iteration: the model faces +X = direction 0. `forward` is declared-only and NOT applied by any baker yet -- a model facing another way renders wrong. (Future: pipeline-applied rotation.)" },
+        "forward": { "const": "+x", "description": "The model MUST face +X (= direction 0). This field is optional -- omit it and +x is assumed; if present it must be `+x`. It is declared-only and NOT applied by any baker yet, so a model built facing another way renders wrong. (Future: pipeline-applied rotation.)" },
         "unit": { "const": "meter" }
       }
     },
@@ -50,7 +50,7 @@
         "required": ["frames", "fps", "playback"],
         "properties": {
           "clip": { "type": "string", "description": "glTF animation clip name embedded in the glb (defaults to the state key)" },
-          "frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction (this is the anim_clips_v1 `sample_frames` value)" },
+          "frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction (the same value as the matching anim_clips_v1 clip's `frames`)" },
           "fps": { "type": "number", "exclusiveMinimum": 0 },
           "playback": { "enum": ["loop", "once", "hold"] }
         }

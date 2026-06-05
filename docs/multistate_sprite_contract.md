@@ -1,5 +1,9 @@
 # game_iso_v1 — multi-state + tight-crop contract (R5 / R5A unblock)
 
+**Audience:** informational — this is the **output** format the pipeline emits and the engine loads.
+A model producer authors **none** of it; it documents what comes back. (Producers deliver a
+`*.asset.json` — see `external_asset_contract.md`.)
+
 **Status:** engine *consumption* designed (verified against the current loader). This is the
 contract the pipeline emits to **now** so R5/R5A can proceed; the engine loader implementation
 lands as a dedicated engine slice (its own branch). **Backward-compatible:** the single-state

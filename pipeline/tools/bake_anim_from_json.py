@@ -4,7 +4,7 @@ writes per-bone keyframes as JSON; this turns them into real glTF animation clip
 
   blender --background --python bake_anim_from_json.py -- IN_RIGGED.glb ANIM.json OUT.glb
 
-ANIM.json (anim_clips_v1): a `clips` map; each clip has playback/fps/sample_frames + a `bones` map
+ANIM.json (anim_clips_v1): a `clips` map; each clip has playback/fps/frames + a `bones` map
 of {bone_name: {rotation_euler: [[frame,[x,y,z]],...], location: [[frame,[x,y,z]],...]}} (radians /
 metres). Bones not listed stay at the bind pose. Channels target bone NAMES, so one file animates
 every body skinned to the same rig profile.

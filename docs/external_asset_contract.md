@@ -89,8 +89,8 @@ declared state. To add a bird, you deliver only a new skinned mesh + texture.
 Every face needs a body **HIT region** so the pipeline can emit the R8 hit-mask. Pick ONE:
 
 - **By material name (default, simplest):** name each material so its name CONTAINS a region
-  keyword. Canonical keyword → region id (single source of truth: `pipeline/tools/mesh_io.py`
-  `REGION_KEYWORDS`):
+  keyword. Canonical keyword → region id (this table is **normative for authoring**; it mirrors
+  `pipeline/tools/mesh_io.py` `REGION_KEYWORDS` in the repo):
 
   | Region (id) | Name contains any of |
   |---|---|
