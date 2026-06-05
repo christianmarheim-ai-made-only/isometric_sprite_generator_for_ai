@@ -85,9 +85,12 @@ The unifying principle this ADR adopts: **STATIC, per-unit visual identity is re
      locations — `core` (B.5) generalizes to *any named socket can host an effect*, each at its own
      per-creature height. Every entity depth-sorts independently, so each occludes correctly on its own.
    - **Multiple INSTANCES of one effect** (the trio) = the engine spawns **one** baked fireball sheet
-     **N times** at N orbit phases around the anchor. The pipeline bakes a single sheet; the count and
-     arrangement are runtime. Each instance is its own depth-sorted entity → some in front of the
-     shoulder, some behind, correctly.
+     **N times** around the anchor, driven by a **SINGLE shared orbit clock** with instances at evenly
+     spaced phase offsets (`i · 360°/N`). They rotate as one **rigid, evenly-spaced constellation** —
+     they must **not** drift into a line or bunch up, which independent per-orb timers would eventually
+     do (and look silly). On a count change (throw one), the survivors **re-space evenly** across the
+     new N−1. The pipeline bakes a single sheet; count, spacing, and the shared phase are runtime. Each
+     instance is its own depth-sorted entity → some in front of the shoulder, some behind, correctly.
    - **Dynamic count** (throw one → N−1) = pure runtime **spawn/despawn** of effect entities — gameplay
      state, **not baked data**, zero contract impact. (Effect entities batch on the shared effect
      atlas, so the cost is *sprites, not bakes*.)
