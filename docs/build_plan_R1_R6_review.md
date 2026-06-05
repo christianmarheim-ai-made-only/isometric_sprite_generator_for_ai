@@ -5,6 +5,10 @@
 > R2–R6 planned); §2 covers sequencing, open questions, and what's deferred.
 > Date: 2026-06-05.
 
+> Supersedes `docs/next_slices_plan.md` (the legacy M1/M2 + setup plan, slices P0–P5 /
+> C0–C9, now shipped as the R1-equivalent foundation). For R2–R6 **this file is
+> authoritative**; ignore that file's §8 P/C status tracker.
+
 ---
 
 ## 0. Context
@@ -94,8 +98,10 @@ part — and is the bake engine for everything below.
   the Gate-2 direction check.
 - `bake.py` — orchestrator: (mesh/descriptor) → R1 render 16 frames → pack atlases →
   engine-shaped manifest → `expected_facing_table.json` → validate.
-- **Vendor the engine `manifest.schema.json`**; add **Gate 1** to `build.py` (validate our
-  manifest against it + the two cross-field rules).
+- **Vendor the engine `manifest.schema.json`** — from the engine repo's **corrected** copy
+  `C:\Code\Claude\docs\pipeline\manifest.schema.json` (30°), **not** the stale
+  `dist/game_iso_v1_reference_v1/CONTRACT/manifest.schema.json` (still says 26.565°).
+  Add **Gate 1** to `build.py` (validate our manifest against it + the two cross-field rules).
 **Acceptance:** our generated manifest passes the vendored engine schema + cross-field
 rules; `bake.py` produces a complete package from a procedural mesh; existing gate green.
 **Depends on:** R1. **Spec status:** fully resolved (the loader contract is pinned).

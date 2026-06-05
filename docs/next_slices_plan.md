@@ -1,6 +1,11 @@
 # Sprite Pipeline — Implementation Plan: Next Slices
 
-_Prepared 2026-06-05. This file is the source of truth for the self-paced build loop._
+> ⚠️ **LEGACY / SUPERSEDED for R2–R6.** This is the M1/M2 + early-setup plan (slices
+> P0–P5, C0–C9), now **shipped** as the R1-equivalent foundation. The **authoritative
+> forward plan is [build_plan_R1_R6_review.md](build_plan_R1_R6_review.md)** (slices
+> R1–R6). An autonomous loop must take the next slice from that R1–R6 plan — **NOT**
+> from the §8 P/C status tracker below (which would point it at C1, a Blender-blocked
+> rig doc, instead of R2). Kept for history.
 
 ## Scope guard (this iteration)
 
@@ -11,6 +16,10 @@ fire/strike markers, runtime equipment layering, and ranged states are deferred
 ADR-0009/0010/0011 (Proposed) and are not implemented now.
 
 ## How the loop uses this document
+
+> **For R2–R6 this procedure is superseded — follow `build_plan_R1_R6_review.md` §1
+> (the R-slices), not the §8 P/C tracker below (which would target C1, not R2).** The
+> steps below are the legacy P/C procedure, kept for history.
 
 Each iteration:
 1. Read this file. Find the first slice in [§4](#4-execution-order) whose status

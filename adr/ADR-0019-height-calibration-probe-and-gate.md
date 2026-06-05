@@ -11,6 +11,12 @@ ADR-0018 pins vertical projection by an explicit height pixel scale rather than 
 
 ## Decision
 
+> **⚠️ SUPERSEDED — see the Resolution section at the end of this ADR.** The bake-side
+> gate is a **foreshortening / aspect** check at 30°, **not** a pixel-height equality
+> check — the `height_world × 24` pixel height is an **engine** test
+> (`render.rs::sprite_size`), not a bake gate. Do not build the redundant pixel-height
+> gate in R3.
+
 Add a **height-calibration probe** — the vertical analogue of the arrow direction probe — and gate height-bearing bakes on it.
 
 - The probe is a known-height vertical reference (e.g., posts of exactly 1.00 m and 2.00 m at the origin), rendered through the production bake path.

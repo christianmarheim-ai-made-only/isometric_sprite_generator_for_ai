@@ -1,98 +1,61 @@
-# Sprite Pipeline M1/M2 Review Bundle
+# Isometric Sprite Generator (`game_iso_v1`)
 
-This bundle contains two things:
+A headless pipeline that bakes a 3D model into **16-direction isometric sprite sheets
++ a machine-readable manifest** for a Bevy/Vulkan isometric game (format
+**`game_iso_v1`**). Core discipline: **avoid silent contract bugs** — output that looks
+right but is subtly wrong (a half-bin rotation, a flipped axis, a wrong camera angle, a
+blended mask value).
 
-1. **ADR review pack** for the blockers identified before M3: arms, weapons, shields, gear, metrics, sockets, effects, AI generation, validation, and atlas/compression policy.
-2. **M1/M2 direction-only implementation** using a generated arrow sprite to verify direction bins, screen projection, atlas packing, hitmask plumbing, anchors, manifest structure, lockfile hash, and validation.
+## Status
 
-The implementation intentionally does **not** solve arms/weapons/equipment in this iteration. Those decisions are captured in proposed ADRs and should be reviewed before M3.
+- **M1/M2 arrow pilot + hardening** — done: deterministic 16-direction probe, validator,
+  fixtures, lockfile `contract_hash` gate, source-asset schema + linter, policies.
+- **R1 — headless 3D renderer** — done: `pipeline/tools/render3d.py`, a numpy
+  orthographic rasterizer whose camera matches the engine's ground projection to
+  floating-point precision.
+- **R2–R6** — spec-resolved in **[docs/build_plan_R1_R6_review.md](docs/build_plan_R1_R6_review.md)**,
+  the **authoritative forward plan**: engine-shaped manifest + bake orchestrator (R2),
+  acceptance gates + calibration (R3), real-mesh + hit-proxy R8 hitmask + metrics (R4),
+  animation/crop + full manifest convergence (R5), first reference character end-to-end +
+  engine load-test (R6).
 
-## Directory layout
-
-```text
-adr/
-  INDEX.md
-  ADR-0006 ... ADR-0017
-
-pipeline/
-  lockfiles/
-    sprite_contract.lock.json
-    sprite_states.lock.json
-    sprite_variants.lock.json
-  schema/
-    sprite_manifest.schema.json
-  tools/
-    contract_hash.py
-    generate_arrow_pilot.py
-    validate_manifest.py
-    smoke_test.py
-  output/arrow_pilot/
-    manifest.json
-    color_atlas.png
-    hitmask_atlas.png
-    debug_sheet.png
-    expected_facing_table.json
-    validation_report.json
-    frames/
-  docs/
-    M1_M2_RUNBOOK.md
-    ASSUMPTIONS.md
-    BEVY_LOADER_INTEGRATION.md
-  bevy_reference/
-    src/
-```
-
-## Quick start
-
-From this directory:
+One green build gate (currently 8/8):
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
 pip install -r requirements.txt
-python pipeline/tools/generate_arrow_pilot.py --clean
-python pipeline/tools/validate_manifest.py pipeline/output/arrow_pilot/manifest.json --report pipeline/output/arrow_pilot/validation_report.json
-python pipeline/tools/smoke_test.py
+python pipeline/tools/build.py --ci
 ```
 
-Expected result: validator reports `ok: true`, and smoke test confirms that a corrupted hash fails closed.
+## The engine contract (pinned)
 
-## Human review target
+`game_iso_v1`: camera **azimuth 45°, elevation 30°** (`sin30° = 0.5` → a 2:1 ground tile;
+`arctan(0.5) ≈ 26.565°` is the on-screen *tile-edge* angle, **not** the camera elevation),
+**1 unit = 1 m**, forward **+X**, up **+Z**, origin = ground footprint center. The engine
+sizes sprites by **`height_world × 24`** (`render.rs::sprite_size`), so the bake supplies
+the **30° foreshortening + `height_world`**, **not** an in-bake ×24. The manifest's
+top-level must carry a `camera` block (`camera.id == "game_iso_v1"`), `frames[]` with
+per-frame `rect` + `anchor`, and (for non-probe variants) `world_metrics`. Full pinned
+contract + locked conventions: **[docs/build_plan_R1_R6_review.md §0](docs/build_plan_R1_R6_review.md)**
+and **[docs/engine_reference_alignment.md](docs/engine_reference_alignment.md)**.
 
-Open:
+## Layout
 
 ```text
-pipeline/output/arrow_pilot/debug_sheet.png
+adr/                       ADR-0006..0019 (design decisions; weapons/AI/compression deferred)
+docs/                      plans + policies — build_plan_R1_R6_review.md is authoritative for R2-R6
+pipeline/
+  tools/                   generators, render3d (R1), validator, source linter, build.py gate, tests
+  schema/                  manifest + source-asset JSON schemas (+ examples)
+  lockfiles/               sprite_contract / sprite_states / sprite_variants
+  style/                   palette + readability previews
+  output/arrow_pilot/      the committed M1/M2 golden baseline (regenerable)
+  bevy_reference/          reference-only Rust snippets (the real engine is the authority)
+source_assets/             source-asset descriptors (e.g. arrow_probe)
 ```
 
-Verify:
+## Scope (this iteration)
 
-- `dir00` is world `+X / East` and appears down-right under the 2:1 iso projection.
-- `dir02` points straight down.
-- `dir10` points straight up.
-- The red cross marks the frame-local anchor `[64,112]`.
-- Direction order winds clockwise on screen as world yaw increases CCW.
-
-## What is implemented
-
-- 16 deterministic direction frames.
-- one color atlas with 4px padding/extrusion.
-- one R8 hitmask atlas with 4px padding/extrusion.
-- manifest with `contract_hash`, `state_contract_version`, atlas rects, frame-local anchor, socket, boxes, world-yaw values, and screen direction vectors.
-- JSON schema.
-- lockfile hash computation.
-- validator cross-checks for lockfiles, states, images, masks, boxes, metrics, dense directions, and M1 diagnostic pair.
-- Bevy/Rust reference snippets for direction lookup, anchor conversion, and hit testing.
-
-## What is intentionally deferred
-
-- Blender headless rendering.
-- real character capsule placeholder.
-- rig-derived hit proxies.
-- arms/weapons/shields/gear combat surfaces.
-- markers and effects.
-- runtime Bevy plugin integration.
-- AI generation.
-- compression/streaming.
-
-Those are covered by the ADRs and should be handled as M2A/M3/M4 work.
+**Body-only.** Weapons, equipment, AI generation, and compression are deferred
+(ADR-0009/0010/0011/0016/0017). The pipeline runs **fully headless** on procedural
+meshes; real art (Blender / glTF / AI) plugs into the **R4** mesh-input and **R5**
+animation seams without pipeline changes.

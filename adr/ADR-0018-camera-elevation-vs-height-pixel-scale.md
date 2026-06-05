@@ -36,6 +36,13 @@ validated contract and must be pinned for production before any height-bearing b
 
 ## Decision
 
+> **⚠️ SUPERSEDED — see the Resolution section at the end of this ADR.** Decision
+> point 1 below ("set the height scale explicitly in the bake" / anamorphic ×24) is
+> **wrong**: the engine applies `×24` itself (`render.rs::sprite_size`). The bake must
+> **not** apply a ×24/anamorphic squash — it bakes at **30°** (correct foreshortening)
+> and emits `height_world`. (Current code is already correct; this note prevents a wrong
+> re-implementation during R2–R6.)
+
 1. The authoritative vertical spec is the **height pixel scale**
    `height_px_per_world_unit` = the engine's `HEIGHT_SCREEN_SCALE` (currently `24`).
    It is **set explicitly in the bake**, not left to fall out of the 30° camera
