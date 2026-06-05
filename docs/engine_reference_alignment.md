@@ -79,10 +79,17 @@ extrusion; atlas `path` relative to manifest; R8 hitmask + palette
   look right on screen, checked via the oracle).
 - `eye_height_world` absent → engine uses **`0.85 · height_world`**.
 
-## ⚠️ OPEN: camera elevation 30° vs 26.565° (USER OWNS THE DECISION)
+## RESOLVED: camera elevation = 30° (confirmed); height↔×24 mapping is the live item
 
-Three positions on the table — **do not silently pick one; this is the one
-irreversible mistake (a wrong elevation forces a full re-bake):**
+> **Update (post-write): the engine confirmed `30°`.** The v1 reference package's
+> `26.565°` claim was the error; a corrected package is incoming. **ADR-0018 (which
+> leaned 30°) stands — no rewrite.** The only remaining live item is the **30° ↔
+> `height·24` reconciliation** (how real heights foreshorten) — the flat arrow can't
+> reveal it, so settle it with a height-bearing reference / the ADR-0019 probe.
+> Original three-position analysis kept below for context.
+
+Three positions that were on the table — **a wrong elevation is the one
+irreversible mistake (forces a full re-bake):**
 
 - **Engine reference (this package):** `26.565° = arctan(0.5)` is correct; **`30°` is
   "wrong"** (stated in README, the format spec, the QA doc, and the schema). Suggests
