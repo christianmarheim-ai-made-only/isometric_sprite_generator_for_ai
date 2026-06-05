@@ -18,9 +18,12 @@ All ADRs are **Proposed** unless ratified by the engine/gameplay review group. T
 | ADR-0015 | M1/M2 arrow pilot direction-only scope | M1/M2 |
 | ADR-0016 | AI generation behind proven seam + cleanup/source validator | M4 |
 | ADR-0017 | Atlas/compression/streaming deferred until measured | M4/M5 |
+| ADR-0018 | Vertical projection pinned by height pixel scale (30°/26.565° trap) | M3 |
+| ADR-0019 | Height-calibration probe + gate before height bakes | M2A/M3 |
 
 ## Review order
 
 1. ADR-0015 and ADR-0014 first: they affect the included M1/M2 implementation.
 2. ADR-0006 through ADR-0013 before M3: they define arms, weapons, shields, gear, sockets, and effects.
 3. ADR-0016 and ADR-0017 before M4/M5: they control generator rollout and memory/compression work.
+4. ADR-0018 and ADR-0019 before any height-bearing bake (M2A/M3): they pin vertical projection by a height pixel scale and gate it with a calibration probe.
