@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "source_asset.schema.json",
+  "title": "Sprite Pipeline Source Asset Descriptor",
+  "description": "Describes a Blender (or other) source asset so the source linter can validate it before export. Body-only this iteration; the schema permits weapon/shield/gear regions and arbitrary socket names for forward-compatibility, but policy (which are allowed now) is enforced by the linter.",
+  "type": "object",
+  "required": [
+    "asset_id",
+    "variant_class",
+    "source_format",
+    "forward_axis",
+    "up_axis",
+    "units",
+    "origin_policy",
+    "visual_objects",
+    "hit_proxy_objects",
+    "metric_proxy_objects",
+    "sockets",
+    "clips_states"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "asset_id": {"type": "string", "minLength": 1},
+    "variant_class": {"type": "string", "enum": ["probe", "character", "effect"]},
+    "source_format": {"type": "string", "enum": ["blend", "fbx", "gltf"]},
+    "forward_axis": {"type": "string", "enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]},
+    "up_axis": {"type": "string", "enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]},
+    "units": {"type": "string", "enum": ["meter", "centimeter", "millimeter", "inch", "foot"]},
+    "origin_policy": {
+      "type": "string",
+      "enum": ["ground_footprint_center", "emission_point", "mesh_origin", "bbox_center"]
+    },
+    "visual_objects": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "hit_proxy_objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "region"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "region": {
+            "type": "string",
+            "enum": ["head", "torso", "arms", "legs", "shield", "weapon", "gear"]
+          }
+        }
+      }
+    },
+    "metric_proxy_objects": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "sockets": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "clips_states": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["state", "frames"],
+        "additionalProperties": false,
+        "properties": {
+          "state": {"type": "string", "minLength": 1},
+          "frames": {"type": "integer", "minimum": 1},
+          "playback": {"type": "string", "enum": ["loop", "once", "once_hold"]},
+          "clip": {"type": ["string", "null"]},
+          "directional": {"type": "boolean"}
+        }
+      }
+    },
+    "notes": {"type": "string"}
+  }
+}

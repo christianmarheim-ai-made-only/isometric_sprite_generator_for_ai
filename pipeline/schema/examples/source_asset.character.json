@@ -1,0 +1,25 @@
+{
+  "asset_id": "soldier_body",
+  "variant_class": "character",
+  "source_format": "blend",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "ground_footprint_center",
+  "visual_objects": ["VIS_body"],
+  "hit_proxy_objects": [
+    {"name": "HIT_head", "region": "head"},
+    {"name": "HIT_torso", "region": "torso"},
+    {"name": "HIT_arm_l", "region": "arms"},
+    {"name": "HIT_arm_r", "region": "arms"},
+    {"name": "HIT_leg_l", "region": "legs"},
+    {"name": "HIT_leg_r", "region": "legs"}
+  ],
+  "metric_proxy_objects": ["METRIC_body"],
+  "sockets": ["origin", "head_center", "hand_l", "hand_r"],
+  "clips_states": [
+    {"state": "idle", "frames": 8, "playback": "loop", "clip": "idle", "directional": true},
+    {"state": "walk", "frames": 8, "playback": "loop", "clip": "walk", "directional": true}
+  ],
+  "notes": "Body-only humanoid (C1/C6). Weapons/shield/gear deferred (post-M3). Frame counts here are illustrative; authoritative counts come from sprite_states.lock.json."
+}

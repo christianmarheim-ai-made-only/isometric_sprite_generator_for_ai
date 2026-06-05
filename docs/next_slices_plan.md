@@ -266,8 +266,8 @@ _Updated by each loop iteration._
 | C0 | done | naming_conventions.md |
 | C2 | done | region_assignment_policy.md |
 | C4 | done | world_metrics_policy.md + measure_metrics.py |
-| P3 | next | schema + body examples |
-| P4 | todo | linter v1 + fixtures |
+| P3 | done | source_asset.schema.json + probe/character/effect examples |
+| P4 | next | linter v1 + fixtures |
 | P2 | todo · blocked:blender (.blend/render) | tooling+descriptor doable now |
 | C5 | todo | headless PIL OK |
 | C1 | todo · blocked:blender (.blend) | skeleton_spec doable now |

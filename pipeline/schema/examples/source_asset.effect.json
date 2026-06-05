@@ -1,0 +1,17 @@
+{
+  "asset_id": "debug_flash",
+  "variant_class": "effect",
+  "source_format": "blend",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "emission_point",
+  "visual_objects": ["VIS_flash"],
+  "hit_proxy_objects": [],
+  "metric_proxy_objects": [],
+  "sockets": ["origin"],
+  "clips_states": [
+    {"state": "play", "frames": 6, "playback": "once", "clip": "flash", "directional": true}
+  ],
+  "notes": "Directional debug flash (C7). Effects have no hitregions (ADR-0012); anchor = emission point; weapon-free."
+}
