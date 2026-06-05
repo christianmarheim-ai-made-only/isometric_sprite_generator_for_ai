@@ -153,11 +153,23 @@ Schema: `pipeline/schema/external_asset.schema.json`. Example: `pipeline/example
 
 ## 8. What the pipeline does with it (consumption)
 
-`bake.py --mesh-file` (OBJ, numpy path) and `blender_bake.py --mesh-file` (glb, Blender path)
-already consume a **static** mesh (regions by material name) and emit the package. The **rigged +
-animated** path (import skeleton + skin + clips, sample each state, combine a variant mesh with a
-shared animation library, render the multi-state package) is the next build step on top of the
-Blender path — the contract above is what it consumes; nothing here changes when it lands.
+One command bakes any compliant asset:
+
+```text
+python pipeline/tools/bake_asset.py your.asset.json
+```
+
+It validates the manifest (the linter), then routes by type and emits an engine-loadable package
+(Gate-1 checked):
+
+| Delivery | Route |
+|---|---|
+| `.obj` mesh | numpy baker (static) |
+| `.glb`/`.gltf`, no rig/animations | Blender baker (static) |
+| `.glb`/`.gltf` + `rig` + `animations` | Blender **animation** baker — imports the skeleton + skin + clips, samples each declared state's clip into poses, renders the **multi-state** package |
+
+All three paths ship today. The rigged path is demonstrated by `pipeline/examples/sparrow.asset.json`
+(+ `crow.glb`, the same rig + animation, different mesh — the reuse case).
 
 ## 9. Validation + acceptance
 

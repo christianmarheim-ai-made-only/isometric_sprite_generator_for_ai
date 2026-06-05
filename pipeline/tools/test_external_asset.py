@@ -34,6 +34,8 @@ def main() -> int:
                 not lint(EX / "humanoid_v1.asset.json"))
     ok &= check("examples/bird_v1.asset.json lints clean as a template (--no-files)",
                 not lint(EX / "bird_v1.asset.json", check_files=False))
+    ok &= check("examples/sparrow.asset.json lints clean (real rigged glb + animations)",
+                not lint(EX / "sparrow.asset.json"))
 
     for prof in ("biped_v1", "bird_v1"):
         p = json.loads((RIG / f"{prof}.json").read_text(encoding="utf-8"))
