@@ -45,6 +45,7 @@ STEPS = [
     ("test_external_asset", [str(SCRIPT_DIR / "test_external_asset.py")]),
     ("test_engine_load", [str(SCRIPT_DIR / "test_engine_load.py")]),
     ("test_blender_parity", [str(SCRIPT_DIR / "test_blender_parity.py")]),
+    ("test_rigged_anim", [str(SCRIPT_DIR / "test_rigged_anim.py")]),
 ]
 
 

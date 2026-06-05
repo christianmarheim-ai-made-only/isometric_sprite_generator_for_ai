@@ -31,7 +31,7 @@ import meshes  # noqa: E402
 from render3d import ground_screen_direction  # noqa: E402
 from measure_metrics import compute_world_metrics  # noqa: E402
 from gate_engine_accept import engine_accept  # noqa: E402
-from bake import _pack, _contract_fields  # noqa: E402  (reuse the atlas packer + contract fields)
+from bake import _pack, _contract_fields, shelf_place, place_into  # noqa: E402  (reuse packers)
 
 CANVAS, DIRS = 256, 16
 
@@ -156,6 +156,88 @@ def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = 
         "build": {"generator": "pipeline/tools/blender_bake.py",
                   "mesh": (Path(mesh_file).name if mesh_file else "humanoid"),
                   "renderer": f"blender_workbench_{meta.get('blender_version', '?')}"},
+    }
+    manifest.update(_contract_fields())
+    (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return manifest, meta
+
+
+def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations: dict,
+                  variant_id: str) -> tuple[dict, dict]:
+    """R8: bake a RIGGED + ANIMATED glb into a MULTI-STATE, tight-cropped package by SAMPLING the
+    glb's clips (blender_render_anim). `asset_animations` = {state: {clip, frames, fps, playback}}
+    from the asset manifest. Same package shape as the procedural bake_character_anim (R5)."""
+    out.mkdir(parents=True, exist_ok=True)
+    states_spec = {s: {"clip": a.get("clip", s), "frames": a["frames"]} for s, a in asset_animations.items()}
+    states_json = out / "_states.json"
+    states_json.write_text(json.dumps(states_spec), encoding="utf-8")
+    proc = subprocess.run(
+        [blender_exe, "--background", "--python", str(SCRIPT_DIR / "blender_render_anim.py"),
+         "--", str(out), str(SCRIPT_DIR), str(mesh_file), str(states_json)],
+        capture_output=True, text=True)
+    meta_p = out / "anim_meta.json"
+    if proc.returncode != 0 or not meta_p.exists():
+        raise RuntimeError(f"anim render failed (exit {proc.returncode}):\n{proc.stdout[-1500:]}\n{proc.stderr[-1500:]}")
+    meta = json.loads(meta_p.read_text(encoding="utf-8"))
+    targets = {int(k): [round(_srgb(c) * 255) for c in v] for k, v in meta["region_color"].items()}
+    canvas = (CANVAS, CANVAS)
+
+    color_imgs, region_imgs, fmeta = [], [], []
+    for state, fi in meta["poses"]:
+        for d in range(DIRS):
+            cimg = Image.open(out / f"color_{state}_f{fi}_dir{d:02d}.png").convert("RGBA")
+            rids = _region_ids(out / f"region_{state}_f{fi}_dir{d:02d}.png", targets)
+            a = np.asarray(cimg)[:, :, 3]
+            ys, xs = np.nonzero(a > 0)
+            bx, by, bw, bh = (int(xs.min()), int(ys.min()), int(xs.max() - xs.min() + 1),
+                              int(ys.max() - ys.min() + 1)) if len(xs) else (0, 0, 1, 1)
+            color_imgs.append(cimg.crop((bx, by, bx + bw, by + bh)))
+            region_imgs.append(Image.fromarray(rids[by:by + bh, bx:bx + bw], "L"))
+            fmeta.append((state, d, fi, [bx, by]))
+
+    placements, atlas_size = shelf_place([im.size for im in color_imgs])
+    color_atlas, rects = place_into(color_imgs, placements, atlas_size, "RGBA")
+    mask_atlas, _ = place_into(region_imgs, placements, atlas_size, "L")
+    color_atlas.save(out / "color_atlas.png")
+    mask_atlas.save(out / "hitmask_atlas.png")
+
+    height, foot_r = float(meta["mesh_height"]), float(meta["mesh_footprint"])
+    metrics = compute_world_metrics((-foot_r, -foot_r, 0.0), (foot_r, foot_r, height), eye_z=round(height * 0.9, 4))
+    ax, ay = round(meta["anchor_frac"][0] * CANVAS, 3), round(meta["anchor_frac"][1] * CANVAS, 3)
+    tip_len = CANVAS * 0.1
+    frames, expected = [], []
+    for (state, d, fi, trim), rect in zip(fmeta, rects):
+        yaw = d * (2 * math.pi / DIRS)
+        sdv = [round(v, 6) for v in ground_screen_direction(yaw).tolist()]
+        frames.append({
+            "state": state, "direction": d, "frame_index": fi, "rect": rect, "mask_rect": rect,
+            "trim": trim, "logical_frame_canvas": list(canvas), "anchor": [ax, ay],
+            "world_yaw_degrees": round(math.degrees(yaw), 6), "screen_direction_vector": sdv,
+            "sockets": {"origin": [ax, ay],
+                        "direction_tip": [round(ax + sdv[0] * tip_len, 3), round(ay + sdv[1] * tip_len, 3)]},
+        })
+        if state == "idle" and fi == 0:
+            expected.append({"direction": d, "world_yaw_degrees": round(math.degrees(yaw), 6),
+                             "screen_direction_vector": sdv})
+
+    animations = {s: {"directions": DIRS, "fps": a["fps"], "frames": a["frames"], "playback": a["playback"]}
+                  for s, a in asset_animations.items()}
+    manifest = {
+        "manifest_version": "sprite_manifest_multistate_v1",
+        "camera": {"id": "game_iso_v1", "azimuth_degrees": 45, "camera_elevation_degrees": 30,
+                   "projection": "orthographic_pixel_iso_dimetric_2_to_1", "screen_y": "down", "tile_px": [64, 32]},
+        "variant_id": variant_id, "variant_class": "character", "direction_count": DIRS,
+        "frame_canvas": list(canvas), "logical_frame_canvas": list(canvas),
+        "default_state": "idle" if "idle" in asset_animations else sorted(asset_animations)[0],
+        "animations": animations,
+        "atlases": {"color": {"path": "color_atlas.png", "size": list(color_atlas.size)},
+                    "hitmask": {"path": "hitmask_atlas.png", "size": list(mask_atlas.size),
+                                "format": "PNG_R8_UINT_linear_no_antialias", "sampling": "nearest",
+                                "palette": {"none": 0, "head": 1, "torso": 2, "arms": 3, "legs": 4}}},
+        "frames": frames, "expected_facing": expected, "world_metrics": metrics,
+        "build": {"generator": "pipeline/tools/blender_bake.py", "mesh": Path(mesh_file).name,
+                  "renderer": f"blender_workbench_anim_{meta.get('blender_version', '?')}",
+                  "states": sorted(asset_animations)},
     }
     manifest.update(_contract_fields())
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")

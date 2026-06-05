@@ -72,6 +72,12 @@ if MESH_FILE:
     region_of = {mat.name: region_for_name(mat.name) for mat in mesh.materials if mat}
     has_tex = any(mat and mat.use_nodes and any(n.type == 'TEX_IMAGE' and n.image
                   for n in mat.node_tree.nodes) for mat in mesh.materials)
+    for _m in mesh.materials:  # show the real PBR base color in MATERIAL mode (Workbench reads diffuse_color)
+        if _m and _m.use_nodes:
+            _b = next((n for n in _m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
+            if _b is not None:
+                _c = _b.inputs['Base Color'].default_value
+                _m.diffuse_color = (_c[0], _c[1], _c[2], 1.0)
 else:
     verts, faces, freg = meshes.humanoid()
     mesh = bpy.data.meshes.new("humanoid")

@@ -28,9 +28,9 @@ import meshes  # noqa: E402
 REGION_NAMES = {1: "head", 2: "torso", 3: "arms", 4: "legs"}
 # keyword (lowercased substring of the material/group name) -> region id. Order: specific first.
 REGION_KEYWORDS = [
-    ("head", 1), ("skull", 1), ("face", 1), ("neck", 1),
-    ("torso", 2), ("chest", 2), ("body", 2), ("spine", 2), ("hip", 2), ("pelvis", 2), ("waist", 2),
-    ("arm", 3), ("hand", 3), ("shoulder", 3), ("elbow", 3), ("wrist", 3),
+    ("head", 1), ("skull", 1), ("face", 1), ("neck", 1), ("beak", 1),
+    ("torso", 2), ("chest", 2), ("body", 2), ("spine", 2), ("hip", 2), ("pelvis", 2), ("waist", 2), ("tail", 2),
+    ("arm", 3), ("hand", 3), ("shoulder", 3), ("elbow", 3), ("wrist", 3), ("wing", 3),
     ("leg", 4), ("foot", 4), ("feet", 4), ("thigh", 4), ("shin", 4), ("knee", 4), ("ankle", 4),
 ]
 
