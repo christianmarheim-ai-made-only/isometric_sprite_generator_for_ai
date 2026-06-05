@@ -167,25 +167,33 @@ def region_box(mask: Image.Image, value: int) -> list[int] | None:
 
 
 def extrude_frame(atlas: Image.Image, frame: Image.Image, rect_x: int, rect_y: int, pad: int) -> None:
-    """Paste frame and extrude its frame edges into the pad area."""
+    """Paste frame and extrude its frame edges into the pad area.
+
+    Edge extrusion replicates the 1px border into the gutter, so every resize
+    uses NEAREST. For the R8 hitmask this keeps region IDs discrete -- no
+    interpolated in-between values -- making mask discreteness structural rather
+    than an accident of today's 1px-uniform strips. The color atlas uses NEAREST
+    too: for a 1px-wide source strip it is identical to any filter and it states
+    the replication intent.
+    """
     w, h = frame.size
     atlas.paste(frame, (rect_x, rect_y))
 
     # Sides.
-    left_col = frame.crop((0, 0, 1, h)).resize((pad, h))
-    right_col = frame.crop((w - 1, 0, w, h)).resize((pad, h))
-    top_row = frame.crop((0, 0, w, 1)).resize((w, pad))
-    bottom_row = frame.crop((0, h - 1, w, h)).resize((w, pad))
+    left_col = frame.crop((0, 0, 1, h)).resize((pad, h), Image.NEAREST)
+    right_col = frame.crop((w - 1, 0, w, h)).resize((pad, h), Image.NEAREST)
+    top_row = frame.crop((0, 0, w, 1)).resize((w, pad), Image.NEAREST)
+    bottom_row = frame.crop((0, h - 1, w, h)).resize((w, pad), Image.NEAREST)
     atlas.paste(left_col, (rect_x - pad, rect_y))
     atlas.paste(right_col, (rect_x + w, rect_y))
     atlas.paste(top_row, (rect_x, rect_y - pad))
     atlas.paste(bottom_row, (rect_x, rect_y + h))
 
     # Corners.
-    atlas.paste(frame.crop((0, 0, 1, 1)).resize((pad, pad)), (rect_x - pad, rect_y - pad))
-    atlas.paste(frame.crop((w - 1, 0, w, 1)).resize((pad, pad)), (rect_x + w, rect_y - pad))
-    atlas.paste(frame.crop((0, h - 1, 1, h)).resize((pad, pad)), (rect_x - pad, rect_y + h))
-    atlas.paste(frame.crop((w - 1, h - 1, w, h)).resize((pad, pad)), (rect_x + w, rect_y + h))
+    atlas.paste(frame.crop((0, 0, 1, 1)).resize((pad, pad), Image.NEAREST), (rect_x - pad, rect_y - pad))
+    atlas.paste(frame.crop((w - 1, 0, w, 1)).resize((pad, pad), Image.NEAREST), (rect_x + w, rect_y - pad))
+    atlas.paste(frame.crop((0, h - 1, 1, h)).resize((pad, pad), Image.NEAREST), (rect_x - pad, rect_y + h))
+    atlas.paste(frame.crop((w - 1, h - 1, w, h)).resize((pad, pad), Image.NEAREST), (rect_x + w, rect_y + h))
 
 
 def make_atlases(frames: list[Image.Image], masks: list[Image.Image]) -> tuple[Image.Image, Image.Image, list[list[int]]]:

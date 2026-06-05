@@ -76,6 +76,12 @@ impl SpriteManifest {
         self.frames.iter().find(|f| f.state == state && f.direction == direction && f.frame_index == frame_index)
     }
 
+    /// Fail closed on stale or mismatched assets.
+    ///
+    /// `expected_contract_hash` is the hash of the engine's `sprite_contract.lock.json`
+    /// alone (the contract seam). State and variant compatibility are checked separately
+    /// via `state_contract_version` and the validator's per-variant cross-check, so adding
+    /// a variant does not change the hash or reject existing assets.
     pub fn critical_runtime_asserts(&self, expected_contract_hash: &str, expected_state_contract_version: &str) -> Result<(), String> {
         if self.contract_hash != expected_contract_hash {
             return Err(format!("contract_hash mismatch: asset={} engine={}", self.contract_hash, expected_contract_hash));

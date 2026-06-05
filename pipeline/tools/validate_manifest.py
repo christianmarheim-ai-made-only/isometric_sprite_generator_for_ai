@@ -142,17 +142,24 @@ def validate_frame_images(manifest: dict[str, Any], color: Image.Image, mask: Im
         label = f"{frame['state']} dir{frame['direction']:02d} frame{frame['frame_index']:02d}"
         rect = frame["rect"]
         mask_rect = frame["mask_rect"]
+        # Frame-local coords (anchor/sockets/boxes) are defined relative to the
+        # rect's top-left and bounded by the rect's own w/h -- not frame_canvas.
+        # They coincide today because the pilot never crops (rect == canvas; the
+        # assertion below enforces that). When M3 tight-crop lands (rect.w <
+        # canvas_w), this is the correct bound; the crop-contains-anchor rule and
+        # the canvas-sized pixel loops below will then need a dedicated M3 test.
+        rect_w, rect_h = rect[2], rect[3]
         reporter.assert_true(rect_inside(rect, color.size), f"{label}: color rect inside atlas")
         reporter.assert_true(rect_inside(mask_rect, mask.size), f"{label}: mask rect inside atlas")
         reporter.assert_true(rect[2:] == [canvas_w, canvas_h], f"{label}: color rect dimensions equal frame_canvas")
         reporter.assert_true(mask_rect[2:] == rect[2:], f"{label}: mask rect dimensions equal color rect")
         ax, ay = frame["anchor"]
-        reporter.assert_true(0 <= ax < canvas_w and 0 <= ay < canvas_h, f"{label}: anchor inside frame canvas")
+        reporter.assert_true(0 <= ax < rect_w and 0 <= ay < rect_h, f"{label}: anchor inside frame rect")
         origin = frame.get("sockets", {}).get("origin")
         reporter.assert_true(origin == frame["anchor"], f"{label}: origin socket equals anchor")
         for socket_name, point in frame.get("sockets", {}).items():
             sx, sy = point
-            reporter.assert_true(0 <= sx < canvas_w and 0 <= sy < canvas_h, f"{label}: socket {socket_name} inside frame canvas")
+            reporter.assert_true(0 <= sx < rect_w and 0 <= sy < rect_h, f"{label}: socket {socket_name} inside frame rect")
 
         color_crop = color.crop((rect[0], rect[1], rect[0] + rect[2], rect[1] + rect[3]))
         mask_crop = mask.crop((mask_rect[0], mask_rect[1], mask_rect[0] + mask_rect[2], mask_rect[1] + mask_rect[3]))
@@ -177,7 +184,7 @@ def validate_frame_images(manifest: dict[str, Any], color: Image.Image, mask: Im
                 continue
             region_value = int(mask_palette[region_name])
             bx, by, bw, bh = box
-            reporter.assert_true(0 <= bx < canvas_w and 0 <= by < canvas_h and bw > 0 and bh > 0 and bx + bw <= canvas_w and by + bh <= canvas_h, f"{label}: {region_name} box inside frame")
+            reporter.assert_true(0 <= bx < rect_w and 0 <= by < rect_h and bw > 0 and bh > 0 and bx + bw <= rect_w and by + bh <= rect_h, f"{label}: {region_name} box inside frame")
             xs: list[int] = []
             ys: list[int] = []
             for y in range(canvas_h):

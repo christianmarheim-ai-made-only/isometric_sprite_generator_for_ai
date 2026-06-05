@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compute the shared lockfile hash for the M1/M2 sprite pipeline debug subset."""
+"""Compute the engine-facing contract hash for the M1/M2 sprite pipeline debug subset."""
 from __future__ import annotations
 
 import argparse
@@ -8,8 +8,13 @@ import json
 from pathlib import Path
 from typing import Any
 
+# The engine-facing seam lives in this lockfile alone (camera, coordinates,
+# formats, palette, sampling, packing); it is the only input to contract_hash.
+CONTRACT_LOCKFILE_NAME = "sprite_contract.lock.json"
+
+# All lockfiles, hashed individually for provenance in manifest.build.
 LOCKFILE_NAMES = [
-    "sprite_contract.lock.json",
+    CONTRACT_LOCKFILE_NAME,
     "sprite_states.lock.json",
     "sprite_variants.lock.json",
 ]
@@ -25,13 +30,20 @@ def canonical_json_bytes(value: Any) -> bytes:
 
 
 def compute_contract_hash(lockfiles_dir: Path) -> str:
-    bundle = {}
-    for name in LOCKFILE_NAMES:
-        path = lockfiles_dir / name
-        if not path.exists():
-            raise FileNotFoundError(f"Missing lockfile: {path}")
-        bundle[name] = load_json(path)
-    digest = hashlib.sha256(canonical_json_bytes(bundle)).hexdigest()
+    """Hash only the engine-facing contract lockfile.
+
+    The contract_hash guards the seam the engine actually consumes -- camera,
+    coordinates, formats, palette, sampling, packing -- so it is derived from
+    sprite_contract.lock.json alone. State compatibility is carried separately
+    by state_contract_version, and variant compatibility by the validator's
+    per-variant cross-check, so adding a variant or editing the states lock must
+    NOT change this hash or invalidate previously generated manifests.
+    See ADR-0014 and the M1/M2 review.
+    """
+    path = lockfiles_dir / CONTRACT_LOCKFILE_NAME
+    if not path.exists():
+        raise FileNotFoundError(f"Missing lockfile: {path}")
+    digest = hashlib.sha256(canonical_json_bytes(load_json(path))).hexdigest()
     return f"sha256:{digest}"
 
 

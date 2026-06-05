@@ -6,7 +6,7 @@ The files under `pipeline/bevy_reference/src/` are reference snippets, not a ful
 
 When loading a sprite manifest, the engine should fail closed if:
 
-- `contract_hash` does not match the engine's lockfiles.
+- `contract_hash` does not match the engine's contract lockfile (`sprite_contract.lock.json` only; state and variant compatibility are checked separately via `state_contract_version` and the per-variant cross-check, so growing the variant roster does not change this hash).
 - `state_contract_version` does not match the engine's pinned state contract.
 - requested state/direction/frame is missing.
 - a rect lies outside the atlas.
