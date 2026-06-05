@@ -135,8 +135,10 @@ Only once these pass is it worth UV-unwrapping and texturing.
 ## After the body: textures, rig, animation
 
 Once the body passes the check above, continue with
-[`external_asset_contract.md`](external_asset_contract.md): UVs + base-color texture (§3), the rig +
-skin if animated (§5), the animation clips (§6), and the small `*.asset.json` manifest (§7). The
+[`texturing_the_body.md`](texturing_the_body.md) for the UV + base-color texture (it ships a
+UV-unwrapped model + layout template to paint on), then
+[`external_asset_contract.md`](external_asset_contract.md) for the rig + skin if animated (§5), the
+animation clips (§6), and the small `*.asset.json` manifest (§7). The
 **reuse split** there is why this stage matters: one body+texture per *variant*, but one rig + one
 animation library shared across the whole *archetype* (10 birds = 10 bodies + 1 `bird_v1` rig + 1
 animation library).

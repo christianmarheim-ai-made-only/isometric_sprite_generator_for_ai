@@ -1,0 +1,10 @@
+{
+  "asset_contract_version": "external_asset_v1",
+  "variant_id": "humanoid_textured",
+  "archetype": "humanoid",
+  "files": { "mesh": "humanoid_textured.glb" },
+  "geometry": { "up": "y", "forward": "+x", "unit": "meter" },
+  "region_source": "material_name",
+  "textures": { "base_color": "uv_checker.png" },
+  "notes": "Worked texture example: the humanoid body UV-unwrapped with uv_checker.png wired as base color (embedded in the glb). Proves the texture round-trip renders (Workbench TEXTURE pass)."
+}

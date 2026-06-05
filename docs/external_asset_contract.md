@@ -62,6 +62,10 @@ declared state. To add a bird, you deliver only a new skinned mesh + texture.
 
 ## 3. Texture / material (for "look sharp")
 
+> **Painting the texture?** See [`texturing_the_body.md`](texturing_the_body.md) for the how-to —
+> with a ready UV-unwrapped model + layout template to paint on, and a verify step. This section is
+> the spec.
+
 - **Format:** PNG, **sRGB** base color, power-of-two (512–2048). Optional `normal` (linear) +
   `roughness`/`metallic` for nicer shading. Reference them from the glTF materials (standard
   PBR `baseColorTexture` etc.) or list them in the manifest `textures`.
