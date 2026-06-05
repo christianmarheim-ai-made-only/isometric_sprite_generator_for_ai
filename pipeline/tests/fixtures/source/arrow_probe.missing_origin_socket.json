@@ -1,0 +1,15 @@
+{
+  "asset_id": "arrow_probe",
+  "variant_class": "probe",
+  "source_format": "blend",
+  "source_file": "arrow_probe.blend",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "ground_footprint_center",
+  "visual_objects": ["VIS_arrow"],
+  "hit_proxy_objects": [{"name": "HIT_torso", "region": "torso"}],
+  "metric_proxy_objects": [],
+  "sockets": [],
+  "clips_states": [{"state": "idle", "frames": 1, "playback": "loop", "directional": true}]
+}

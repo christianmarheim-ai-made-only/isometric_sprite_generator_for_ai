@@ -267,8 +267,8 @@ _Updated by each loop iteration._
 | C2 | done | region_assignment_policy.md |
 | C4 | done | world_metrics_policy.md + measure_metrics.py |
 | P3 | done | source_asset.schema.json + probe/character/effect examples |
-| P4 | next | linter v1 + fixtures |
-| P2 | todo · blocked:blender (.blend/render) | tooling+descriptor doable now |
+| P4 | done | lint_source_asset.py + fixtures + test_lint_source |
+| P2 | next · blocked:blender (.blend/render) | tooling+descriptor doable now |
 | C5 | todo | headless PIL OK |
 | C1 | todo · blocked:blender (.blend) | skeleton_spec doable now |
 | P5 | todo | code now; fixtures need C1 |

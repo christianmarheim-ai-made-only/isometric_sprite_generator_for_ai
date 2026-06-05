@@ -23,6 +23,7 @@
     "asset_id": {"type": "string", "minLength": 1},
     "variant_class": {"type": "string", "enum": ["probe", "character", "effect"]},
     "source_format": {"type": "string", "enum": ["blend", "fbx", "gltf"]},
+    "source_file": {"type": "string", "minLength": 1},
     "forward_axis": {"type": "string", "enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]},
     "up_axis": {"type": "string", "enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]},
     "units": {"type": "string", "enum": ["meter", "centimeter", "millimeter", "inch", "foot"]},
