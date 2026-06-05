@@ -1,0 +1,22 @@
+{
+  "palette_version": "style_palette_v1",
+  "notes": "Visual style palette for sprite authoring (straight alpha). This is NOT the hitmask region palette (that is sprite_contract.lock.json mask_palette). Roles group shadow/mid/light ramps; keep a limited palette for readability.",
+  "colors": [
+    {"name": "outline", "rgba": [26, 22, 30, 255], "role": "outline"},
+    {"name": "neutral_dark", "rgba": [44, 46, 58, 255], "role": "neutral"},
+    {"name": "neutral_mid", "rgba": [120, 124, 140, 255], "role": "neutral"},
+    {"name": "neutral_light", "rgba": [206, 212, 222, 255], "role": "neutral"},
+    {"name": "skin_shadow", "rgba": [150, 96, 78, 255], "role": "skin"},
+    {"name": "skin_mid", "rgba": [206, 150, 120, 255], "role": "skin"},
+    {"name": "skin_light", "rgba": [240, 198, 168, 255], "role": "skin"},
+    {"name": "cloth_shadow", "rgba": [58, 70, 110, 255], "role": "cloth"},
+    {"name": "cloth_mid", "rgba": [86, 110, 168, 255], "role": "cloth"},
+    {"name": "cloth_light", "rgba": [140, 168, 220, 255], "role": "cloth"},
+    {"name": "leather_shadow", "rgba": [78, 54, 38, 255], "role": "leather"},
+    {"name": "leather_mid", "rgba": [126, 90, 60, 255], "role": "leather"},
+    {"name": "metal_shadow", "rgba": [82, 92, 104, 255], "role": "metal"},
+    {"name": "metal_mid", "rgba": [150, 162, 176, 255], "role": "metal"},
+    {"name": "metal_light", "rgba": [214, 224, 236, 255], "role": "metal"},
+    {"name": "accent_warm", "rgba": [220, 150, 60, 255], "role": "accent"}
+  ]
+}

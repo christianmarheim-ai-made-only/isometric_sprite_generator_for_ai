@@ -269,8 +269,8 @@ _Updated by each loop iteration._
 | P3 | done | source_asset.schema.json + probe/character/effect examples |
 | P4 | done | lint_source_asset.py + fixtures + test_lint_source |
 | P2 | partial:blender | exporter + descriptor done; .blend + render are human steps |
-| C5 | next | headless PIL OK |
-| C1 | todo · blocked:blender (.blend) | skeleton_spec doable now |
+| C5 | done | style_guide.md + palette.json + make_style_assets.py |
+| C1 | next · blocked:blender (.blend) | skeleton_spec doable now |
 | P5 | todo | code now; fixtures need C1 |
 | C6 | todo · blocked:blender (.blend) | descriptors/conformance now |
 | C7 | todo | weapon-free; PIL OK |
