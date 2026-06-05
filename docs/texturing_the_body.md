@@ -44,7 +44,8 @@ checker, and validate with the bake below — the rules and the verify step are 
 1. **A UV unwrap.** Non-overlapping islands. The body from the modeling stage should already have
    one; if not, unwrap it (a cube/box projection reads cleanly on blocky bodies, smart-UV on organic
    ones). The renderer samples your texture through these UVs.
-2. **Base color = PNG, sRGB, power-of-two** (512–2048 px). This is the "diffuse"/albedo — the color
+2. **Base color = PNG, sRGB**, each dimension a power of two in {512, 1024, 2048} (width and height
+   may differ, e.g. 1024×2048). This is the "diffuse"/albedo — the color
    of the surface. (The pipeline renders with `view_transform = Standard`, so your sRGB colors show
    as authored — no filmic/AgX shift.)
 3. **Wire it as the glTF base color**, i.e. an **Image Texture → Principled BSDF "Base Color"** on

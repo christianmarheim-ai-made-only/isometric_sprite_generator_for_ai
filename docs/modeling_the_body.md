@@ -32,9 +32,9 @@ If any of these is wrong the body will look wrong in-engine no matter how good t
    sized from real height; wrong scale ⇒ wrong on-screen size next to everything else.
 2. **Up axis.** Build Z-up, or Y-up and declare `up: "y"` in the manifest later. (glTF is Y-up by
    default; the pipeline converts.)
-3. **Forward = +X.** The body **faces +X** — that is "direction 0". Nose/chest/beak point down the
-   +X axis. (If you must face another way, you'll declare `forward` later, but +X is the default and
-   the simplest.)
+3. **Forward = +X — required.** The body **faces +X** (direction 0); nose/chest/beak point down the
+   +X axis. `forward` is declared-only (the schema pins it to `+x`) and is **not applied by any baker
+   yet** — a body built facing another way renders 90/180° wrong. Build it facing +X.
 4. **Origin = ground footprint centre.** The lowest point sits at **z = 0**, and the standing
    footprint is centred on **x = y = 0**. Feet on the floor, body over the origin.
 5. **Give it a FRONT — front and back must look different.** This is the rule people miss. If the

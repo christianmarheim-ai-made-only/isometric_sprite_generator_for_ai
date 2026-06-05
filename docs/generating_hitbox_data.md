@@ -11,10 +11,14 @@ artifact that bundles them:
 |---|---|---|
 | **R8 hit-mask** (per-pixel region map: head/torso/arms/legs) | the **region-tagged faces** (material names) | the renderer, automatically, at bake time |
 | **`world_metrics`** (the collision capsule: height, footprint radius, eye) | the body's **vertex AABB** | the baker, automatically; you can override |
-| **`hitbox_v1` JSON** (capsule + per-region world AABBs) | the same vertices | `hitbox_from_mesh.py`, or an AI by hand |
+| **`hitbox_v1` JSON** (capsule + per-region world AABBs) — **OPTIONAL, verification-only** | the same vertices | `hitbox_from_mesh.py`, or an AI by hand |
 
 You do **not** paint or place hitboxes by eye. You **tag** the geometry by region (already done in
 [`modeling_the_body.md`](modeling_the_body.md)) and **measure** the rest.
+
+> The `hitbox_v1` JSON is **not a delivery**: no `*.asset.json` field references it and no baker
+> consumes it. It is a diagnostic you generate to confirm the bake's `world_metrics`/regions. The R8
+> mask + `world_metrics` (both produced by the baker) are the authoritative hit data the engine uses.
 
 ---
 
@@ -25,8 +29,9 @@ keyword table is in [`modeling_the_body.md`](modeling_the_body.md)). The rendere
 into a per-pixel **R8 mask atlas** (palette `none 0 / head 1 / torso 2 / arms 3 / legs 4`), one
 region id per pixel, aligned to the color sprite. **There is nothing extra to author** — if the
 materials are named right, the mask is correct. Verify it on the `*_hit_sheet.png`
-(head=red/torso=green/arms=blue/legs=yellow). Body-only this iteration: ids `1..4` only; `5..7`
-(weapon/shield/gear) are reserved and rejected.
+(head=red/torso=green/arms=blue/legs=yellow). Body-only this iteration: ids `1..4` only. `5..7`
+(weapon/shield/gear) are **reserved in the palette for a future gear iteration** — there is no
+authoring path to them yet (weapon/shield material names map to `torso`, like any unmatched name).
 
 ## 2. The collision capsule (`world_metrics`) — measured from the AABB
 
@@ -37,13 +42,13 @@ model's vertices:
 ```text
 height_world           = max(z) over all verts                       # top of the body above ground
 footprint_radius_world = max(|x|,|y|) over GROUND-CONTACT verts only  # z <= zmin + 0.15*height (zmin=0 after step 2)
-eye_height_world       = head/eye socket z, else 0.9 * height_world   # must be <= height_world
+eye_height_world       = 0.9 * height_world   # OPTIONAL; no eye-socket input is read this iteration; <= height
 ```
 
 Two rules that matter:
 
 - **Footprint = ground contact, not the widest cross-section.** Use only the verts near the floor
-  (`z <= 0.15 * height`). An out-flung arm or a wing must **not** inflate the collision radius — the
+  (`z <= zmin + 0.15*(zmax−zmin)`, with `zmin=0` after normalizing). An out-flung arm or a wing must **not** inflate the collision radius — the
   capsule is what the body stands in, not its silhouette. (See
   [`world_metrics_policy.md`](world_metrics_policy.md).)
 - **Exclude equipment** from the proxy — held weapons, shields, capes, backpacks, VFX. Body-only

@@ -31,7 +31,8 @@ cell's full address is the triple `(state, direction, frame_index)`:
   no gaps/dupes. Total `frames[]` length == Σ over states of `direction_count × frames`.
 
 **(C) `default_state`** (NEW, optional scalar): the state shown when nothing is playing. Omit →
-engine defaults to `"idle"`; if no `idle`, the first state in sorted key order.
+engine defaults to `"idle"`; if no `idle`, the **lexicographically-first** state name (byte/ASCII
+order) — e.g. with states `{attack, fly}` and no idle, `attack`.
 
 This **extends** game_iso_v1 (`camera.id` stays `"game_iso_v1"`; all existing required fields +
 loader rules unchanged; the schema's `additionalProperties:true` already permits these).
@@ -44,15 +45,26 @@ loader rules unchanged; the schema's `additionalProperties:true` already permits
 
 ## 3. Tight-crop (R5) — the sizing decision
 Tight-cropping trims transparent padding, so a frame's `rect` is smaller than its logical cell.
-The engine sizes by `world_height × HEIGHT_SCREEN_SCALE` × the **logical** frame aspect, and
-anchors by a fraction of the **logical** frame. A trimmed `rect` alone breaks both. So carry the
-logical frame explicitly. Emit per frame (or top-level if uniform):
+The engine sizes via `scale = world_height × HEIGHT_SCREEN_SCALE / logical_frame_canvas.h`, then
+draws the tight `rect` at `rect.w × scale` by `rect.h × scale`, and anchors by a fraction of the
+**logical** frame. A trimmed `rect` alone breaks both. So carry the logical frame explicitly. Emit
+per frame (or top-level if uniform):
 - **`logical_frame_canvas`**: `[w, h]` — the **untrimmed** cell size; the sizing reference that
   maps to `world_metrics` (height). (Equals today's `frame_canvas` for uncropped frames.)
-- **`rect`**: `[x, y, w, h]` — the **tight** atlas region (the actual pixels), as today.
+- **`rect`**: `[x, y, w, h]` — the **tight** color-atlas region (the actual pixels), as today.
+- **`mask_rect`**: `[x, y, w, h]` — the tight region in the **hitmask** atlas; its `w,h` MUST equal
+  `rect`'s `w,h` (the engine rejects a size mismatch). Position may differ if the atlases pack
+  independently; today `mask_rect == rect`.
 - **`trim`**: `[ox, oy]` — the tight rect's top-left **within** the logical frame (`[0,0]` if
   uncropped).
-- **`anchor`**: `[ax, ay]` — the foot, in **logical** `frame_canvas` coordinates (as today).
+- **`anchor`**: `[ax, ay]` — the foot, in **absolute logical-frame PIXELS** (top-left origin, +Y
+  down; NOT a 0..1 fraction). The engine divides by `logical_frame_canvas` to normalize.
+
+**Atlases:** the manifest carries `atlases.color` (`path` + `size`) and `atlases.hitmask` (`path` +
+`size` + `format` + `sampling` + `palette`). For large models (16 dirs × many frames × many actions
+× higher res) these may be **paged** — multiple atlas pages addressed by a per-frame `page` index;
+see [`atlas_paging_contract.md`](atlas_paging_contract.md). Single-page is the default and loads
+unchanged.
 
 Engine sizing/placement (deterministic):
 - `scale = world_height × HEIGHT_SCREEN_SCALE / logical_frame_canvas.h`

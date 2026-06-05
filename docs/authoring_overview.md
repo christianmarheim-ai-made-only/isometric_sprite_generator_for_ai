@@ -31,4 +31,9 @@ python pipeline/tools/make_contact_sheet.py pipeline/output/<variant_id>   # eye
 per *variant*. So **10 birds = 10 bodies/textures + 1 `bird_v1` rig + 1 animation file**, and the
 hitbox for each falls out of its geometry. One AI can churn the whole set.
 
-> Body-only this iteration: no weapons/shields/gear (HIT regions 5–7 reserved).
+**Fixed pipeline constants (not producer choices):** the logical frame canvas is **256×256** and the
+height scale is **24 on-screen px per world-metre** (`on_screen_height ≈ world_height × 24`); detail
+finer than ~`world_height/256` m is wasted at the reference size.
+
+> Body-only this iteration: no weapons/shields/gear (HIT regions 5–7 reserved for a future iteration;
+> there is no authoring path to them yet).
