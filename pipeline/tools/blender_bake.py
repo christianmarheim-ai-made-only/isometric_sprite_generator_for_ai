@@ -164,7 +164,7 @@ def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = 
 
 
 def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations: dict,
-                  variant_id: str, default_state: str | None = None) -> tuple[dict, dict]:
+                  variant_id: str, default_state: str | None = None, up: str = "y") -> tuple[dict, dict]:
     """R8: bake a RIGGED + ANIMATED glb into a MULTI-STATE, tight-cropped package by SAMPLING the
     glb's clips (blender_render_anim). `asset_animations` = {state: {clip, frames, fps, playback}}
     from the asset manifest. Same package shape as the procedural bake_character_anim (R5)."""
@@ -175,7 +175,7 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
     states_json.write_text(json.dumps(states_spec), encoding="utf-8")
     proc = subprocess.run(
         [blender_exe, "--background", "--python", str(SCRIPT_DIR / "blender_render_anim.py"),
-         "--", str(out), str(SCRIPT_DIR), str(mesh_file), str(states_json)],
+         "--", str(out), str(SCRIPT_DIR), str(mesh_file), str(states_json), str(up)],
         capture_output=True, text=True)
     meta_p = out / "anim_meta.json"
     if proc.returncode != 0 or not meta_p.exists():

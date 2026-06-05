@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "results": [
+    {
+      "file": "chr_pirate_duelist_v1.asset.json",
+      "schema": "schema/external_asset.schema.json",
+      "valid": true
+    },
+    {
+      "file": "chr_pirate_duelist_v1_anim.json",
+      "schema": "schema/animation_clips.schema.json",
+      "valid": true
+    },
+    {
+      "file": "chr_pirate_duelist_v1_hitbox.json",
+      "schema": "schema/hitbox_spec.schema.json",
+      "valid": true
+    },
+    {
+      "file": "chr_pirate_duelist_v1.source_asset.json",
+      "schema": "schema/source_asset.schema.json",
+      "valid": true
+    }
+  ]
+}

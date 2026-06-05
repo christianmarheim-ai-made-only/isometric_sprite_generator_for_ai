@@ -24,7 +24,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from bake import shelf_place, place_into  # noqa: E402
-from constants import MAX_PAGE_PX  # noqa: E402  (per-page cap; see atlas_paging_contract.md §5)
+from constants import MAX_PAGE_PX, PAD  # noqa: E402  (per-page cap; see atlas_paging_contract.md §5)
 
 
 def _box(rect):
@@ -58,7 +58,9 @@ def shard(pkg: Path, out: Path, policy: str = "per_state") -> dict:
         sfr = [f for f in frames if f.get("state", "idle") == state]
         cims = [color.crop(_box(f["rect"])) for f in sfr]
         mims = [hit.crop(_box(f.get("mask_rect", f["rect"]))) for f in sfr]
-        placements, atlas_size = shelf_place([im.size for im in cims], max_w=MAX_PAGE_PX)
+        # Target MAX_PAGE_PX - PAD: shelf_place returns content_width + PAD, so packing up to
+        # MAX_PAGE_PX would overshoot the cap by PAD (a fully-packed row yielded 4097-4099px).
+        placements, atlas_size = shelf_place([im.size for im in cims], max_w=MAX_PAGE_PX - PAD)
         cpage, rects = place_into(cims, placements, atlas_size, "RGBA")
         mpage, _ = place_into(mims, placements, atlas_size, "L")
         if cpage.width > MAX_PAGE_PX or cpage.height > MAX_PAGE_PX:

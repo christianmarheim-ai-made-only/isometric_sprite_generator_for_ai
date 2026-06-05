@@ -15,6 +15,7 @@ from mathutils import Matrix, Vector
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 OUT, TOOLS, MESH_FILE, STATES_JSON = argv[0], argv[1], argv[2], argv[3]
+UP = argv[4] if len(argv) > 4 else "y"  # asset geometry.up; "z" needs a Z-up correction (see below)
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, TOOLS)
 from mesh_io import region_for_name, REGION_KEYWORDS  # noqa: E402
@@ -34,6 +35,14 @@ imported = [o for o in bpy.data.objects if o not in before]
 obj = next(o for o in imported if o.type == 'MESH')
 arm = next((o for o in imported if o.type == 'ARMATURE'), None)
 root_obj = arm if arm else obj
+
+# Honor the asset's declared up-axis. Blender's glTF importer ALWAYS assumes the file is glTF
+# Y-up and rotates +90deg about X. A glb authored Z-up (geometry.up == "z") therefore lands on
+# its back (body along Blender -Y). Undo it with a -90deg X rotation so the character stands
+# head-up (+Z), forward unchanged (+X). up == "y" (standard glTF, e.g. grunt/sparrow) needs none.
+if UP == "z":
+    root_obj.matrix_world = Matrix.Rotation(math.radians(-90.0), 4, 'X') @ root_obj.matrix_world
+    bpy.context.view_layer.update()
 
 bpy.context.view_layer.update()
 cos = [obj.matrix_world @ v.co for v in obj.data.vertices]      # rest world coords

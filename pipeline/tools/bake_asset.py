@@ -71,7 +71,7 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
                 mesh_for_bake = str(animated)
                 route = "Blender / rigged + animated (clips embedded from animation_clips JSON)"
             manifest, _ = bake_animated(out, blender, mesh_for_bake, anims, variant_id,
-                                        default_state=asset.get("default_state"))
+                                        default_state=asset.get("default_state"), up=up)
         else:
             manifest, _ = bake_blender(out, blender, str(mesh_path), variant_id)
             route = "Blender / static"

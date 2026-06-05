@@ -1,0 +1,1126 @@
+{
+  "model_source_version": "procedural_character_model_source_v1",
+  "asset_id": "chr_pirate_duelist_v1",
+  "character_name": "Pirate Duelist",
+  "archetype": "biped",
+  "rig_profile": "biped_v1",
+  "unit": "meter",
+  "up_axis": "+Z",
+  "forward_axis": "+X",
+  "origin_policy": "ground_footprint_center",
+  "art_direction": {
+    "style": "stylized isometric readable pirate NPC/combatant",
+    "silhouette": "large tricorn hat, navy long coat, red sash, boots, right-hand flintlock pistol",
+    "palette": [
+      "navy",
+      "burgundy red",
+      "dark brown leather",
+      "warm skin",
+      "brass/gold trim"
+    ],
+    "body_only_contract_note": "Pistol and hat are visual components tagged into body hit regions until weapon/gear regions are added to the contract."
+  },
+  "world_metrics": {
+    "unit": "meter",
+    "metrics_source": "authored_at_model_design_time",
+    "height_world": 1.82,
+    "visual_height_world": 2.02,
+    "footprint_radius_world": 0.38,
+    "eye_height_world": 1.64,
+    "eye_position_world": [
+      0.13,
+      0.0,
+      1.64
+    ],
+    "shoulder_height_world": 1.42,
+    "capsule_height_world": 1.82,
+    "capsule_radius_world": 0.38,
+    "origin_policy": "ground_footprint_center",
+    "forward_axis": "+X",
+    "up_axis": "+Z"
+  },
+  "physical_metrics": {
+    "unit": "meter_kg_second",
+    "metrics_source": "authored_from_metric_proxy_volume",
+    "density_profile": "human_v1",
+    "density_kg_per_m3": 985.0,
+    "body_volume_m3": 0.086294,
+    "mass_kg": 85.0,
+    "weight_newtons_earth": 833.565,
+    "gravity_m_per_s2": 9.80665,
+    "volume_policy": "closed human body metric proxy; decorative hat, coat flares, pistol, loose cloth, and gear are excluded from body volume",
+    "metric_proxy_volume_breakdown_m3": [
+      {
+        "name": "torso_chest_abdomen_proxy",
+        "volume_m3": 0.036294
+      },
+      {
+        "name": "pelvis_proxy",
+        "volume_m3": 0.0115
+      },
+      {
+        "name": "head_neck_proxy",
+        "volume_m3": 0.0055
+      },
+      {
+        "name": "upper_arms_pair_proxy",
+        "volume_m3": 0.006
+      },
+      {
+        "name": "forearms_pair_proxy",
+        "volume_m3": 0.0044
+      },
+      {
+        "name": "hands_pair_proxy",
+        "volume_m3": 0.0011
+      },
+      {
+        "name": "thighs_pair_proxy",
+        "volume_m3": 0.0116
+      },
+      {
+        "name": "lower_legs_pair_proxy",
+        "volume_m3": 0.008
+      },
+      {
+        "name": "feet_pair_proxy",
+        "volume_m3": 0.0019
+      }
+    ]
+  },
+  "bones": [
+    {
+      "name": "root",
+      "parent": null,
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        0.1
+      ]
+    },
+    {
+      "name": "hips",
+      "parent": "root",
+      "head": [
+        0.0,
+        0.0,
+        0.92
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.02
+      ]
+    },
+    {
+      "name": "spine",
+      "parent": "hips",
+      "head": [
+        0.0,
+        0.0,
+        1.02
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.22
+      ]
+    },
+    {
+      "name": "chest",
+      "parent": "spine",
+      "head": [
+        0.0,
+        0.0,
+        1.22
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.44
+      ]
+    },
+    {
+      "name": "head",
+      "parent": "chest",
+      "head": [
+        0.0,
+        0.0,
+        1.46
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.8
+      ]
+    },
+    {
+      "name": "arm.L",
+      "parent": "chest",
+      "head": [
+        0.0,
+        0.2,
+        1.42
+      ],
+      "tail": [
+        0.0,
+        0.34,
+        1.16
+      ]
+    },
+    {
+      "name": "forearm.L",
+      "parent": "arm.L",
+      "head": [
+        0.0,
+        0.34,
+        1.16
+      ],
+      "tail": [
+        0.0,
+        0.44,
+        0.92
+      ]
+    },
+    {
+      "name": "hand.L",
+      "parent": "forearm.L",
+      "head": [
+        0.0,
+        0.44,
+        0.92
+      ],
+      "tail": [
+        0.0,
+        0.48,
+        0.84
+      ]
+    },
+    {
+      "name": "arm.R",
+      "parent": "chest",
+      "head": [
+        0.0,
+        -0.2,
+        1.42
+      ],
+      "tail": [
+        0.0,
+        -0.34,
+        1.16
+      ]
+    },
+    {
+      "name": "forearm.R",
+      "parent": "arm.R",
+      "head": [
+        0.0,
+        -0.34,
+        1.16
+      ],
+      "tail": [
+        0.0,
+        -0.44,
+        0.92
+      ]
+    },
+    {
+      "name": "hand.R",
+      "parent": "forearm.R",
+      "head": [
+        0.0,
+        -0.44,
+        0.92
+      ],
+      "tail": [
+        0.0,
+        -0.48,
+        0.84
+      ]
+    },
+    {
+      "name": "thigh.L",
+      "parent": "hips",
+      "head": [
+        0.0,
+        0.1,
+        0.92
+      ],
+      "tail": [
+        0.0,
+        0.1,
+        0.5
+      ]
+    },
+    {
+      "name": "shin.L",
+      "parent": "thigh.L",
+      "head": [
+        0.0,
+        0.1,
+        0.5
+      ],
+      "tail": [
+        0.0,
+        0.1,
+        0.08
+      ]
+    },
+    {
+      "name": "foot.L",
+      "parent": "shin.L",
+      "head": [
+        0.0,
+        0.1,
+        0.08
+      ],
+      "tail": [
+        0.12,
+        0.1,
+        0.0
+      ]
+    },
+    {
+      "name": "thigh.R",
+      "parent": "hips",
+      "head": [
+        0.0,
+        -0.1,
+        0.92
+      ],
+      "tail": [
+        0.0,
+        -0.1,
+        0.5
+      ]
+    },
+    {
+      "name": "shin.R",
+      "parent": "thigh.R",
+      "head": [
+        0.0,
+        -0.1,
+        0.5
+      ],
+      "tail": [
+        0.0,
+        -0.1,
+        0.08
+      ]
+    },
+    {
+      "name": "foot.R",
+      "parent": "shin.R",
+      "head": [
+        0.0,
+        -0.1,
+        0.08
+      ],
+      "tail": [
+        0.12,
+        -0.1,
+        0.0
+      ]
+    }
+  ],
+  "sockets": [
+    {
+      "name": "eye",
+      "parent_bone": "head",
+      "position_world": [
+        0.13,
+        0.0,
+        1.64
+      ],
+      "purpose": "vision/aim origin"
+    },
+    {
+      "name": "head_socket",
+      "parent_bone": "head",
+      "position_world": [
+        0.0,
+        0.0,
+        1.92
+      ],
+      "purpose": "hat/top-of-head attachment"
+    },
+    {
+      "name": "shoulder_perch.L",
+      "parent_bone": "chest",
+      "position_world": [
+        0.02,
+        0.23,
+        1.43
+      ],
+      "purpose": "parrot/perch attachment"
+    },
+    {
+      "name": "shoulder_perch.R",
+      "parent_bone": "chest",
+      "position_world": [
+        0.02,
+        -0.23,
+        1.43
+      ],
+      "purpose": "parrot/perch attachment"
+    },
+    {
+      "name": "hand.L",
+      "parent_bone": "hand.L",
+      "position_world": [
+        0.03,
+        0.49,
+        0.88
+      ],
+      "purpose": "offhand item attach"
+    },
+    {
+      "name": "hand.R",
+      "parent_bone": "hand.R",
+      "position_world": [
+        0.03,
+        -0.49,
+        0.88
+      ],
+      "purpose": "weapon attach"
+    },
+    {
+      "name": "muzzle.R",
+      "parent_bone": "hand.R",
+      "position_world": [
+        0.48,
+        -0.5,
+        0.91
+      ],
+      "purpose": "projectile/VFX spawn; forward +X"
+    },
+    {
+      "name": "back_socket",
+      "parent_bone": "chest",
+      "position_world": [
+        -0.16,
+        0.0,
+        1.25
+      ],
+      "purpose": "back/cape/loot attach"
+    },
+    {
+      "name": "belt_socket",
+      "parent_bone": "hips",
+      "position_world": [
+        0.1,
+        -0.24,
+        0.94
+      ],
+      "purpose": "belt/holster attach"
+    },
+    {
+      "name": "foot.L",
+      "parent_bone": "foot.L",
+      "position_world": [
+        0.12,
+        0.1,
+        0.02
+      ],
+      "purpose": "left footstep/contact"
+    },
+    {
+      "name": "foot.R",
+      "parent_bone": "foot.R",
+      "position_world": [
+        0.12,
+        -0.1,
+        0.02
+      ],
+      "purpose": "right footstep/contact"
+    }
+  ],
+  "materials_ref": "chr_pirate_duelist_v1_materials.json",
+  "texture_atlas_ref": "chr_pirate_duelist_v1_texture_atlas.json",
+  "components": [
+    {
+      "name": "torso_pelvis_body",
+      "shape": "ellipsoid",
+      "bone": "hips",
+      "material": "torso_coat_navy",
+      "center": [
+        0.0,
+        0.0,
+        0.98
+      ],
+      "radii": [
+        0.19,
+        0.28,
+        0.17
+      ],
+      "segments": 16,
+      "rings": 8,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_chest_body",
+      "shape": "ellipsoid",
+      "bone": "chest",
+      "material": "torso_coat_navy",
+      "center": [
+        0.02,
+        0.0,
+        1.25
+      ],
+      "radii": [
+        0.23,
+        0.32,
+        0.3
+      ],
+      "segments": 18,
+      "rings": 9,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_shirt_front_panel",
+      "shape": "box",
+      "bone": "chest",
+      "material": "torso_shirt_cream",
+      "center": [
+        0.24,
+        0.0,
+        1.24
+      ],
+      "size": [
+        0.035,
+        0.18,
+        0.42
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_waist_sash_front",
+      "shape": "box",
+      "bone": "hips",
+      "material": "torso_sash_red",
+      "center": [
+        0.22,
+        0.0,
+        0.94
+      ],
+      "size": [
+        0.04,
+        0.48,
+        0.12
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_waist_sash_left",
+      "shape": "box",
+      "bone": "hips",
+      "material": "torso_sash_red",
+      "center": [
+        0.0,
+        0.29,
+        0.94
+      ],
+      "size": [
+        0.3,
+        0.035,
+        0.11
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_waist_sash_right",
+      "shape": "box",
+      "bone": "hips",
+      "material": "torso_sash_red",
+      "center": [
+        0.0,
+        -0.29,
+        0.94
+      ],
+      "size": [
+        0.3,
+        0.035,
+        0.11
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_belt_front",
+      "shape": "box",
+      "bone": "hips",
+      "material": "torso_belt_leather",
+      "center": [
+        0.255,
+        0.0,
+        1.02
+      ],
+      "size": [
+        0.03,
+        0.5,
+        0.065
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_belt_buckle",
+      "shape": "box",
+      "bone": "hips",
+      "material": "torso_trim_gold",
+      "center": [
+        0.282,
+        0.0,
+        1.02
+      ],
+      "size": [
+        0.024,
+        0.09,
+        0.075
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_coat_tail_left",
+      "shape": "box",
+      "bone": "hips",
+      "material": "torso_coat_navy",
+      "center": [
+        -0.12,
+        0.16,
+        0.68
+      ],
+      "size": [
+        0.05,
+        0.18,
+        0.64
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_coat_tail_right",
+      "shape": "box",
+      "bone": "hips",
+      "material": "torso_coat_navy",
+      "center": [
+        -0.12,
+        -0.16,
+        0.68
+      ],
+      "size": [
+        0.05,
+        0.18,
+        0.64
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "torso_pendant",
+      "shape": "ellipsoid",
+      "bone": "chest",
+      "material": "torso_pendant_gold",
+      "center": [
+        0.255,
+        0.0,
+        1.39
+      ],
+      "radii": [
+        0.018,
+        0.035,
+        0.035
+      ],
+      "segments": 12,
+      "rings": 6,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_neck",
+      "shape": "cylinder",
+      "bone": "head",
+      "material": "head_skin_warm",
+      "p0": [
+        0.0,
+        0.0,
+        1.39
+      ],
+      "p1": [
+        0.0,
+        0.0,
+        1.5
+      ],
+      "radius": 0.055,
+      "segments": 14,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_face",
+      "shape": "ellipsoid",
+      "bone": "head",
+      "material": "head_skin_warm",
+      "center": [
+        0.055,
+        0.0,
+        1.61
+      ],
+      "radii": [
+        0.13,
+        0.105,
+        0.16
+      ],
+      "segments": 18,
+      "rings": 9,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_nose",
+      "shape": "ellipsoid",
+      "bone": "head",
+      "material": "head_skin_warm",
+      "center": [
+        0.18,
+        0.0,
+        1.62
+      ],
+      "radii": [
+        0.035,
+        0.018,
+        0.025
+      ],
+      "segments": 10,
+      "rings": 5,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_hair_back",
+      "shape": "ellipsoid",
+      "bone": "head",
+      "material": "head_hair_dark",
+      "center": [
+        -0.035,
+        0.0,
+        1.61
+      ],
+      "radii": [
+        0.105,
+        0.13,
+        0.16
+      ],
+      "segments": 16,
+      "rings": 8,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_beard_front",
+      "shape": "ellipsoid",
+      "bone": "head",
+      "material": "head_hair_dark",
+      "center": [
+        0.155,
+        0.0,
+        1.52
+      ],
+      "radii": [
+        0.04,
+        0.075,
+        0.06
+      ],
+      "segments": 12,
+      "rings": 6,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_bandana_wrap",
+      "shape": "ellipsoid",
+      "bone": "head",
+      "material": "head_bandana_red",
+      "center": [
+        0.02,
+        0.0,
+        1.73
+      ],
+      "radii": [
+        0.135,
+        0.145,
+        0.035
+      ],
+      "segments": 16,
+      "rings": 5,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_hat_brim",
+      "shape": "ellipsoid",
+      "bone": "head",
+      "material": "head_hat_navy",
+      "center": [
+        0.02,
+        0.0,
+        1.8
+      ],
+      "radii": [
+        0.23,
+        0.34,
+        0.045
+      ],
+      "segments": 24,
+      "rings": 5,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_hat_crown",
+      "shape": "ellipsoid",
+      "bone": "head",
+      "material": "head_hat_navy",
+      "center": [
+        0.02,
+        0.0,
+        1.9
+      ],
+      "radii": [
+        0.15,
+        0.22,
+        0.12
+      ],
+      "segments": 18,
+      "rings": 7,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_hat_front_gold_trim",
+      "shape": "box",
+      "bone": "head",
+      "material": "head_trim_gold",
+      "center": [
+        0.235,
+        0.0,
+        1.825
+      ],
+      "size": [
+        0.025,
+        0.42,
+        0.025
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_hat_left_gold_trim",
+      "shape": "box",
+      "bone": "head",
+      "material": "head_trim_gold",
+      "center": [
+        0.0,
+        0.335,
+        1.825
+      ],
+      "size": [
+        0.3,
+        0.025,
+        0.025
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "head_hat_right_gold_trim",
+      "shape": "box",
+      "bone": "head",
+      "material": "head_trim_gold",
+      "center": [
+        0.0,
+        -0.335,
+        1.825
+      ],
+      "size": [
+        0.3,
+        0.025,
+        0.025
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "arms_upper_L_sleeve",
+      "shape": "cylinder",
+      "bone": "arm.L",
+      "material": "arms_sleeve_navy",
+      "p0": [
+        0.0,
+        0.2,
+        1.42
+      ],
+      "p1": [
+        0.0,
+        0.34,
+        1.16
+      ],
+      "radius": 0.065,
+      "segments": 12,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "arms_forearm_L_sleeve",
+      "shape": "cylinder",
+      "bone": "forearm.L",
+      "material": "arms_sleeve_navy",
+      "p0": [
+        0.0,
+        0.34,
+        1.16
+      ],
+      "p1": [
+        0.0,
+        0.44,
+        0.94
+      ],
+      "radius": 0.055,
+      "segments": 12,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "arms_hand_L_skin",
+      "shape": "ellipsoid",
+      "bone": "hand.L",
+      "material": "arms_hand_skin",
+      "center": [
+        0.02,
+        0.48,
+        0.88
+      ],
+      "radii": [
+        0.045,
+        0.035,
+        0.055
+      ],
+      "segments": 10,
+      "rings": 5,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "arms_upper_R_sleeve",
+      "shape": "cylinder",
+      "bone": "arm.R",
+      "material": "arms_sleeve_navy",
+      "p0": [
+        0.0,
+        -0.2,
+        1.42
+      ],
+      "p1": [
+        0.0,
+        -0.34,
+        1.16
+      ],
+      "radius": 0.065,
+      "segments": 12,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "arms_forearm_R_sleeve",
+      "shape": "cylinder",
+      "bone": "forearm.R",
+      "material": "arms_sleeve_navy",
+      "p0": [
+        0.0,
+        -0.34,
+        1.16
+      ],
+      "p1": [
+        0.0,
+        -0.44,
+        0.94
+      ],
+      "radius": 0.055,
+      "segments": 12,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "arms_hand_R_skin",
+      "shape": "ellipsoid",
+      "bone": "hand.R",
+      "material": "arms_hand_skin",
+      "center": [
+        0.02,
+        -0.48,
+        0.88
+      ],
+      "radii": [
+        0.045,
+        0.035,
+        0.055
+      ],
+      "segments": 10,
+      "rings": 5,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "arms_pistol_barrel",
+      "shape": "cylinder",
+      "bone": "hand.R",
+      "material": "arms_pistol_steel",
+      "p0": [
+        0.16,
+        -0.5,
+        0.91
+      ],
+      "p1": [
+        0.48,
+        -0.5,
+        0.91
+      ],
+      "radius": 0.018,
+      "segments": 12,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "arms_pistol_grip",
+      "shape": "box",
+      "bone": "hand.R",
+      "material": "arms_pistol_wood",
+      "center": [
+        0.12,
+        -0.5,
+        0.84
+      ],
+      "size": [
+        0.08,
+        0.04,
+        0.14
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "arms_pistol_gold_lock",
+      "shape": "box",
+      "bone": "hand.R",
+      "material": "arms_pistol_gold",
+      "center": [
+        0.22,
+        -0.5,
+        0.87
+      ],
+      "size": [
+        0.06,
+        0.045,
+        0.035
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "legs_thigh_L_pants",
+      "shape": "cylinder",
+      "bone": "thigh.L",
+      "material": "legs_pants_brown",
+      "p0": [
+        0.0,
+        0.1,
+        0.9
+      ],
+      "p1": [
+        0.0,
+        0.1,
+        0.52
+      ],
+      "radius": 0.075,
+      "segments": 12,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "legs_shin_L_boot",
+      "shape": "cylinder",
+      "bone": "shin.L",
+      "material": "legs_boot_leather",
+      "p0": [
+        0.0,
+        0.1,
+        0.52
+      ],
+      "p1": [
+        0.01,
+        0.1,
+        0.1
+      ],
+      "radius": 0.065,
+      "segments": 12,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "legs_foot_L_boot",
+      "shape": "box",
+      "bone": "foot.L",
+      "material": "legs_boot_leather",
+      "center": [
+        0.11,
+        0.1,
+        0.045
+      ],
+      "size": [
+        0.24,
+        0.12,
+        0.08
+      ],
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "legs_thigh_R_pants",
+      "shape": "cylinder",
+      "bone": "thigh.R",
+      "material": "legs_pants_brown",
+      "p0": [
+        0.0,
+        -0.1,
+        0.9
+      ],
+      "p1": [
+        0.0,
+        -0.1,
+        0.52
+      ],
+      "radius": 0.075,
+      "segments": 12,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "legs_shin_R_boot",
+      "shape": "cylinder",
+      "bone": "shin.R",
+      "material": "legs_boot_leather",
+      "p0": [
+        0.0,
+        -0.1,
+        0.52
+      ],
+      "p1": [
+        0.01,
+        -0.1,
+        0.1
+      ],
+      "radius": 0.065,
+      "segments": 12,
+      "include_in_metric_volume": false
+    },
+    {
+      "name": "legs_foot_R_boot",
+      "shape": "box",
+      "bone": "foot.R",
+      "material": "legs_boot_leather",
+      "center": [
+        0.11,
+        -0.1,
+        0.045
+      ],
+      "size": [
+        0.24,
+        0.12,
+        0.08
+      ],
+      "include_in_metric_volume": false
+    }
+  ],
+  "generation_outputs": {
+    "mesh_glb": "chr_pirate_duelist_v1.glb",
+    "asset_manifest": "chr_pirate_duelist_v1.asset.json",
+    "animation_rawdata": "chr_pirate_duelist_v1_anim.json",
+    "hitbox_diagnostic": "chr_pirate_duelist_v1_hitbox.json"
+  }
+}

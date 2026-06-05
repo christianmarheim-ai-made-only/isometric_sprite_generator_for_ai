@@ -1,0 +1,51 @@
+{
+  "physical_metrics_version": "physical_metrics_v1_proposed_extension",
+  "asset_id": "chr_pirate_duelist_v1",
+  "unit": "meter_kg_second",
+  "metrics_source": "authored_from_metric_proxy_volume",
+  "density_profile": "human_v1",
+  "density_kg_per_m3": 985.0,
+  "body_volume_m3": 0.086294,
+  "mass_kg": 85.0,
+  "weight_newtons_earth": 833.565,
+  "gravity_m_per_s2": 9.80665,
+  "volume_policy": "closed human body metric proxy; decorative hat, coat flares, pistol, loose cloth, and gear are excluded from body volume",
+  "metric_proxy_volume_breakdown_m3": [
+    {
+      "name": "torso_chest_abdomen_proxy",
+      "volume_m3": 0.036294
+    },
+    {
+      "name": "pelvis_proxy",
+      "volume_m3": 0.0115
+    },
+    {
+      "name": "head_neck_proxy",
+      "volume_m3": 0.0055
+    },
+    {
+      "name": "upper_arms_pair_proxy",
+      "volume_m3": 0.006
+    },
+    {
+      "name": "forearms_pair_proxy",
+      "volume_m3": 0.0044
+    },
+    {
+      "name": "hands_pair_proxy",
+      "volume_m3": 0.0011
+    },
+    {
+      "name": "thighs_pair_proxy",
+      "volume_m3": 0.0116
+    },
+    {
+      "name": "lower_legs_pair_proxy",
+      "volume_m3": 0.008
+    },
+    {
+      "name": "feet_pair_proxy",
+      "volume_m3": 0.0019
+    }
+  ]
+}

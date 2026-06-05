@@ -37,8 +37,12 @@ declared state. To add a bird, you deliver only a new skinned mesh + texture.
 - **Units = metres.** A 1.8 m humanoid is 1.8 units tall. The pipeline sizes sprites from real
   height, so wrong scale = wrong on-screen size.
 - **Up axis:** declare `up` (`"y"` glTF-standard Y-up, `"z"` Z-up; default `z`). **HONORED for
-  `.obj`** — a Y-up obj without `up:"y"` bakes sideways. For `.glb`/`.gltf` the importer reads the
-  file's own axis and this field is currently inert; set it correctly anyway for portability.
+  `.obj`** (a Y-up obj without `up:"y"` bakes sideways) **and now for `.glb`/`.gltf`** — Blender's
+  glTF importer always assumes Y-up, so a Z-up-authored glb (`up:"z"`) is rotated upright by the bake
+  (a −90° X correction in `blender_render_anim`), while a standard Y-up glb (`up:"y"`) needs none.
+  Declare it to match how your glb is actually authored. *Confirmed end-to-end by the
+  `chr_pirate_duelist_v1` PoC — a `up:"z"` glb that baked lying down until the Blender path was taught
+  to honor the field.*
 - **Forward = +X — required.** The model MUST face +X (direction 0). `forward` is declared-only (the
   schema pins it to `"+x"`) and is **not applied by any baker yet** — a model facing another way
   renders 90/180° wrong. (Pipeline-applied `forward` rotation is a planned follow-up.)
