@@ -76,6 +76,10 @@ declared state. To add a bird, you deliver only a new skinned mesh + texture.
 
 ## 4. HIT regions (gameplay hit-mask — body-only this iteration)
 
+> **Generating the hit/collision data?** See [`generating_hitbox_data.md`](generating_hitbox_data.md)
+> — the R8 mask comes free from the region tags, and the collision capsule is pure min/max over the
+> vertices (a tool + the by-hand math). This section is the spec.
+
 Every face needs a body **HIT region** so the pipeline can emit the R8 hit-mask. Pick ONE:
 
 - **By material name (default, simplest):** name each material with a region keyword. The pipeline
@@ -103,6 +107,10 @@ Every face needs a body **HIT region** so the pipeline can emit the R8 hit-mask.
   cycles), and you only owe mesh + texture + HIT regions.
 
 ## 6. Animation (the movement data — read + write)
+
+> **Generating the animation?** See [`generating_animation_data.md`](generating_animation_data.md)
+> for authoring motion as a compact per-bone keyframe JSON (`anim_clips_v1`) that an AI can write by
+> hand, plus `bake_anim_from_json.py` to turn it into the glTF clips described below.
 
 Animations are **glTF 2.0 animation clips** — this IS the movement-data format, and it is what you
 read/write:

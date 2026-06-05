@@ -1,0 +1,72 @@
+{
+  "hitbox_spec_version": "hitbox_v1",
+  "from_mesh": "humanoid.obj",
+  "unit": "meter",
+  "up": "z",
+  "world_metrics": {
+    "height_world": 1.8,
+    "footprint_radius_world": 0.3,
+    "unit": "meter",
+    "eye_height_world": 1.62
+  },
+  "collision_capsule": {
+    "radius_world": 0.3,
+    "height_world": 1.8,
+    "note": "axis-aligned capsule/cylinder of this radius and height, centered on the foot at the origin"
+  },
+  "regions": {
+    "head": {
+      "id": 1,
+      "aabb_min": [
+        -0.19,
+        -0.12,
+        1.46
+      ],
+      "aabb_max": [
+        0.23,
+        0.12,
+        1.8
+      ]
+    },
+    "torso": {
+      "id": 2,
+      "aabb_min": [
+        -0.23,
+        -0.24,
+        0.88
+      ],
+      "aabb_max": [
+        0.23,
+        0.24,
+        1.46
+      ]
+    },
+    "arms": {
+      "id": 3,
+      "aabb_min": [
+        -0.15,
+        -0.38,
+        0.86
+      ],
+      "aabb_max": [
+        0.01,
+        0.38,
+        1.42
+      ]
+    },
+    "legs": {
+      "id": 4,
+      "aabb_min": [
+        -0.18,
+        -0.3,
+        0.0
+      ],
+      "aabb_max": [
+        0.04,
+        0.3,
+        0.92
+      ]
+    }
+  },
+  "hitmask_note": "the authoritative per-pixel HIT map is the R8 hitmask the renderer bakes from the SAME region tags (palette none0/head1/torso2/arms3/legs4); these AABBs are the coarse world-space boxes."
+}

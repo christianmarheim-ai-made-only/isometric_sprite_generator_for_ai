@@ -1,0 +1,24 @@
+{
+  "anim_spec_version": "anim_clips_v1",
+  "rig": "bird_v1",
+  "notes": "Wing-flap fly + rest idle for any body skinned to bird_v1. Channels target BONE NAMES, so this same file animates every bird variant (sparrow, crow, ...). Angles in radians, translations in metres; root stays in place (locomotion is the game's job).",
+  "clips": {
+    "idle": {
+      "playback": "loop",
+      "sample_frames": 1,
+      "fps": 1,
+      "duration_frames": 1,
+      "bones": {}
+    },
+    "fly": {
+      "playback": "loop",
+      "sample_frames": 4,
+      "fps": 12,
+      "duration_frames": 6,
+      "bones": {
+        "wing.L": { "rotation_euler": [[1, [-0.8, 0, 0]], [3, [0.8, 0, 0]], [5, [-0.8, 0, 0]]] },
+        "wing.R": { "rotation_euler": [[1, [0.8, 0, 0]], [3, [-0.8, 0, 0]], [5, [0.8, 0, 0]]] }
+      }
+    }
+  }
+}
