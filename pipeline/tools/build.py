@@ -25,6 +25,7 @@ STEPS = [
     ("test_mask_discrete", [str(SCRIPT_DIR / "test_mask_discrete.py")]),
     ("test_fixtures", [str(SCRIPT_DIR / "test_fixtures.py")]),
     ("test_lint_source", [str(SCRIPT_DIR / "test_lint_source.py")]),
+    ("test_render3d", [str(SCRIPT_DIR / "test_render3d.py")]),
     ("validate", [
         str(SCRIPT_DIR / "validate_manifest.py"),
         str(OUTPUT / "manifest.json"),
