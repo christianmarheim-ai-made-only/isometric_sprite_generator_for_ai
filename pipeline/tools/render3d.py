@@ -58,6 +58,7 @@ class Frame:
     rgba: Image.Image
     bbox: tuple        # (x, y, w, h) tight alpha bbox in frame px
     anchor: tuple      # (ax, ay) foot (world origin) in frame px
+    region: object = None  # HxW uint8 R8 HIT-region map (None unless face_region given)
 
 
 def _fit(all_raw: np.ndarray, w: int, h: int, margin: int):
@@ -70,8 +71,9 @@ def _fit(all_raw: np.ndarray, w: int, h: int, margin: int):
     return s, ox, oy
 
 
-def _rasterize(p2d, depth, faces, face_shade, w, h):
+def _rasterize(p2d, depth, faces, face_shade, w, h, face_region=None):
     color = np.zeros((h, w, 4), dtype=np.uint8)
+    region = np.zeros((h, w), dtype=np.uint8) if face_region is not None else None
     zbuf = np.full((h, w), -np.inf)
     for fi in range(len(faces)):
         a, b, c = faces[fi]
@@ -104,13 +106,22 @@ def _rasterize(p2d, depth, faces, face_shade, w, h):
         rgb = (int(40 + 200 * sh), int(60 + 180 * sh), int(95 + 150 * sh), 255)
         sub = color[miny:maxy + 1, minx:maxx + 1]
         sub[win] = rgb
-    return color
+        if region is not None:
+            rsub = region[miny:maxy + 1, minx:maxx + 1]
+            rsub[win] = np.uint8(face_region[fi])
+    return color, region
 
 
-def render_directions(verts, faces, n=16, canvas=(256, 256), margin=16, light=None):
-    """Render `n` game_iso_v1 direction frames of a mesh. Returns a list of Frame."""
+def render_directions(verts, faces, n=16, canvas=(256, 256), margin=16, light=None, face_region=None):
+    """Render `n` game_iso_v1 direction frames of a mesh. Returns a list of Frame.
+
+    If `face_region` (one HIT region id per face) is given, each Frame also carries a
+    discrete R8 `region` map (nearest face's region id, 0 = background, no AA).
+    """
     verts = np.asarray(verts, dtype=float)
     faces = np.asarray(faces, dtype=int)
+    if face_region is not None:
+        face_region = np.asarray(face_region, dtype=int)
     w, h = canvas
     if light is None:
         light = np.array([0.3, 0.4, 0.85])
@@ -129,9 +140,9 @@ def render_directions(verts, faces, n=16, canvas=(256, 256), margin=16, light=No
         nrm[nrm == 0] = 1.0
         fn = fn / nrm
         shade = np.clip(np.abs(fn @ light), 0.15, 1.0)
-        color = _rasterize(p2d, depth, faces, shade, w, h)
+        color, region = _rasterize(p2d, depth, faces, shade, w, h, face_region)
         img = Image.fromarray(color, "RGBA")
         ys, xs = np.where(color[:, :, 3] > 0)
         bbox = (int(xs.min()), int(ys.min()), int(xs.max() - xs.min() + 1), int(ys.max() - ys.min() + 1)) if len(xs) else (0, 0, 0, 0)
-        frames.append(Frame(img, bbox, (ox, oy)))
+        frames.append(Frame(img, bbox, (ox, oy), region))
     return frames

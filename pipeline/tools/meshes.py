@@ -54,3 +54,37 @@ def arrow_wedge(length=0.6, z=0.02):
     v = np.array([[p[0], p[1], z] for p in pts], dtype=float)
     f = np.array([[0, 1, 5], [0, 5, 6], [2, 3, 4]], dtype=int)
     return v, f
+
+
+# HIT regions (body-only; matches mask_palette none0/head1/torso2/arms3/legs4).
+REGION = {"head": 1, "torso": 2, "arms": 3, "legs": 4}
+
+
+def _assemble(parts):
+    """Combine [(verts, faces, region_id), ...] into (verts, faces, face_region)."""
+    vs, fs, rs = [], [], []
+    offset = 0
+    for v, f, r in parts:
+        vs.append(v)
+        fs.append(f + offset)
+        rs.append(np.full(len(f), r, dtype=int))
+        offset += len(v)
+    return np.concatenate(vs), np.concatenate(fs), np.concatenate(rs)
+
+
+def humanoid():
+    """A body-only humanoid (~1.8 m) built from boxes -- foot at origin, facing +X.
+
+    Per-face HIT region: head 1, torso 2, arms 3, legs 4 (no weapons/shield/gear this
+    iteration). Returns (verts Nx3, faces Mx3, face_region M,) for the R8 HIT proxy.
+    """
+    parts = []
+    for sy in (-1.0, 1.0):                                   # two legs
+        cy = sy * 0.20
+        parts.append((*box(-0.11, 0.11, cy - 0.10, cy + 0.10, 0.0, 0.92), REGION["legs"]))
+    parts.append((*box(-0.16, 0.16, -0.24, 0.24, 0.88, 1.46), REGION["torso"]))
+    for sy in (-1.0, 1.0):                                   # two arms, outboard of the torso
+        cy = sy * 0.31
+        parts.append((*box(-0.08, 0.08, cy - 0.07, cy + 0.07, 0.86, 1.42), REGION["arms"]))
+    parts.append((*box(-0.12, 0.12, -0.12, 0.12, 1.46, 1.80), REGION["head"]))
+    return _assemble(parts)

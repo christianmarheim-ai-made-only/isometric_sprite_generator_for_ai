@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Test: bake.py renders a procedural mesh into an engine-accepted package (R2).
+"""Test: bake.py renders procedural meshes into engine-accepted packages (R2 + R4).
 
-Bakes to a temp dir (no committed output) and asserts Gate-1 (engine acceptance)
-passes — proving the render3d -> pack -> engine-shaped-manifest path is loadable.
+Bakes to a temp dir (no committed output) and asserts:
+  - probe meshes (cube/pole) -> Gate-1 (engine acceptance) passes (R2);
+  - the body-only humanoid CHARACTER -> Gate-1 passes (variant_class=character with
+    measured world_metrics), its R8 HIT-proxy hitmask is DISCRETE and within the body
+    palette {0..4} with all four regions present, and metrics are valid (R4).
 
 Run: python pipeline/tools/test_bake.py   (exit 0 = all pass)
 """
@@ -12,11 +15,14 @@ import sys
 import tempfile
 from pathlib import Path
 
+import numpy as np
+from PIL import Image
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from bake import bake  # noqa: E402
+from bake import bake, bake_character  # noqa: E402
 from gate_engine_accept import engine_accept  # noqa: E402
 
 
@@ -28,13 +34,31 @@ def check(label: str, cond: bool) -> bool:
 def main() -> int:
     ok = True
     with tempfile.TemporaryDirectory() as td:
+        # R2: probe meshes are engine-accepted.
         for mesh in ("cube", "pole"):
             manifest = bake(mesh, Path(td) / f"{mesh}_probe", canvas_px=256)
-            errors = engine_accept(manifest)
-            ok &= check(f"bake '{mesh}' -> engine-accepted package", not errors)
-            if errors:
-                for e in errors:
-                    print("   ", e)
+            ok &= check(f"bake probe '{mesh}' -> engine-accepted package", not engine_accept(manifest))
+
+        # R4: body-only humanoid character (color + R8 HIT hitmask + metrics).
+        out = Path(td) / "humanoid_ref"
+        manifest = bake_character(out, canvas_px=256)
+        errors = engine_accept(manifest)
+        ok &= check("bake character humanoid -> engine-accepted (character + valid metrics)", not errors)
+        for e in errors:
+            print("   ", e)
+
+        mask = np.asarray(Image.open(out / "hitmask_atlas.png").convert("L"))
+        vals = {int(v) for v in np.unique(mask)}
+        ok &= check(f"hitmask discrete & within body palette {{0..4}} (got {sorted(vals)})", vals <= {0, 1, 2, 3, 4})
+        ok &= check("all 4 body regions present (head/torso/arms/legs)", {1, 2, 3, 4} <= vals)
+
+        m = manifest["world_metrics"]
+        eye = m.get("eye_height_world", 0.0)
+        ok &= check(
+            f"metrics valid (h={m['height_world']}, foot={m['footprint_radius_world']}, eye={eye}<=h)",
+            m["height_world"] > 0 and m["footprint_radius_world"] > 0 and 0 < eye <= m["height_world"],
+        )
+
     print("ALL PASS" if ok else "SOME FAILED")
     return 0 if ok else 1
 
