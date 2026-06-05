@@ -106,8 +106,9 @@ author; you only choose the states. Use this when you don't need custom motion.
 ## Verify
 
 - [ ] **It moves:** in the `*_color_sheet.png`, a multi-frame clip's frames differ down the column
-      (wings flap / legs swing). A quick numeric check: the mean abs pixel diff between frame 0 and
-      frame 2 of a clip is well above zero (the bird example measures ~43).
+      (wings flap / legs swing). A quick numeric check: the mean absolute pixel difference between
+      frame 0 and frame 2 of a clip is clearly non-zero — the limbs visibly move (a flat/static clip
+      would be ~0).
 - [ ] **idle is steady**, the anchor stays at the feet across all frames, 16 directions intact.
 - [ ] **Reuse holds:** the same `*_anim.json` baked onto a second variant of the same rig produces
       identical motion (the bird file drives both `sparrow` and `crow`).

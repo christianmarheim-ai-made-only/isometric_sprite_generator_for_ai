@@ -36,7 +36,7 @@ model's vertices:
 
 ```text
 height_world           = max(z) over all verts                       # top of the body above ground
-footprint_radius_world = max(|x|,|y|) over GROUND-CONTACT verts only  # verts with z <= 0.15 * height
+footprint_radius_world = max(|x|,|y|) over GROUND-CONTACT verts only  # z <= zmin + 0.15*height (zmin=0 after step 2)
 eye_height_world       = head/eye socket z, else 0.9 * height_world   # must be <= height_world
 ```
 
@@ -92,8 +92,12 @@ does, and the per-region AABBs, and prints/writes the JSON.
 **By hand / by an AI** — there is no DCC step; it is arithmetic over the vertex list:
 
 1. Read the verts (and each face's region tag).
-2. `height = max z`. Translate so `min z = 0` if not already (origin at the foot).
-3. `ground = verts with z <= 0.15*height`; `footprint_radius = max(|x|,|y|)` over `ground`.
+2. **Normalize to the contract** (the pipeline does this on load): translate so `min z = 0` (foot
+   on the ground) **and** so the footprint is centered on `x = y = 0` — subtract the X and Y bbox
+   midpoints. This XY-centering matters for the per-region AABBs on any body that isn't already
+   symmetric (e.g. the example humanoid shifts ~0.07 in X because of its front features).
+3. `height = max z`. `ground = verts with z <= 0.15*height`; `footprint_radius = max(|x|,|y|)`
+   over `ground`.
 4. `eye = 0.9*height` (or the head socket z).
 5. For each region id, gather its faces' verts; `aabb_min/max = min/max` of those.
 
