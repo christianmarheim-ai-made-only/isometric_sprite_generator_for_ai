@@ -62,6 +62,21 @@ The unifying principle this ADR adopts: **STATIC, per-unit visual identity is re
    Everything dynamic or shared (spells, shields, status auras, hit flashes) is a **layer (Part B)**.
    So the two halves of this ADR partition cleanly by one test: *is the visual a permanent identity of
    this unit, or a transient/shared overlay?*
+5. **Binding an overlay to the unit: a per-creature `core` anchor + automatic depth occlusion.**
+   Orbiting / enveloping effects (an orb circling the body, a shield bubble, a status ring) pivot on a
+   **`core` / centre anchor recorded per creature** — distinct from the foot/ground anchor the sprite
+   is *placed* by. Its **height (z) is per-creature**: a long-legged creature's core sits high (the orb
+   floats up around the torso), a stubby creature's sits low (the orb hugs the ground) — pivot on the
+   foot anchor instead and the effect circles the *feet*. Author it as an explicit anchor, or derive it
+   from the torso-region centroid the hitbox already carries. The effect is then a separate
+   depth-sorted entity at `core_xy + horizontal_offset(t)`, and **front/behind occlusion is FREE**: the
+   engine's per-entity ground-depth sort (`x+y`) draws the effect *behind* the character on the far
+   side — the opaque silhouette hides it — and *in front* on the near side, with **no per-pixel depth
+   buffer**. **Caveat:** the depth key ignores height (ADR-0018), so the front/behind separation comes
+   from the effect's **horizontal** motion; a purely **vertical** effect (rising straight up through
+   the body) produces no depth separation and cannot be occluded this way. Same anchor machinery as a
+   held weapon (ADR-0021 socket projection) — a hand-cast spell and a held sword both bind to a
+   per-creature point at a per-creature height.
 
 ## Consequences
 
@@ -84,9 +99,10 @@ The unifying principle this ADR adopts: **STATIC, per-unit visual identity is re
 
 - Does the tint / `color_variants` data live in the **manifest** (pipeline emits it) or purely
   game-side? (additive either way; emitting it keeps the recolor reproducible + reviewable.)
-- **Effect→unit sync contract:** which socket/anchor + depth offset does an overlay effect bind to?
-  Ties directly to the M2A 3D→2D socket projection (ADR-0021) — the same hook places a held weapon and
-  a hand-cast spell.
+- **Effect→unit binding — resolved to a per-creature `core` anchor (see Part B.5).** Residual: is
+  `core` an explicitly authored anchor or derived from the torso-region centroid, and is it **static**
+  (rest-pose) or **per-frame**? A static rest-pose `core` is enough for a coarse orbit/aura; a
+  hand-tracked effect needs the per-frame socket (ADR-0021).
 - **Selective recolor mask:** a dedicated palette-index mask, or reuse the 4-region R8 hitmask? (4
   regions is likely too coarse for arbitrary recolor zones — probably a separate small index mask.)
 - Greyscale-authoring convention: do we add a pipeline check/warning that a creature declared
