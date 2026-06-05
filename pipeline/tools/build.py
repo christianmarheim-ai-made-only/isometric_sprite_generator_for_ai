@@ -50,6 +50,7 @@ STEPS = [
     ("test_rigged_anim", [str(SCRIPT_DIR / "test_rigged_anim.py")]),
     ("test_combat_bake", [str(SCRIPT_DIR / "test_combat_bake.py")]),
     ("test_texture_pass", [str(SCRIPT_DIR / "test_texture_pass.py")]),
+    ("test_preview", [str(SCRIPT_DIR / "test_preview.py")]),
 ]
 
 

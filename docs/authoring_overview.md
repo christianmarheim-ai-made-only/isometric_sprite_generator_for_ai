@@ -27,6 +27,18 @@ python pipeline/tools/bake_asset.py your.asset.json
 python pipeline/tools/make_contact_sheet.py pipeline/output/<variant_id>   # eyeball 16 directions
 ```
 
+**When a sprite looks wrong, open the source previewer first** — it shows the model at diagnostic
+(non-iso) angles per stage so you can localize the fault before it's a sprite:
+
+```text
+python pipeline/tools/preview_source.py your.asset.json   # mesh -> texture -> hit regions -> rig -> per-clip poses
+```
+
+Walk the rows: a bad **mesh** row = geometry; **material** wrong but mesh fine = texture; **hit
+regions** wrong = a mis-named material (it flags any material that fell back to torso); a bad **pose**
+row = animation. Each bake also writes `output/<variant>/build_log.json` (inputs+hashes, env, gate,
+warnings) — diff two to verify a fix.
+
 **Scale (the payoff):** rig + animation library are shared per *archetype*; mesh + texture are
 per *variant*. So **10 birds = 10 bodies/textures + 1 `bird_v1` rig + 1 animation file**, and the
 hitbox for each falls out of its geometry. One AI can churn the whole set.
