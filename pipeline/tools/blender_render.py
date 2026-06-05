@@ -36,23 +36,57 @@ bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 scene.view_settings.view_transform = 'Standard'  # predictable sRGB (not AgX) for region->id mapping
 
-# --- humanoid mesh (identical geometry to meshes.humanoid) ---
-verts, faces, freg = meshes.humanoid()
-mesh = bpy.data.meshes.new("humanoid")
-mesh.from_pydata([[float(c) for c in v] for v in verts], [], [[int(c) for c in f] for f in faces])
-mesh.update()
-obj = bpy.data.objects.new("humanoid", mesh)
-scene.collection.objects.link(obj)
-
-slot = {}
-for rid, (r, g, b) in REGION_COLOR.items():
-    m = bpy.data.materials.new(f"region{rid}")
-    m.use_nodes = False
-    m.diffuse_color = (r, g, b, 1.0)
-    slot[rid] = len(mesh.materials)
-    mesh.materials.append(m)
-for i, poly in enumerate(mesh.polygons):
-    poly.material_index = slot[int(freg[i])]
+# --- mesh: a real glTF/glb file (--mesh-file; HIT regions by material name), or the procedural humanoid ---
+MESH_FILE = argv[2] if len(argv) > 2 and argv[2] else None
+if MESH_FILE:
+    from mesh_io import region_for_name  # noqa: E402
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=MESH_FILE)  # Blender converts glTF Y-up -> Z-up
+    imported = [o for o in bpy.data.objects if o not in before and o.type == 'MESH']
+    if not imported:
+        raise SystemExit(f"no mesh imported from {MESH_FILE}")
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in imported:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = imported[0]
+    if len(imported) > 1:
+        bpy.ops.object.join()
+    obj = bpy.context.view_layer.objects.active
+    obj.rotation_mode = 'XYZ'  # glTF import sets QUATERNION; the render loop uses rotation_euler
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    mesh = obj.data
+    cos = [v.co for v in mesh.vertices]
+    shift = Vector((  # foot (min z) -> 0, footprint centered on x=y=0 (the game_iso_v1 contract)
+        (min(c.x for c in cos) + max(c.x for c in cos)) / 2.0,
+        (min(c.y for c in cos) + max(c.y for c in cos)) / 2.0,
+        min(c.z for c in cos),
+    ))
+    for v in mesh.vertices:
+        v.co = v.co - shift
+    if not mesh.materials:  # no materials -> a single torso slot
+        mesh.materials.append(bpy.data.materials.new("torso"))
+        for poly in mesh.polygons:
+            poly.material_index = 0
+    for mat in mesh.materials:  # recolor each material by NAME -> its HIT region color
+        if mat is not None:
+            mat.use_nodes = False
+            mat.diffuse_color = (*REGION_COLOR[region_for_name(mat.name)], 1.0)
+else:
+    verts, faces, freg = meshes.humanoid()
+    mesh = bpy.data.meshes.new("humanoid")
+    mesh.from_pydata([[float(c) for c in v] for v in verts], [], [[int(c) for c in f] for f in faces])
+    mesh.update()
+    obj = bpy.data.objects.new("humanoid", mesh)
+    scene.collection.objects.link(obj)
+    slot = {}
+    for rid, (r, g, b) in REGION_COLOR.items():
+        m = bpy.data.materials.new(f"region{rid}")
+        m.use_nodes = False
+        m.diffuse_color = (r, g, b, 1.0)
+        slot[rid] = len(mesh.materials)
+        mesh.materials.append(m)
+    for i, poly in enumerate(mesh.polygons):
+        poly.material_index = slot[int(freg[i])]
 
 # --- EXACT game_iso_v1 camera: local X=screen-right, Y=screen-up, Z=toward-camera ---
 right = Vector((1.0, -1.0, 0.0)).normalized()                       # d(x-y)
@@ -105,11 +139,17 @@ for i in range(DIRS):
     r.filepath = os.path.join(OUT, f"region_dir{i:02d}.png")
     bpy.ops.render.render(write_still=True)
 
+# Measured world metrics from the FINAL mesh (local coords; foot at z~0 after normalization).
+_z = [v.co.z for v in mesh.vertices]
+_zmin, _zmax = min(_z), max(_z)
+_ground = [max(abs(v.co.x), abs(v.co.y)) for v in mesh.vertices if v.co.z <= _zmin + 0.15 * (_zmax - _zmin)]
 meta = {
     "canvas": CANVAS, "dirs": DIRS, "ortho_scale": cam_data.ortho_scale,
     "region_color": {str(k): list(v) for k, v in REGION_COLOR.items()},
     "camera_probe": camera_probe,
     "anchor_frac": probe((0, 0, 0)),  # foot (world origin) is rotation-invariant about +Z
+    "mesh_height": round(_zmax, 6),
+    "mesh_footprint": round(max(_ground) if _ground else 0.0, 6),
     "blender_version": bpy.app.version_string,
 }
 with open(os.path.join(OUT, "blender_meta.json"), "w") as f:

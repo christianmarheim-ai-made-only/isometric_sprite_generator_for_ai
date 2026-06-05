@@ -42,6 +42,18 @@ def main() -> int:
         vals = {int(v) for v in np.unique(mask)}
         ok &= check(f"hitmask discrete & within body palette {{0..4}} (got {sorted(vals)})", vals <= {0, 1, 2, 3, 4})
         ok &= check("all 4 body regions present (head/torso/arms/legs)", {1, 2, 3, 4} <= vals)
+
+        # R8: import a REAL glTF (HIT regions assigned by MATERIAL NAME) and bake it via Blender.
+        glb = SCRIPT_DIR.parent / "test_meshes" / "humanoid.glb"
+        if glb.exists():
+            gm, gmeta = bake_blender(Path(td) / "gltf", blender, mesh_file=str(glb), variant_id="humanoid_gltf")
+            ok &= check(f"glTF import: render3d<->Blender parity (worst {camera_parity_error(gmeta):.4f} < 0.02)",
+                        camera_parity_error(gmeta) < 0.02)
+            ok &= check("glTF bake -> engine-accepted CHARACTER (Gate-1)", not engine_accept(gm))
+            gvals = {int(x) for x in np.unique(np.asarray(Image.open(Path(td) / "gltf" / "hitmask_atlas.png").convert("L")))}
+            ok &= check(f"glTF hitmask: all 4 regions by material NAME (got {sorted(gvals)})", {1, 2, 3, 4} <= gvals)
+        else:
+            ok &= check("glTF fixture present (pipeline/test_meshes/humanoid.glb)", False)
     print("ALL PASS" if ok else "SOME FAILED")
     return 0 if ok else 1
 

@@ -56,12 +56,13 @@ def find_blender(explicit: str | None = None) -> str | None:
     return None
 
 
-def _run_blender(blender: str, out: Path) -> dict:
+def _run_blender(blender: str, out: Path, mesh_file=None) -> dict:
     out.mkdir(parents=True, exist_ok=True)
-    proc = subprocess.run(
-        [blender, "--background", "--python", str(SCRIPT_DIR / "blender_render.py"),
-         "--", str(out), str(SCRIPT_DIR)],
-        capture_output=True, text=True)
+    cmd = [blender, "--background", "--python", str(SCRIPT_DIR / "blender_render.py"),
+           "--", str(out), str(SCRIPT_DIR)]
+    if mesh_file:
+        cmd.append(str(mesh_file))
+    proc = subprocess.run(cmd, capture_output=True, text=True)
     meta = out / "blender_meta.json"
     if proc.returncode != 0 or not meta.exists():
         raise RuntimeError(f"Blender render failed (exit {proc.returncode}):\n{proc.stdout[-1500:]}\n{proc.stderr[-1500:]}")
@@ -102,8 +103,8 @@ def camera_parity_error(meta: dict) -> float:
     return worst
 
 
-def bake_blender(out: Path, blender_exe: str) -> tuple[dict, dict]:
-    meta = _run_blender(blender_exe, out)
+def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = "humanoid_blender") -> tuple[dict, dict]:
+    meta = _run_blender(blender_exe, out, mesh_file)
     targets = {int(k): [round(_srgb(c) * 255) for c in v] for k, v in meta["region_color"].items()}
     color_imgs = [Image.open(out / f"color_dir{i:02d}.png").convert("RGBA") for i in range(DIRS)]
     region_arrs = [_region_ids(out / f"region_dir{i:02d}.png", targets) for i in range(DIRS)]
@@ -113,11 +114,8 @@ def bake_blender(out: Path, blender_exe: str) -> tuple[dict, dict]:
     color_atlas.save(out / "color_atlas.png")
     mask_atlas.save(out / "hitmask_atlas.png")
 
-    verts = meshes.humanoid()[0]
-    height = float(verts[:, 2].max())
-    z_floor = float(verts[:, 2].min())
-    ground = verts[verts[:, 2] <= z_floor + 0.15 * height]
-    foot_r = float(np.max(np.abs(ground[:, :2])))
+    height = float(meta["mesh_height"])
+    foot_r = float(meta["mesh_footprint"])
     metrics = compute_world_metrics((-foot_r, -foot_r, 0.0), (foot_r, foot_r, height),
                                     eye_z=round(height * 0.9, 4))
 
@@ -142,7 +140,7 @@ def bake_blender(out: Path, blender_exe: str) -> tuple[dict, dict]:
         "camera": {"id": "game_iso_v1", "azimuth_degrees": 45, "camera_elevation_degrees": 30,
                    "projection": "orthographic_pixel_iso_dimetric_2_to_1", "screen_y": "down",
                    "tile_px": [64, 32]},
-        "variant_id": "humanoid_blender",
+        "variant_id": variant_id,
         "variant_class": "character",
         "direction_count": DIRS,
         "frame_canvas": list(canvas),
@@ -155,7 +153,8 @@ def bake_blender(out: Path, blender_exe: str) -> tuple[dict, dict]:
         "frames": frames,
         "expected_facing": expected,
         "world_metrics": metrics,
-        "build": {"generator": "pipeline/tools/blender_bake.py", "mesh": "humanoid",
+        "build": {"generator": "pipeline/tools/blender_bake.py",
+                  "mesh": (Path(mesh_file).name if mesh_file else "humanoid"),
                   "renderer": f"blender_workbench_{meta.get('blender_version', '?')}"},
     }
     manifest.update(_contract_fields())
@@ -164,16 +163,18 @@ def bake_blender(out: Path, blender_exe: str) -> tuple[dict, dict]:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="R7: Blender-render a character package + check parity.")
-    ap.add_argument("--out", type=Path, default=PIPELINE_ROOT / "reference" / "humanoid_blender")
+    ap = argparse.ArgumentParser(description="R7/R8: Blender-render a character package + check parity.")
+    ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--blender", default=None)
+    ap.add_argument("--mesh-file", default=None, help="import a real glTF/glb (HIT regions by material name)")
     args = ap.parse_args()
     blender = find_blender(args.blender)
     if not blender:
         print("SKIP: Blender not found (set $BLENDER or install to %LOCALAPPDATA%\\blender-portable).")
         return 0
-    out = args.out.resolve()
-    manifest, meta = bake_blender(out, blender)
+    variant_id = (Path(args.mesh_file).stem + "_blender") if args.mesh_file else "humanoid_blender"
+    out = (args.out or (PIPELINE_ROOT / "reference" / variant_id)).resolve()
+    manifest, meta = bake_blender(out, blender, args.mesh_file, variant_id)
     parity = camera_parity_error(meta)
     errors = engine_accept(manifest)
     print(f"R7: Blender {meta.get('blender_version')} -> {out}")
