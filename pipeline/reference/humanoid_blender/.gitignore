@@ -1,0 +1,6 @@
+# Commit only the final package; ignore Blender's per-direction render intermediates.
+*
+!.gitignore
+!color_atlas.png
+!hitmask_atlas.png
+!manifest.json

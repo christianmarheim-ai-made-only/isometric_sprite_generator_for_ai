@@ -24,6 +24,17 @@ fn reference_character_is_engine_loadable() {
 }
 
 #[test]
+fn reference_blender_character_is_engine_loadable() {
+    // R7: the Blender-rendered production package is engine-loadable too.
+    let json = manifest("../reference/humanoid_blender/manifest.json");
+    let s = parse_manifest(&json).expect("engine must accept the Blender-rendered reference character");
+    assert_eq!(s.variant.frames.len(), 16);
+    assert_eq!(s.name, "humanoid_blender");
+    let m = s.variant.metrics;
+    assert!(m.eye_height_world.unwrap() <= m.height_world, "eye <= height");
+}
+
+#[test]
 fn arrow_pilot_is_engine_loadable_forward_compat() {
     // The rich M1/M2 pilot manifest carries extra fields (state, animations, boxes,
     // hitmask, contract_hash, ...); the engine loader ignores them (serde forward-compat).

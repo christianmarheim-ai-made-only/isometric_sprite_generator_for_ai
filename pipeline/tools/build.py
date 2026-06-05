@@ -7,11 +7,11 @@ last so the written report matches the final regenerated output.
   python pipeline/tools/build.py        # full sub-tool output
   python pipeline/tools/build.py --ci   # one PASS/FAIL line per step + summary
 """
-# Status: R1-R4 + R6 implemented and this gate is green (12 steps). The plan is in
-# docs/build_plan_R1_R6_review.md (authoritative; R-naming). Steps are appended as slices
-# land: Gate-1 (engine-acceptance) R2; Gate-2 (direction, rendered-pixel) + Gate-3
-# (elevation) R3; bake/character (test_bake) R2/R4; cargo engine load-test
-# (test_engine_load -> bevy_reference, the vendored engine parse_manifest) R6.
+# Status: R1-R4, R6, R7 implemented and this gate is green (13 steps; the R7 Blender step
+# skips where Blender is absent). Plan: docs/build_plan_R1_R6_review.md. Gate-1
+# (engine-acceptance) R2; Gate-2/Gate-3 R3; bake/character (test_bake) R2/R4; cargo engine
+# load-test (test_engine_load -> bevy_reference) R6; Blender<->render3d parity
+# (test_blender_parity) R7.
 from __future__ import annotations
 
 import argparse
@@ -40,6 +40,7 @@ STEPS = [
     ("test_gates", [str(SCRIPT_DIR / "test_gates.py")]),
     ("test_bake", [str(SCRIPT_DIR / "test_bake.py")]),
     ("test_engine_load", [str(SCRIPT_DIR / "test_engine_load.py")]),
+    ("test_blender_parity", [str(SCRIPT_DIR / "test_blender_parity.py")]),
 ]
 
 

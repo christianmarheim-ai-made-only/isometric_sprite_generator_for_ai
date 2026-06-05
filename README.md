@@ -19,7 +19,8 @@ blended mask value).
   (`pipeline/reference/humanoid_ref/`) + a real `cargo` engine load-test (`bevy_reference`,
   the vendored engine `parse_manifest` accept/reject). **R5** (multi-state animation,
   tight-crop) is deferred — blocked on the engine (one frame per direction) + a frame-canvas
-  sizing decision; **R7** (Blender/glTF) needs Blender. Plan:
+  sizing decision. **R7 ✓** Blender production renderer (`pipeline/reference/humanoid_blender/`):
+  the exact game_iso_v1 camera (render3d↔Blender parity 0.0), engine-loadable, same R8 hitmask. Plan:
   **[docs/build_plan_R1_R6_review.md](docs/build_plan_R1_R6_review.md)**.
 
 One green build gate (`build.py --ci`, all steps green):
