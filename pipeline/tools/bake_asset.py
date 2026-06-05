@@ -40,8 +40,11 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
     mesh_path = (base / mesh).resolve()
     up = (asset.get("geometry") or {}).get("up", "z")
     anims = asset.get("animations")
+    clips_rel = (asset.get("files") or {}).get("animation_clips")
     ext = mesh_path.suffix.lower()
 
+    import time
+    t0 = time.perf_counter()
     if ext == ".obj":
         from bake import bake_mesh
         manifest = bake_mesh(str(mesh_path), out, variant_id=variant_id, up=up)
@@ -75,10 +78,25 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
     else:
         raise SystemExit(f"unsupported mesh format: {ext}")
 
+    bake_ms = round((time.perf_counter() - t0) * 1000, 1)
     errs = engine_accept(manifest)
     if errs:
         raise SystemExit("baked package failed Gate-1:\n  " + "\n  ".join(errs))
-    print(f"BAKE_ASSET OK [{route}]: {variant_id} -> {out}  ({len(manifest['frames'])} frames)")
+
+    from build_log import write_build_log
+    meta = {}
+    for mf in ("anim_meta.json", "blender_meta.json"):
+        mp = out / mf
+        if mp.exists():
+            meta = json.loads(mp.read_text(encoding="utf-8"))
+            break
+    clips_path = (base / clips_rel).resolve() if clips_rel else None
+    log = write_build_log(out, manifest, route, asset_path=manifest_path, mesh=mesh_path,
+                          clips=clips_path, gate_reasons=[], meta=meta,
+                          stages=[{"name": "bake", "ms": bake_ms}])
+    nwarn = len(log["warnings"])
+    tail = f"  [{nwarn} warning(s): {', '.join(sorted({w['code'] for w in log['warnings']}))}]" if nwarn else ""
+    print(f"BAKE_ASSET OK [{route}]: {variant_id} -> {out}  ({len(manifest['frames'])} frames){tail}")
     return manifest
 
 

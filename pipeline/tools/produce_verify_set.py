@@ -29,6 +29,7 @@ from bake_asset import bake_asset            # noqa: E402
 from bake import bake_character_anim          # noqa: E402
 from gate_engine_accept import engine_accept  # noqa: E402
 from make_contact_sheet import contact_sheet  # noqa: E402
+from build_log import write_build_log, write_build_index, index_summary  # noqa: E402
 
 JOBS = [
     ("humanoid_obj", "humanoid_obj.asset.json", "numpy · OBJ static"),
@@ -48,7 +49,7 @@ def _states_summary(m: dict) -> str:
 
 def main() -> int:
     VERIFY.mkdir(parents=True, exist_ok=True)
-    rows = []
+    rows, logs = [], []
     for variant, asset, route in JOBS:
         out = VERIFY / variant
         print(f"\n=== {variant}  [{route}] ===")
@@ -59,6 +60,10 @@ def main() -> int:
             print(f"BAKE OK [numpy/procedural]: {variant} -> {out}  ({len(m['frames'])} frames)")
         errs = engine_accept(m)
         gate = "PASS" if not errs else "FAIL: " + "; ".join(errs)
+        # bake_asset already wrote build_log.json; the procedural path didn't -> write one now
+        blog = out / "build_log.json"
+        logs.append(json.loads(blog.read_text(encoding="utf-8")) if blog.exists()
+                    else write_build_log(out, m, route, gate_reasons=errs, meta={}))
         info = contact_sheet(out)
         rows.append({
             "variant": variant, "route": route, "gate": gate,
@@ -110,13 +115,22 @@ def main() -> int:
         "- **Hit regions** cover the silhouette and match the body part under them.",
         "",
         "Regenerate: `python pipeline/tools/produce_verify_set.py`",
+        "",
+        "**Build logs:** per-bake `<variant>/build_log.json` (inputs+hashes, env, gate, warnings) + "
+        "batch `build_index.json`. Diff two runs to verify a fix.",
     ]
     (VERIFY / "INDEX.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    idx = write_build_index(VERIFY, logs)
 
     failed = [r["variant"] for r in rows if r["gate"] != "PASS"]
+    total_warn = sum(r["warnings"] for r in idx)
     print("\n" + "=" * 60)
+    print(index_summary(idx))
+    print("=" * 60)
     print(f"VERIFY SET: {len(rows)} packages -> {VERIFY}")
-    print(f"INDEX: {VERIFY / 'INDEX.md'}")
+    print(f"INDEX: {VERIFY / 'INDEX.md'}  |  BUILD INDEX: {VERIFY / 'build_index.json'}")
+    if total_warn:
+        print(f"WARNINGS this batch: {total_warn} (see per-variant build_log.json)")
     if failed:
         print(f"GATE FAILURES: {failed}")
         return 1

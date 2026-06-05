@@ -39,7 +39,7 @@ scene.view_settings.view_transform = 'Standard'  # predictable sRGB (not AgX) fo
 # --- mesh: a real glTF/glb file (--mesh-file; HIT regions by material name), or the procedural humanoid ---
 MESH_FILE = argv[2] if len(argv) > 2 and argv[2] else None
 if MESH_FILE:
-    from mesh_io import region_for_name  # noqa: E402
+    from mesh_io import region_for_name, REGION_KEYWORDS  # noqa: E402
     before = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=MESH_FILE)  # Blender converts glTF Y-up -> Z-up
     imported = [o for o in bpy.data.objects if o not in before and o.type == 'MESH']
@@ -70,6 +70,7 @@ if MESH_FILE:
     # Keep the ART materials for the color pass; record each material's HIT region (by NAME) for
     # the region pass; detect whether any material carries a base-color texture (-> real look).
     region_of = {mat.name: region_for_name(mat.name) for mat in mesh.materials if mat}
+    region_fallback = sorted(n for n in region_of if not any(kw in n.lower() for kw, _ in REGION_KEYWORDS))
     has_tex = any(mat and mat.use_nodes and any(n.type == 'TEX_IMAGE' and n.image
                   for n in mat.node_tree.nodes) for mat in mesh.materials)
     for _m in mesh.materials:  # show the real PBR base color in MATERIAL mode (Workbench reads diffuse_color)
@@ -95,6 +96,7 @@ else:
     for i, poly in enumerate(mesh.polygons):
         poly.material_index = slot[int(freg[i])]
     region_of = {f"region{rid}": rid for rid in REGION_COLOR}  # procedural: art color == region color
+    region_fallback = []  # explicit region ids, never name-matched
     has_tex = False
 
 # --- EXACT game_iso_v1 camera: local X=screen-right, Y=screen-up, Z=toward-camera ---
@@ -172,6 +174,8 @@ meta = {
     "anchor_frac": probe((0, 0, 0)),  # foot (world origin) is rotation-invariant about +Z
     "mesh_height": round(_zmax, 6),
     "mesh_footprint": round(max(_ground) if _ground else 0.0, 6),
+    "region_fallback_materials": region_fallback,
+    "has_tex": bool(has_tex),
     "blender_version": bpy.app.version_string,
 }
 with open(os.path.join(OUT, "blender_meta.json"), "w") as f:

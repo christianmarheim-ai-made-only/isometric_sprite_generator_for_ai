@@ -17,7 +17,7 @@ argv = sys.argv[sys.argv.index("--") + 1:]
 OUT, TOOLS, MESH_FILE, STATES_JSON = argv[0], argv[1], argv[2], argv[3]
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, TOOLS)
-from mesh_io import region_for_name  # noqa: E402
+from mesh_io import region_for_name, REGION_KEYWORDS  # noqa: E402
 
 states = json.loads(open(STATES_JSON, encoding="utf-8").read())
 CANVAS, DIRS = 256, 16
@@ -49,6 +49,8 @@ ground = [max(abs(c.x), abs(c.y)) for c in cos if c.z <= min(zs) + 0.15 * height
 footprint = max(ground) if ground else max(max(abs(c.x), abs(c.y)) for c in cos)
 
 region_of = {m.name: region_for_name(m.name) for m in obj.data.materials if m}
+# materials whose name matched NO region keyword silently default to torso=2 -> a likely mistake
+region_fallback = sorted(n for n in region_of if not any(kw in n.lower() for kw, _ in REGION_KEYWORDS))
 has_tex = any(m and m.use_nodes and any(n.type == 'TEX_IMAGE' and n.image
               for n in m.node_tree.nodes) for m in obj.data.materials)
 for _m in obj.data.materials:  # show the real PBR base color in MATERIAL mode (Workbench reads diffuse_color)
@@ -93,6 +95,7 @@ camera_probe = {k: probe(v) for k, v in {"origin": (0, 0, 0), "px": (1, 0, 0), "
 
 actions = {a.name: a for a in bpy.data.actions}
 poses = []  # (state, frame_index, action_name|None, frame_value|None)
+missing_clips = []  # declared states whose clip is absent from the glb -> rendered as the REST pose
 for state, spec in states.items():
     clip, nf = spec.get("clip", state), spec["frames"]
     act = actions.get(clip)
@@ -101,6 +104,7 @@ for state, spec in states.items():
         for fi in range(nf):
             poses.append((state, fi, clip, f0 + (f1 - f0) * (fi / nf)))
     else:
+        missing_clips.append(state)
         poses.append((state, 0, None, None))
 
 if arm and not arm.animation_data:
@@ -141,6 +145,8 @@ meta = {
     "camera_probe": camera_probe, "anchor_frac": probe((0, 0, 0)),
     "mesh_height": round(height, 6), "mesh_footprint": round(footprint, 6),
     "poses": [[s, fi] for (s, fi, _, _) in poses],
+    "region_fallback_materials": region_fallback,
+    "missing_clips": missing_clips,
     "blender_version": bpy.app.version_string,
 }
 json.dump(meta, open(os.path.join(OUT, "anim_meta.json"), "w"), indent=2)
