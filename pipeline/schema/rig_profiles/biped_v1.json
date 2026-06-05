@@ -1,24 +1,25 @@
 {
   "rig_profile": "biped_v1",
-  "description": "Body-only biped skeleton. A mesh declaring rig=biped_v1 MUST skin to these exact bone names so shared biped animations apply. Bind pose: relaxed A-pose, feet at the origin on z=0, facing +X.",
+  "description": "Body-only biped skeleton (~1.8 m). A mesh declaring rig=biped_v1 MUST skin to these exact bone names so shared biped animations apply. Bind pose: relaxed A-pose, feet at the origin on z=0, facing +X.",
+  "bind_pose_units": "metre, +Z up, +X forward; per-bone head/tail are world-space rest positions for a ~1.8 m figure",
   "bones": [
-    { "name": "root", "parent": null },
-    { "name": "hips", "parent": "root" },
-    { "name": "spine", "parent": "hips" },
-    { "name": "chest", "parent": "spine" },
-    { "name": "head", "parent": "chest" },
-    { "name": "arm.L", "parent": "chest" },
-    { "name": "forearm.L", "parent": "arm.L" },
-    { "name": "hand.L", "parent": "forearm.L" },
-    { "name": "arm.R", "parent": "chest" },
-    { "name": "forearm.R", "parent": "arm.R" },
-    { "name": "hand.R", "parent": "forearm.R" },
-    { "name": "thigh.L", "parent": "hips" },
-    { "name": "shin.L", "parent": "thigh.L" },
-    { "name": "foot.L", "parent": "shin.L" },
-    { "name": "thigh.R", "parent": "hips" },
-    { "name": "shin.R", "parent": "thigh.R" },
-    { "name": "foot.R", "parent": "shin.R" }
+    { "name": "root",      "parent": null,    "head": [0.0, 0.0, 0.0],    "tail": [0.0, 0.0, 0.10] },
+    { "name": "hips",      "parent": "root",  "head": [0.0, 0.0, 0.92],   "tail": [0.0, 0.0, 1.02] },
+    { "name": "spine",     "parent": "hips",  "head": [0.0, 0.0, 1.02],   "tail": [0.0, 0.0, 1.22] },
+    { "name": "chest",     "parent": "spine", "head": [0.0, 0.0, 1.22],   "tail": [0.0, 0.0, 1.44] },
+    { "name": "head",      "parent": "chest", "head": [0.0, 0.0, 1.46],   "tail": [0.0, 0.0, 1.80] },
+    { "name": "arm.L",     "parent": "chest", "head": [0.0, 0.20, 1.42],  "tail": [0.0, 0.34, 1.16] },
+    { "name": "forearm.L", "parent": "arm.L", "head": [0.0, 0.34, 1.16],  "tail": [0.0, 0.44, 0.92] },
+    { "name": "hand.L",    "parent": "forearm.L", "head": [0.0, 0.44, 0.92], "tail": [0.0, 0.48, 0.84] },
+    { "name": "arm.R",     "parent": "chest", "head": [0.0, -0.20, 1.42], "tail": [0.0, -0.34, 1.16] },
+    { "name": "forearm.R", "parent": "arm.R", "head": [0.0, -0.34, 1.16], "tail": [0.0, -0.44, 0.92] },
+    { "name": "hand.R",    "parent": "forearm.R", "head": [0.0, -0.44, 0.92], "tail": [0.0, -0.48, 0.84] },
+    { "name": "thigh.L",   "parent": "hips",  "head": [0.0, 0.10, 0.92],  "tail": [0.0, 0.10, 0.50] },
+    { "name": "shin.L",    "parent": "thigh.L", "head": [0.0, 0.10, 0.50], "tail": [0.0, 0.10, 0.08] },
+    { "name": "foot.L",    "parent": "shin.L", "head": [0.0, 0.10, 0.08], "tail": [0.12, 0.10, 0.0] },
+    { "name": "thigh.R",   "parent": "hips",  "head": [0.0, -0.10, 0.92], "tail": [0.0, -0.10, 0.50] },
+    { "name": "shin.R",    "parent": "thigh.R", "head": [0.0, -0.10, 0.50], "tail": [0.0, -0.10, 0.08] },
+    { "name": "foot.R",    "parent": "shin.R", "head": [0.0, -0.10, 0.08], "tail": [0.12, -0.10, 0.0] }
   ],
   "region_by_bone": {
     "head": "head",
@@ -27,5 +28,11 @@
     "arm.R": "arms", "forearm.R": "arms", "hand.R": "arms",
     "thigh.L": "legs", "shin.L": "legs", "foot.L": "legs",
     "thigh.R": "legs", "shin.R": "legs", "foot.R": "legs"
+  },
+  "states": {
+    "_note": "States a biped variant may deliver. A variant MUST deliver at least `idle`; others are optional. fps/playback/frames match pipeline/lockfiles/sprite_states.lock.json (the procedural biped library). Extra states beyond this list are allowed if the variant authors clips for them.",
+    "idle":   { "required": true,  "frames": 1, "fps": 1,  "playback": "loop" },
+    "walk":   { "required": false, "frames": 4, "fps": 8,  "playback": "loop" },
+    "attack": { "required": false, "frames": 3, "fps": 12, "playback": "once" }
   }
 }

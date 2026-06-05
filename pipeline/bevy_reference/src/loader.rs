@@ -55,7 +55,9 @@ impl WorldMetrics {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FrameDef {
     pub direction: usize,
-    /// Tight atlas rect (the actual pixels).
+    /// Atlas page this frame's pixels live on (0 for single-page packages).
+    pub page: usize,
+    /// Tight atlas rect (the actual pixels), LOCAL to `page`.
     pub x: u32,
     pub y: u32,
     pub w: u32,
@@ -93,6 +95,10 @@ pub struct AnimMeta {
 #[derive(Clone, Debug, PartialEq)]
 pub struct SpriteVariant {
     pub directions: usize,
+    /// Atlas pages as (path, w, h). Single-page packages have exactly one; `FrameDef::page`
+    /// indexes this list (atlas paging -- docs/atlas_paging_contract.md).
+    pub pages: Vec<(String, u32, u32)>,
+    /// Page 0 size, for single-page consumers.
     pub atlas_w: u32,
     pub atlas_h: u32,
     /// The DEFAULT state's frame 0, one per direction (MIN render set).
@@ -122,20 +128,47 @@ pub struct LoadedSprite {
 struct CameraDef {
     id: String,
 }
-#[derive(Deserialize)]
-struct ColorAtlasDef {
+#[derive(Deserialize, Clone)]
+struct PageDef {
     path: String,
     size: [u32; 2],
 }
+#[derive(Deserialize, Clone)]
+struct AtlasDef {
+    #[serde(default)]
+    path: Option<String>,
+    #[serde(default)]
+    size: Option<[u32; 2]>,
+    #[serde(default)]
+    pages: Vec<PageDef>,
+}
+impl AtlasDef {
+    /// Resolve to a page list: explicit `pages`, else the single-page `path`+`size` alias.
+    fn page_list(&self) -> Result<Vec<PageDef>, String> {
+        if !self.pages.is_empty() {
+            Ok(self.pages.clone())
+        } else if let (Some(p), Some(s)) = (self.path.clone(), self.size) {
+            Ok(vec![PageDef { path: p, size: s }])
+        } else {
+            Err("atlas needs either `pages` or `path`+`size`".to_string())
+        }
+    }
+}
 #[derive(Deserialize)]
 struct AtlasesDef {
-    color: ColorAtlasDef,
+    color: AtlasDef,
+    #[serde(default)]
+    hitmask: Option<AtlasDef>,
 }
 #[derive(Deserialize)]
 struct FrameEntry {
     direction: usize,
     rect: [u32; 4],
     anchor: [f32; 2],
+    #[serde(default)]
+    page: usize,
+    #[serde(default)]
+    mask_rect: Option<[u32; 4]>,
     #[serde(default)]
     state: Option<String>,
     #[serde(default)]
@@ -198,19 +231,50 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
     if fcw == 0 || fch == 0 {
         return Err("frame_canvas dimensions must be > 0".to_string());
     }
-    let [aw, ah] = m.atlases.color.size;
-    if aw == 0 || ah == 0 {
-        return Err("atlases.color.size dimensions must be > 0".to_string());
+    let pages = m.atlases.color.page_list()?;
+    for (i, pg) in pages.iter().enumerate() {
+        if pg.size[0] == 0 || pg.size[1] == 0 {
+            return Err(format!("atlases.color page {i} has a zero dimension"));
+        }
+    }
+    if let Some(hm) = &m.atlases.hitmask {
+        let hpages = hm.page_list()?;
+        if hpages.len() != pages.len() {
+            return Err(format!(
+                "atlases.hitmask pages ({}) must equal atlases.color pages ({})",
+                hpages.len(), pages.len()
+            ));
+        }
     }
     for fr in &m.frames {
         let [x, y, w, h] = fr.rect;
         if w == 0 || h == 0 {
             return Err(format!("frame (dir {}) has a zero-size rect", fr.direction));
         }
-        if x as u64 + w as u64 > aw as u64 || y as u64 + h as u64 > ah as u64 {
-            return Err(format!("frame (dir {}) rect [{x}, {y}, {w}, {h}] exceeds the atlas {aw}x{ah}", fr.direction));
+        let pg = pages.get(fr.page).ok_or_else(|| {
+            format!("frame (dir {}) page {} out of range 0..{}", fr.direction, fr.page, pages.len())
+        })?;
+        let [pw, ph] = pg.size;
+        if x as u64 + w as u64 > pw as u64 || y as u64 + h as u64 > ph as u64 {
+            return Err(format!(
+                "frame (dir {}) rect [{x}, {y}, {w}, {h}] exceeds page {} ({pw}x{ph})",
+                fr.direction, fr.page
+            ));
+        }
+        if let Some([_, _, mw, mh]) = fr.mask_rect {
+            if mw != w || mh != h {
+                return Err(format!(
+                    "frame (dir {}) mask_rect {mw}x{mh} must match rect {w}x{h}",
+                    fr.direction
+                ));
+            }
         }
     }
+    let aw = pages[0].size[0];
+    let ah = pages[0].size[1];
+    let atlas_path = pages[0].path.clone();
+    let page_list: Vec<(String, u32, u32)> =
+        pages.iter().map(|p| (p.path.clone(), p.size[0], p.size[1])).collect();
 
     let [lw0, lh0] = m.logical_frame_canvas.unwrap_or(m.frame_canvas);
 
@@ -248,6 +312,7 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
     Ok(LoadedSprite {
         variant: SpriteVariant {
             directions: dc,
+            pages: page_list,
             atlas_w: aw,
             atlas_h: ah,
             frames,
@@ -257,7 +322,7 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
             animations,
             all_frames,
         },
-        atlas: m.atlases.color.path,
+        atlas: atlas_path,
         name: m.variant_id,
     })
 }
@@ -372,6 +437,7 @@ fn frame_def(fr: &FrameEntry, lw0: u32, lh0: u32) -> FrameDef {
     let [lw, lh] = fr.logical_frame_canvas.unwrap_or([lw0, lh0]);
     FrameDef {
         direction: fr.direction,
+        page: fr.page,
         x,
         y,
         w,

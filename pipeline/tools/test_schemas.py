@@ -41,7 +41,11 @@ def main() -> int:
         (SCHEMA / "animation_clips.schema.json", [EX / "animation" / "bird_v1_anim.json"]),
         (SCHEMA / "hitbox_spec.schema.json", [EX / "hitbox" / "humanoid_hitbox.json"]),
         (SCHEMA / "sprite_manifest.schema.json",
-         sorted(REF.glob("*/manifest.json")) + [OUT / "arrow_pilot" / "manifest.json"]),
+         sorted(REF.glob("*/manifest.json")) + [
+             OUT / "arrow_pilot" / "manifest.json",
+             EX / "atlas_paging" / "manifest.example.json",
+             EX / "atlas_paging" / "humanoid_anim_paged.manifest.json",
+         ]),
     ]
     for schema_path, data_paths in pairs:
         for dp in data_paths:

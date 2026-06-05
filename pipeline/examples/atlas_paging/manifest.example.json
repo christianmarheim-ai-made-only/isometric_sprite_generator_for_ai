@@ -1,0 +1,53 @@
+{
+  "manifest_version": "sprite_manifest_multistate_v1",
+  "contract_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "state_contract_version": "sprite_states_multistate_v1",
+  "variant_id": "paged_example",
+  "variant_class": "character",
+  "camera": {
+    "id": "game_iso_v1",
+    "azimuth_degrees": 45,
+    "camera_elevation_degrees": 30,
+    "projection": "orthographic_pixel_iso_dimetric_2_to_1",
+    "screen_y": "down",
+    "tile_px": [64, 32]
+  },
+  "direction_count": 2,
+  "frame_canvas": [104, 208],
+  "logical_frame_canvas": [104, 208],
+  "default_state": "idle",
+  "atlas_page_policy": "per_state",
+  "animations": {
+    "idle": { "directions": 2, "frames": 1, "fps": 1, "playback": "loop" },
+    "walk": { "directions": 2, "frames": 2, "fps": 8, "playback": "loop" }
+  },
+  "atlases": {
+    "color": {
+      "format": "PNG_RGBA8_sRGB_straight_alpha",
+      "sampling": "linear",
+      "pages": [
+        { "path": "color.idle.png", "size": [210, 210] },
+        { "path": "color.walk.png", "size": [420, 210] }
+      ]
+    },
+    "hitmask": {
+      "format": "PNG_R8_UINT_linear_no_antialias",
+      "sampling": "nearest",
+      "palette": { "none": 0, "head": 1, "torso": 2, "arms": 3, "legs": 4 },
+      "pages": [
+        { "path": "mask.idle.png", "size": [210, 210] },
+        { "path": "mask.walk.png", "size": [420, 210] }
+      ]
+    }
+  },
+  "frames": [
+    { "state": "idle", "direction": 0, "frame_index": 0, "page": 0, "world_yaw_degrees": 0,   "rect": [4, 4, 100, 200],   "mask_rect": [4, 4, 100, 200],   "trim": [0, 0], "logical_frame_canvas": [104, 208], "anchor": [52, 196], "sockets": { "origin": [52, 196] } },
+    { "state": "idle", "direction": 1, "frame_index": 0, "page": 0, "world_yaw_degrees": 180, "rect": [108, 4, 100, 200], "mask_rect": [108, 4, 100, 200], "trim": [0, 0], "logical_frame_canvas": [104, 208], "anchor": [52, 196], "sockets": { "origin": [52, 196] } },
+    { "state": "walk", "direction": 0, "frame_index": 0, "page": 1, "world_yaw_degrees": 0,   "rect": [4, 4, 100, 200],   "mask_rect": [4, 4, 100, 200],   "trim": [0, 0], "logical_frame_canvas": [104, 208], "anchor": [52, 196], "sockets": { "origin": [52, 196] } },
+    { "state": "walk", "direction": 0, "frame_index": 1, "page": 1, "world_yaw_degrees": 0,   "rect": [108, 4, 100, 200], "mask_rect": [108, 4, 100, 200], "trim": [0, 0], "logical_frame_canvas": [104, 208], "anchor": [52, 196], "sockets": { "origin": [52, 196] } },
+    { "state": "walk", "direction": 1, "frame_index": 0, "page": 1, "world_yaw_degrees": 180, "rect": [212, 4, 100, 200], "mask_rect": [212, 4, 100, 200], "trim": [0, 0], "logical_frame_canvas": [104, 208], "anchor": [52, 196], "sockets": { "origin": [52, 196] } },
+    { "state": "walk", "direction": 1, "frame_index": 1, "page": 1, "world_yaw_degrees": 180, "rect": [316, 4, 100, 200], "mask_rect": [316, 4, 100, 200], "trim": [0, 0], "logical_frame_canvas": [104, 208], "anchor": [52, 196], "sockets": { "origin": [52, 196] } }
+  ],
+  "world_metrics": { "height_world": 1.8, "footprint_radius_world": 0.3, "eye_height_world": 1.62, "unit": "meter" },
+  "build": { "generator": "hand-authored multi-page example (docs/atlas_paging_contract.md)" }
+}

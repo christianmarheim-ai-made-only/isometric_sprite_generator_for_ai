@@ -8,6 +8,7 @@
     "manifest_version",
     "contract_hash",
     "state_contract_version",
+    "camera",
     "variant_id",
     "variant_class",
     "frame_canvas",
@@ -19,6 +20,17 @@
   ],
   "properties": {
     "manifest_version": {"type": "string"},
+    "camera": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"const": "game_iso_v1"},
+        "azimuth_degrees": {"type": "number"},
+        "camera_elevation_degrees": {"type": "number"},
+        "tile_px": {"$ref": "#/$defs/size2"}
+      },
+      "additionalProperties": true
+    },
     "contract_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
     "state_contract_version": {"type": "string"},
     "variant_id": {"type": "string"},

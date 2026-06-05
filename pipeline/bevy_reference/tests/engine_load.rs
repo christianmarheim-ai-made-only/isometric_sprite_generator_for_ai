@@ -71,6 +71,51 @@ fn loader_rejects_zero_size_atlas() {
 }
 
 #[test]
+fn multi_atlas_paged_manifest_loads() {
+    // Atlas paging: a multi-PAGE manifest (one page per state) loads; frames address their page.
+    let json = manifest("../examples/atlas_paging/manifest.example.json");
+    let s = parse_manifest(&json).expect("engine must accept a multi-page (paged) manifest");
+    assert_eq!(s.variant.pages.len(), 2, "two atlas pages");
+    assert_eq!(s.variant.pages[0].0, "color.idle.png");
+    assert_eq!(s.variant.pages[1].0, "color.walk.png");
+    let w = s.variant.frame("walk", 1, 1).expect("walk dir1 f1 present");
+    assert_eq!(w.page, 1, "walk frame addresses page 1");
+    // single-page back-compat: page 0 size is still exposed as atlas_w/atlas_h
+    assert_eq!((s.variant.atlas_w, s.variant.atlas_h), (210, 210));
+}
+
+#[test]
+fn paged_rect_exceeding_its_page_is_rejected() {
+    // per-PAGE bounds: a frame whose rect overflows ITS page must fail (not the global atlas).
+    let bad = r#"{"camera":{"id":"game_iso_v1"},"variant_class":"character","direction_count":1,
+        "frame_canvas":[10,10],
+        "atlases":{"color":{"pages":[{"path":"a.png","size":[10,10]},{"path":"b.png","size":[10,10]}]}},
+        "world_metrics":{"height_world":1.0,"footprint_radius_world":0.5},
+        "frames":[{"direction":0,"page":1,"rect":[5,5,20,20],"anchor":[5,9]}]}"#;
+    assert!(parse_manifest(bad).is_err(), "rect overflowing its page must be rejected");
+}
+
+#[test]
+fn single_page_alias_still_loads() {
+    // back-compat: the flat {path,size} form (no `pages`) loads as one synthesized page.
+    let json = manifest("../reference/humanoid_ref/manifest.json");
+    let s = parse_manifest(&json).expect("single-page reference still loads");
+    assert_eq!(s.variant.pages.len(), 1, "single page synthesized from path+size");
+    assert!(s.variant.frames.iter().all(|f| f.page == 0), "all frames on page 0");
+}
+
+#[test]
+fn sharded_real_package_loads() {
+    // shard_atlas.py output (the real per-state pager, run on the 128-frame humanoid_anim
+    // reference) loads: 3 pages for idle/walk/attack, every frame on a valid page.
+    let json = manifest("../examples/atlas_paging/humanoid_anim_paged.manifest.json");
+    let s = parse_manifest(&json).expect("engine must accept the sharded multi-state package");
+    assert_eq!(s.variant.pages.len(), 3, "one page per state (idle/walk/attack)");
+    assert_eq!(s.variant.directions, 16);
+    assert!(s.variant.all_frames.values().all(|f| f.page < 3), "every frame addresses a valid page");
+}
+
+#[test]
 fn reference_multistate_character_is_engine_loadable() {
     // R5: the multi-state, tight-cropped character loads; the loader validates full
     // (state,direction,frame_index) coverage and builds the DEFAULT state's frame 0 per dir.
