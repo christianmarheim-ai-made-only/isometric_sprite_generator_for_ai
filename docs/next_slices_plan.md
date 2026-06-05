@@ -263,8 +263,8 @@ _Updated by each loop iteration._
 |---|---|---|
 | P0 | done | runbook.md + m1_arrow_pilot_review.md |
 | P1 | done | build.py + test_fixtures + repo-relative report path |
-| C0 | next | naming conventions |
-| C2 | todo | body regions only |
+| C0 | done | naming_conventions.md |
+| C2 | next | body regions only |
 | C4 | todo | body-only metrics |
 | P3 | todo | schema + body examples |
 | P4 | todo | linter v1 + fixtures |
