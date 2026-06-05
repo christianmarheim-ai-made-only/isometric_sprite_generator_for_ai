@@ -24,6 +24,7 @@ All ADRs are **Proposed** unless ratified by the engine/gameplay review group. T
 | ADR-0021 | M2A equipment-layering execution stance (affirms ADR-0011) | — (parked; first equipped character) |
 | ADR-0022 | Lock 256² as the engine-facing logical frame canvas | Task #21 / D-canvas (engine sign-off) |
 | ADR-0023 | `world_scale_multiplier` deferred; measured height is sufficient | — (parked) |
+| ADR-0024 | Color variations (runtime tint first) + effects as separate layers, never baked in | effects/M2A milestone |
 
 **ADR-0020 – ADR-0023 are explicitly PARKED** (Proposed, recorded for later review, not scheduled): metallic materials, M2A execution detail, the 256² canvas lock, and the world-scale multiplier. They capture decisions + recommendations so a future session can ratify cold. See each ADR's `Related:` line for the source investigation doc.
 
