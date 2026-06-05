@@ -1,0 +1,1038 @@
+{
+  "animations": {
+    "idle": {
+      "directions": 16,
+      "fps": 1,
+      "frames": 1,
+      "markers": [],
+      "playback": "loop"
+    }
+  },
+  "atlases": {
+    "color": {
+      "extrusion_px": 4,
+      "format": "PNG_RGBA8_sRGB_straight_alpha",
+      "padding_px": 4,
+      "path": "color_atlas.png",
+      "sampling": "linear",
+      "size": [
+        544,
+        544
+      ]
+    },
+    "hitmask": {
+      "extrusion_px": 4,
+      "format": "PNG_R8_UINT_linear_no_antialias",
+      "padding_px": 4,
+      "palette": {
+        "none": 0,
+        "torso": 2
+      },
+      "path": "hitmask_atlas.png",
+      "sampling": "nearest",
+      "size": [
+        544,
+        544
+      ]
+    }
+  },
+  "build": {
+    "assumptions": [
+      "Arrow pilot verifies direction/atlas/manifest plumbing only.",
+      "Blender camera and real rig-derived proxy rendering are deferred.",
+      "Weapons/equipment/arms are deferred to M2A/M3 ADR review."
+    ],
+    "generated_at_utc": "2026-06-05T00:28:17.344433+00:00",
+    "generator": "pipeline/tools/generate_arrow_pilot.py",
+    "generator_mode": "deterministic_python_no_blender",
+    "lockfile_hashes": {
+      "sprite_contract.lock.json": "sha256:87ceec8b51cfe3932eeb7d6201e603e44a5bd01c39009b2a8209b2090ae7535f",
+      "sprite_states.lock.json": "sha256:724e3fc3dd0fe9dbcdb6849729fa9a7bff2d013a53488f62baf5c416202ec8d1",
+      "sprite_variants.lock.json": "sha256:339510ff8bed9d16c354f310bddd0cd8a15a672ab74e7579889a6cb4f16fc53e"
+    }
+  },
+  "contract_hash": "sha256:6cba4162af6fe782492970115fafb9d97c8809d3f569f0e29b8f4bd93f739be8",
+  "direction_count": 16,
+  "expected_facing": [
+    {
+      "boxes": {
+        "torso": [
+          35,
+          54,
+          62,
+          37
+        ]
+      },
+      "diagnostic": "dir00_world_+X_East",
+      "direction": 0,
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "screen_label": "down_right",
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "boxes": {
+        "torso": [
+          41,
+          45,
+          47,
+          56
+        ]
+      },
+      "diagnostic": "",
+      "direction": 1,
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "screen_label": "down_right",
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "boxes": {
+        "torso": [
+          49,
+          42,
+          31,
+          67
+        ]
+      },
+      "diagnostic": "dir02_should_point_down",
+      "direction": 2,
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "screen_label": "down",
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "boxes": {
+        "torso": [
+          41,
+          45,
+          47,
+          56
+        ]
+      },
+      "diagnostic": "",
+      "direction": 3,
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "screen_label": "down_left",
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "boxes": {
+        "torso": [
+          32,
+          54,
+          62,
+          37
+        ]
+      },
+      "diagnostic": "",
+      "direction": 4,
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "screen_label": "down_left",
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "boxes": {
+        "torso": [
+          29,
+          59,
+          66,
+          31
+        ]
+      },
+      "diagnostic": "",
+      "direction": 5,
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "screen_label": "down_left",
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "boxes": {
+        "torso": [
+          28,
+          57,
+          67,
+          31
+        ]
+      },
+      "diagnostic": "",
+      "direction": 6,
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "screen_label": "left",
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "boxes": {
+        "torso": [
+          29,
+          55,
+          66,
+          31
+        ]
+      },
+      "diagnostic": "",
+      "direction": 7,
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "screen_label": "up_left",
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "boxes": {
+        "torso": [
+          32,
+          54,
+          62,
+          37
+        ]
+      },
+      "diagnostic": "",
+      "direction": 8,
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "screen_label": "up_left",
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "boxes": {
+        "torso": [
+          41,
+          44,
+          47,
+          56
+        ]
+      },
+      "diagnostic": "",
+      "direction": 9,
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "screen_label": "up_left",
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "boxes": {
+        "torso": [
+          49,
+          36,
+          31,
+          67
+        ]
+      },
+      "diagnostic": "dir10_should_point_up",
+      "direction": 10,
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "screen_label": "up",
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "boxes": {
+        "torso": [
+          41,
+          44,
+          47,
+          56
+        ]
+      },
+      "diagnostic": "",
+      "direction": 11,
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "screen_label": "up_right",
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "boxes": {
+        "torso": [
+          35,
+          54,
+          62,
+          37
+        ]
+      },
+      "diagnostic": "",
+      "direction": 12,
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "screen_label": "up_right",
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "boxes": {
+        "torso": [
+          34,
+          55,
+          66,
+          31
+        ]
+      },
+      "diagnostic": "",
+      "direction": 13,
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "screen_label": "up_right",
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "boxes": {
+        "torso": [
+          34,
+          57,
+          67,
+          31
+        ]
+      },
+      "diagnostic": "",
+      "direction": 14,
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "screen_label": "right",
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "boxes": {
+        "torso": [
+          34,
+          59,
+          66,
+          31
+        ]
+      },
+      "diagnostic": "",
+      "direction": 15,
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "screen_label": "down_right",
+      "world_yaw_degrees": 337.5
+    }
+  ],
+  "frame_canvas": [
+    128,
+    128
+  ],
+  "frames": [
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          35,
+          54,
+          62,
+          37
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir00_frame00.png",
+      "direction": 0,
+      "frame_index": 0,
+      "mask_rect": [
+        4,
+        4,
+        128,
+        128
+      ],
+      "rect": [
+        4,
+        4,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        0.447214
+      ],
+      "screen_label": "down_right",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 0.0
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          41,
+          45,
+          47,
+          56
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir01_frame00.png",
+      "direction": 1,
+      "frame_index": 0,
+      "mask_rect": [
+        140,
+        4,
+        128,
+        128
+      ],
+      "rect": [
+        140,
+        4,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        0.770076
+      ],
+      "screen_label": "down_right",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 22.5
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          49,
+          42,
+          31,
+          67
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir02_frame00.png",
+      "direction": 2,
+      "frame_index": 0,
+      "mask_rect": [
+        276,
+        4,
+        128,
+        128
+      ],
+      "rect": [
+        276,
+        4,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        0.0,
+        1.0
+      ],
+      "screen_label": "down",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 45.0
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          41,
+          45,
+          47,
+          56
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir03_frame00.png",
+      "direction": 3,
+      "frame_index": 0,
+      "mask_rect": [
+        412,
+        4,
+        128,
+        128
+      ],
+      "rect": [
+        412,
+        4,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        0.770076
+      ],
+      "screen_label": "down_left",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 67.5
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          32,
+          54,
+          62,
+          37
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir04_frame00.png",
+      "direction": 4,
+      "frame_index": 0,
+      "mask_rect": [
+        4,
+        140,
+        128,
+        128
+      ],
+      "rect": [
+        4,
+        140,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        0.447214
+      ],
+      "screen_label": "down_left",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 90.0
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          29,
+          59,
+          66,
+          31
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir05_frame00.png",
+      "direction": 5,
+      "frame_index": 0,
+      "mask_rect": [
+        140,
+        140,
+        128,
+        128
+      ],
+      "rect": [
+        140,
+        140,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        0.202803
+      ],
+      "screen_label": "down_left",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 112.5
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          28,
+          57,
+          67,
+          31
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir06_frame00.png",
+      "direction": 6,
+      "frame_index": 0,
+      "mask_rect": [
+        276,
+        140,
+        128,
+        128
+      ],
+      "rect": [
+        276,
+        140,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        -1.0,
+        0.0
+      ],
+      "screen_label": "left",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 135.0
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          29,
+          55,
+          66,
+          31
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir07_frame00.png",
+      "direction": 7,
+      "frame_index": 0,
+      "mask_rect": [
+        412,
+        140,
+        128,
+        128
+      ],
+      "rect": [
+        412,
+        140,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        -0.97922,
+        -0.202803
+      ],
+      "screen_label": "up_left",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 157.5
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          32,
+          54,
+          62,
+          37
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir08_frame00.png",
+      "direction": 8,
+      "frame_index": 0,
+      "mask_rect": [
+        4,
+        276,
+        128,
+        128
+      ],
+      "rect": [
+        4,
+        276,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        -0.894427,
+        -0.447214
+      ],
+      "screen_label": "up_left",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 180.0
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          41,
+          44,
+          47,
+          56
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir09_frame00.png",
+      "direction": 9,
+      "frame_index": 0,
+      "mask_rect": [
+        140,
+        276,
+        128,
+        128
+      ],
+      "rect": [
+        140,
+        276,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        -0.637952,
+        -0.770076
+      ],
+      "screen_label": "up_left",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 202.5
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          49,
+          36,
+          31,
+          67
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir10_frame00.png",
+      "direction": 10,
+      "frame_index": 0,
+      "mask_rect": [
+        276,
+        276,
+        128,
+        128
+      ],
+      "rect": [
+        276,
+        276,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        -0.0,
+        -1.0
+      ],
+      "screen_label": "up",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 225.0
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          41,
+          44,
+          47,
+          56
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir11_frame00.png",
+      "direction": 11,
+      "frame_index": 0,
+      "mask_rect": [
+        412,
+        276,
+        128,
+        128
+      ],
+      "rect": [
+        412,
+        276,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        0.637952,
+        -0.770076
+      ],
+      "screen_label": "up_right",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 247.5
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          35,
+          54,
+          62,
+          37
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir12_frame00.png",
+      "direction": 12,
+      "frame_index": 0,
+      "mask_rect": [
+        4,
+        412,
+        128,
+        128
+      ],
+      "rect": [
+        4,
+        412,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        0.894427,
+        -0.447214
+      ],
+      "screen_label": "up_right",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 270.0
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          34,
+          55,
+          66,
+          31
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir13_frame00.png",
+      "direction": 13,
+      "frame_index": 0,
+      "mask_rect": [
+        140,
+        412,
+        128,
+        128
+      ],
+      "rect": [
+        140,
+        412,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        -0.202803
+      ],
+      "screen_label": "up_right",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 292.5
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          34,
+          57,
+          67,
+          31
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir14_frame00.png",
+      "direction": 14,
+      "frame_index": 0,
+      "mask_rect": [
+        276,
+        412,
+        128,
+        128
+      ],
+      "rect": [
+        276,
+        412,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        1.0,
+        -0.0
+      ],
+      "screen_label": "right",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 315.0
+    },
+    {
+      "anchor": [
+        64.0,
+        112.0
+      ],
+      "boxes": {
+        "torso": [
+          34,
+          59,
+          66,
+          31
+        ]
+      },
+      "debug_source_frame": "frames/color/arrow_idle_dir15_frame00.png",
+      "direction": 15,
+      "frame_index": 0,
+      "mask_rect": [
+        412,
+        412,
+        128,
+        128
+      ],
+      "rect": [
+        412,
+        412,
+        128,
+        128
+      ],
+      "screen_direction_vector": [
+        0.97922,
+        0.202803
+      ],
+      "screen_label": "down_right",
+      "sockets": {
+        "origin": [
+          64.0,
+          112.0
+        ]
+      },
+      "state": "idle",
+      "world_yaw_degrees": 337.5
+    }
+  ],
+  "manifest_version": "sprite_manifest_debug_subset_v1",
+  "state_contract_version": "sprite_states_debug_v1",
+  "surface_policy": {
+    "equipment_surface_policy": "not_exercised_in_m1_m2_arrow_pilot",
+    "mask_semantics": "debug_single_foreground_region; see ADR-0015",
+    "selection": "any_nonzero_region_selects_owner"
+  },
+  "variant_class": "debug_direction_pilot",
+  "variant_id": "pilot_arrow",
+  "world_metrics": {
+    "footprint_radius_world": 0.25,
+    "height_world": 0.1,
+    "metrics_policy": "debug_placeholder_only_not_gameplay"
+  }
+}

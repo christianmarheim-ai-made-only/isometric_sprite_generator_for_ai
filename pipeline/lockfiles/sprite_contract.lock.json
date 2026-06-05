@@ -1,0 +1,82 @@
+{
+  "camera": {
+    "diagnostic": "dir02 points down; dir10 points up",
+    "height_axis": "up",
+    "id": "game_iso_v1",
+    "projection": "2_to_1_pixel_isometric_debug_ground_plane",
+    "screen_projection_formula": {
+      "screen_x": "(world_x - world_y) * 32",
+      "screen_y": "(world_x + world_y) * 16"
+    },
+    "screen_y": "down",
+    "tile_px": [
+      64,
+      32
+    ]
+  },
+  "contract_name": "sprite_output_contract_debug_subset",
+  "contract_version": "m1_m2_arrow_pilot_v1",
+  "coordinates": {
+    "anchor": "frame_local_ground_contact_or_debug_pivot",
+    "frame_space": "rect_top_left_origin_px",
+    "origin": "top_left",
+    "rect_space": "atlas_local_px",
+    "y_axis": "down"
+  },
+  "facing": {
+    "allowed_direction_counts": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "bin16_formula": "floor(angle_rad / (TAU/16)) modulo 16",
+    "positive": "CCW_toward_+Y",
+    "render_yaw": "direction_index * TAU / N; lower edge, never center",
+    "space": "world",
+    "zero": "+X_East"
+  },
+  "formats": {
+    "color": {
+      "runtime": "decoded_RGBA8",
+      "source": "PNG_RGBA8_sRGB_straight_alpha"
+    },
+    "hitmask": {
+      "runtime": "decoded_R8",
+      "source": "PNG_R8_linear_no_antialias"
+    }
+  },
+  "mask_palette": {
+    "arms": 3,
+    "gear": 7,
+    "head": 1,
+    "legs": 4,
+    "none": 0,
+    "shield": 5,
+    "torso": 2,
+    "weapon": 6
+  },
+  "metrics": {
+    "eye_height_world": "optional_positive_and_lte_height",
+    "footprint_radius_world": "required_positive",
+    "height_world": "required_positive",
+    "unit": "meter"
+  },
+  "notes": "Debug subset for the M1/M2 arrow pilot. Production contract remains sprite_output_contract_decision_complete_v3.",
+  "packing": {
+    "base_atlas_max_px": [
+      2048,
+      2048
+    ],
+    "extrusion_px": 4,
+    "padding_px": 4,
+    "rotated_packing": false
+  },
+  "sampling": {
+    "address_mode": "clamp_to_edge",
+    "color": "linear",
+    "hitmask": "nearest",
+    "mipmaps": false
+  }
+}

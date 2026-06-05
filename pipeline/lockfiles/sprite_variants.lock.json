@@ -1,0 +1,21 @@
+{
+  "variant_contract_version": "sprite_variants_debug_v1",
+  "variants": {
+    "pilot_arrow": {
+      "direction_count": 16,
+      "equipment_baked": false,
+      "frame_canvas": [
+        128,
+        128
+      ],
+      "notes": "M1/M2 direction-only arrow. Not a production character and not an equipment/weapon test.",
+      "required_sockets": [
+        "origin"
+      ],
+      "supported_states": [
+        "idle"
+      ],
+      "variant_class": "debug_direction_pilot"
+    }
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sprite_manifest_debug_subset.schema.json",
+  "title": "Sprite Manifest Debug Subset",
+  "type": "object",
+  "required": [
+    "manifest_version",
+    "contract_hash",
+    "state_contract_version",
+    "variant_id",
+    "variant_class",
+    "frame_canvas",
+    "direction_count",
+    "animations",
+    "atlases",
+    "frames",
+    "world_metrics",
+    "build"
+  ],
+  "properties": {
+    "manifest_version": {"type": "string"},
+    "contract_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "state_contract_version": {"type": "string"},
+    "variant_id": {"type": "string"},
+    "variant_class": {"type": "string"},
+    "frame_canvas": {
+      "type": "array",
+      "items": {"type": "integer", "minimum": 1},
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "direction_count": {"type": "integer", "enum": [1, 2, 4, 8, 16]},
+    "animations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["playback", "directions", "frames", "fps"],
+        "properties": {
+          "playback": {"type": "string", "enum": ["loop", "once", "once_hold"]},
+          "directions": {"type": "integer", "enum": [1, 2, 4, 8, 16]},
+          "frames": {"type": "integer", "minimum": 1},
+          "fps": {"type": "number", "exclusiveMinimum": 0},
+          "markers": {"type": "array"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "atlases": {
+      "type": "object",
+      "required": ["color", "hitmask"],
+      "properties": {
+        "color": {"$ref": "#/$defs/atlas"},
+        "hitmask": {"$ref": "#/$defs/atlas"}
+      },
+      "additionalProperties": false
+    },
+    "frames": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/frame"},
+      "minItems": 1
+    },
+    "world_metrics": {
+      "type": "object",
+      "required": ["height_world", "footprint_radius_world"],
+      "properties": {
+        "height_world": {"type": "number", "exclusiveMinimum": 0},
+        "footprint_radius_world": {"type": "number", "exclusiveMinimum": 0},
+        "eye_height_world": {"type": "number", "exclusiveMinimum": 0},
+        "metrics_policy": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "expected_facing": {"type": "array"},
+    "build": {"type": "object"}
+  },
+  "$defs": {
+    "atlas": {
+      "type": "object",
+      "required": ["path", "size", "format", "sampling"],
+      "properties": {
+        "path": {"type": "string"},
+        "size": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1},
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "format": {"type": "string"},
+        "sampling": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "rect": {
+      "type": "array",
+      "items": {"type": "integer", "minimum": 0},
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "point": {
+      "type": "array",
+      "items": {"type": "number"},
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "frame": {
+      "type": "object",
+      "required": [
+        "state",
+        "direction",
+        "frame_index",
+        "world_yaw_degrees",
+        "rect",
+        "mask_rect",
+        "anchor",
+        "sockets",
+        "boxes"
+      ],
+      "properties": {
+        "state": {"type": "string"},
+        "direction": {"type": "integer", "minimum": 0},
+        "frame_index": {"type": "integer", "minimum": 0},
+        "world_yaw_degrees": {"type": "number"},
+        "screen_direction_vector": {"$ref": "#/$defs/point"},
+        "rect": {"$ref": "#/$defs/rect"},
+        "mask_rect": {"$ref": "#/$defs/rect"},
+        "anchor": {"$ref": "#/$defs/point"},
+        "sockets": {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/point"}
+        },
+        "boxes": {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/rect"}
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

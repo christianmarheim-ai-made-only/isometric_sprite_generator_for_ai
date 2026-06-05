@@ -1,0 +1,15 @@
+{
+  "state_contract_version": "sprite_states_debug_v1",
+  "states": {
+    "idle": {
+      "directions": 16,
+      "fps": 1,
+      "frames": 1,
+      "playback": "loop",
+      "required_markers": [],
+      "required_sockets": [
+        "origin"
+      ]
+    }
+  }
+}

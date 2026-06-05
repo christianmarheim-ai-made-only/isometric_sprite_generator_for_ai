@@ -1,0 +1,290 @@
+[
+  {
+    "boxes": {
+      "torso": [
+        35,
+        54,
+        62,
+        37
+      ]
+    },
+    "diagnostic": "dir00_world_+X_East",
+    "direction": 0,
+    "screen_direction_vector": [
+      0.894427,
+      0.447214
+    ],
+    "screen_label": "down_right",
+    "world_yaw_degrees": 0.0
+  },
+  {
+    "boxes": {
+      "torso": [
+        41,
+        45,
+        47,
+        56
+      ]
+    },
+    "diagnostic": "",
+    "direction": 1,
+    "screen_direction_vector": [
+      0.637952,
+      0.770076
+    ],
+    "screen_label": "down_right",
+    "world_yaw_degrees": 22.5
+  },
+  {
+    "boxes": {
+      "torso": [
+        49,
+        42,
+        31,
+        67
+      ]
+    },
+    "diagnostic": "dir02_should_point_down",
+    "direction": 2,
+    "screen_direction_vector": [
+      0.0,
+      1.0
+    ],
+    "screen_label": "down",
+    "world_yaw_degrees": 45.0
+  },
+  {
+    "boxes": {
+      "torso": [
+        41,
+        45,
+        47,
+        56
+      ]
+    },
+    "diagnostic": "",
+    "direction": 3,
+    "screen_direction_vector": [
+      -0.637952,
+      0.770076
+    ],
+    "screen_label": "down_left",
+    "world_yaw_degrees": 67.5
+  },
+  {
+    "boxes": {
+      "torso": [
+        32,
+        54,
+        62,
+        37
+      ]
+    },
+    "diagnostic": "",
+    "direction": 4,
+    "screen_direction_vector": [
+      -0.894427,
+      0.447214
+    ],
+    "screen_label": "down_left",
+    "world_yaw_degrees": 90.0
+  },
+  {
+    "boxes": {
+      "torso": [
+        29,
+        59,
+        66,
+        31
+      ]
+    },
+    "diagnostic": "",
+    "direction": 5,
+    "screen_direction_vector": [
+      -0.97922,
+      0.202803
+    ],
+    "screen_label": "down_left",
+    "world_yaw_degrees": 112.5
+  },
+  {
+    "boxes": {
+      "torso": [
+        28,
+        57,
+        67,
+        31
+      ]
+    },
+    "diagnostic": "",
+    "direction": 6,
+    "screen_direction_vector": [
+      -1.0,
+      0.0
+    ],
+    "screen_label": "left",
+    "world_yaw_degrees": 135.0
+  },
+  {
+    "boxes": {
+      "torso": [
+        29,
+        55,
+        66,
+        31
+      ]
+    },
+    "diagnostic": "",
+    "direction": 7,
+    "screen_direction_vector": [
+      -0.97922,
+      -0.202803
+    ],
+    "screen_label": "up_left",
+    "world_yaw_degrees": 157.5
+  },
+  {
+    "boxes": {
+      "torso": [
+        32,
+        54,
+        62,
+        37
+      ]
+    },
+    "diagnostic": "",
+    "direction": 8,
+    "screen_direction_vector": [
+      -0.894427,
+      -0.447214
+    ],
+    "screen_label": "up_left",
+    "world_yaw_degrees": 180.0
+  },
+  {
+    "boxes": {
+      "torso": [
+        41,
+        44,
+        47,
+        56
+      ]
+    },
+    "diagnostic": "",
+    "direction": 9,
+    "screen_direction_vector": [
+      -0.637952,
+      -0.770076
+    ],
+    "screen_label": "up_left",
+    "world_yaw_degrees": 202.5
+  },
+  {
+    "boxes": {
+      "torso": [
+        49,
+        36,
+        31,
+        67
+      ]
+    },
+    "diagnostic": "dir10_should_point_up",
+    "direction": 10,
+    "screen_direction_vector": [
+      -0.0,
+      -1.0
+    ],
+    "screen_label": "up",
+    "world_yaw_degrees": 225.0
+  },
+  {
+    "boxes": {
+      "torso": [
+        41,
+        44,
+        47,
+        56
+      ]
+    },
+    "diagnostic": "",
+    "direction": 11,
+    "screen_direction_vector": [
+      0.637952,
+      -0.770076
+    ],
+    "screen_label": "up_right",
+    "world_yaw_degrees": 247.5
+  },
+  {
+    "boxes": {
+      "torso": [
+        35,
+        54,
+        62,
+        37
+      ]
+    },
+    "diagnostic": "",
+    "direction": 12,
+    "screen_direction_vector": [
+      0.894427,
+      -0.447214
+    ],
+    "screen_label": "up_right",
+    "world_yaw_degrees": 270.0
+  },
+  {
+    "boxes": {
+      "torso": [
+        34,
+        55,
+        66,
+        31
+      ]
+    },
+    "diagnostic": "",
+    "direction": 13,
+    "screen_direction_vector": [
+      0.97922,
+      -0.202803
+    ],
+    "screen_label": "up_right",
+    "world_yaw_degrees": 292.5
+  },
+  {
+    "boxes": {
+      "torso": [
+        34,
+        57,
+        67,
+        31
+      ]
+    },
+    "diagnostic": "",
+    "direction": 14,
+    "screen_direction_vector": [
+      1.0,
+      -0.0
+    ],
+    "screen_label": "right",
+    "world_yaw_degrees": 315.0
+  },
+  {
+    "boxes": {
+      "torso": [
+        34,
+        59,
+        66,
+        31
+      ]
+    },
+    "diagnostic": "",
+    "direction": 15,
+    "screen_direction_vector": [
+      0.97922,
+      0.202803
+    ],
+    "screen_label": "down_right",
+    "world_yaw_degrees": 337.5
+  }
+]
