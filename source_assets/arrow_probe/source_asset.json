@@ -1,0 +1,16 @@
+{
+  "asset_id": "arrow_probe",
+  "variant_class": "probe",
+  "source_format": "blend",
+  "source_file": "arrow_probe.blend",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "ground_footprint_center",
+  "visual_objects": ["VIS_arrow"],
+  "hit_proxy_objects": [{"name": "HIT_torso", "region": "torso"}],
+  "metric_proxy_objects": [],
+  "sockets": ["origin"],
+  "clips_states": [{"state": "idle", "frames": 1, "playback": "loop", "directional": true}],
+  "notes": "P2 Blender arrow probe. Render: blender --background arrow_probe.blend --python ../../pipeline/tools/export_blender_probe.py . Prereq: add an 'arrow_probe' variant to sprite_variants.lock.json (variant_class probe); adding a variant does not change contract_hash."
+}

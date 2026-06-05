@@ -268,8 +268,8 @@ _Updated by each loop iteration._
 | C4 | done | world_metrics_policy.md + measure_metrics.py |
 | P3 | done | source_asset.schema.json + probe/character/effect examples |
 | P4 | done | lint_source_asset.py + fixtures + test_lint_source |
-| P2 | next · blocked:blender (.blend/render) | tooling+descriptor doable now |
-| C5 | todo | headless PIL OK |
+| P2 | partial:blender | exporter + descriptor done; .blend + render are human steps |
+| C5 | next | headless PIL OK |
 | C1 | todo · blocked:blender (.blend) | skeleton_spec doable now |
 | P5 | todo | code now; fixtures need C1 |
 | C6 | todo · blocked:blender (.blend) | descriptors/conformance now |
