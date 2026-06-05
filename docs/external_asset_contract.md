@@ -46,6 +46,10 @@ declared state. To add a bird, you deliver only a new skinned mesh + texture.
 
 ## 2. Mesh
 
+> **Building the body from scratch?** See [`modeling_the_body.md`](modeling_the_body.md) for the
+> step-by-step geometry how-to (scale, forward axis, giving it a *front*, region-named parts) plus a
+> 5-minute pre-texture check. This section is the spec; that doc is the tutorial.
+
 - **Format:** glTF 2.0 **`.glb`** (preferred — carries rig + skin + animation + textures in one
   file) or **`.obj`** (static only, no rig/animation). Triangulated.
 - **One logical mesh** (or cleanly mergeable parts). Manifold-ish; no stray loose geometry.
