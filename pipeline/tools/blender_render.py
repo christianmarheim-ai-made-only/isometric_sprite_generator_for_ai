@@ -67,10 +67,11 @@ if MESH_FILE:
         mesh.materials.append(bpy.data.materials.new("torso"))
         for poly in mesh.polygons:
             poly.material_index = 0
-    for mat in mesh.materials:  # recolor each material by NAME -> its HIT region color
-        if mat is not None:
-            mat.use_nodes = False
-            mat.diffuse_color = (*REGION_COLOR[region_for_name(mat.name)], 1.0)
+    # Keep the ART materials for the color pass; record each material's HIT region (by NAME) for
+    # the region pass; detect whether any material carries a base-color texture (-> real look).
+    region_of = {mat.name: region_for_name(mat.name) for mat in mesh.materials if mat}
+    has_tex = any(mat and mat.use_nodes and any(n.type == 'TEX_IMAGE' and n.image
+                  for n in mat.node_tree.nodes) for mat in mesh.materials)
 else:
     verts, faces, freg = meshes.humanoid()
     mesh = bpy.data.meshes.new("humanoid")
@@ -87,6 +88,8 @@ else:
         mesh.materials.append(m)
     for i, poly in enumerate(mesh.polygons):
         poly.material_index = slot[int(freg[i])]
+    region_of = {f"region{rid}": rid for rid in REGION_COLOR}  # procedural: art color == region color
+    has_tex = False
 
 # --- EXACT game_iso_v1 camera: local X=screen-right, Y=screen-up, Z=toward-camera ---
 right = Vector((1.0, -1.0, 0.0)).normalized()                       # d(x-y)
@@ -127,15 +130,28 @@ def probe(p):
 camera_probe = {k: probe(v) for k, v in
                 {"origin": (0, 0, 0), "px": (1, 0, 0), "py": (0, 1, 0), "pz": (0, 0, 1)}.items()}
 
+# COLOR pass -- the ART's real look (base-color TEXTURE if present, else the material base
+# colors), studio-lit. (Procedural/untextured -> MATERIAL shows its diffuse_color.)
+shading.color_type = 'TEXTURE' if has_tex else 'MATERIAL'
+shading.light = 'STUDIO'
+scene.display.render_aa = '8'
 for i in range(DIRS):
-    yaw = i * (2 * math.pi / DIRS)
-    obj.rotation_euler = (0.0, 0.0, yaw)
-    shading.light = 'STUDIO'
-    scene.display.render_aa = '8'
+    obj.rotation_euler = (0.0, 0.0, i * (2 * math.pi / DIRS))
     r.filepath = os.path.join(OUT, f"color_dir{i:02d}.png")
     bpy.ops.render.render(write_still=True)
-    shading.light = 'FLAT'
-    scene.display.render_aa = 'OFF'
+
+# Recolor every material to its flat HIT-region color for the REGION pass (-> R8 hit-mask).
+for mat in mesh.materials:
+    if mat is not None:
+        mat.use_nodes = False
+        mat.diffuse_color = (*REGION_COLOR[region_of.get(mat.name, 2)], 1.0)
+
+# REGION pass -- flat region colors, no AA.
+shading.color_type = 'MATERIAL'
+shading.light = 'FLAT'
+scene.display.render_aa = 'OFF'
+for i in range(DIRS):
+    obj.rotation_euler = (0.0, 0.0, i * (2 * math.pi / DIRS))
     r.filepath = os.path.join(OUT, f"region_dir{i:02d}.png")
     bpy.ops.render.render(write_still=True)
 
