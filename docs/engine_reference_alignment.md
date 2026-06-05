@@ -79,23 +79,31 @@ extrusion; atlas `path` relative to manifest; R8 hitmask + palette
   look right on screen, checked via the oracle).
 - `eye_height_world` absent → engine uses **`0.85 · height_world`**.
 
-## Camera elevation = 30° (engine-confirmed); the live item is the height ↔ ×24 mapping
+## Camera elevation = 30° (engine-confirmed & verified); height is engine-sized by `height_world`
 
-The camera elevation is **30°** (confirmed by the engine). The ground projection
-(`×32/×16`, `tile_px [64,32]`) is verified and the flat arrow is elevation-immune,
-so nothing shipped is affected.
+**Verified against the corrected reference package (`game_iso_v1_reference_v1_corrected.zip`, 2026-06-05).**
+Elevation `30°` is confirmed and now documented consistently across the engine schema,
+the manifest (`camera_elevation_degrees: 30` + new `camera_elevation_definition` /
+`camera_geometry_note` fields), the format/QA/reconciliation specs, and a new
+`CAMERA_GEOMETRY_NOTE.md`. The golden sample passes **Gate 1** (schema + cross-field
+rules). Geometry: `sin(elevation)=0.5 → 30°` for the 2:1 ground tile; `arctan(0.5)≈26.565°`
+is the on-screen tile-edge angle, **not** the camera elevation (a 26.565° camera would
+render ≈2.236:1 — wrong). This matches ADR-0018.
 
-The one remaining item — and the only place a wrong call forces a re-bake — is how
-**real heights foreshorten**: the engine maps world height with
-`HEIGHT_SCREEN_SCALE = 24` (`screen_y = −(x+y)·16 + height·24`), while a naive 30°
-ortho camera would render height at ≈39 px/unit instead. So the bake must **set the
-height scale explicitly to 24** (ADR-0018), and a flat arrow cannot reveal whether
-it's right.
+**Height — clarified by the corrected docs:** `HEIGHT_SCREEN_SCALE = 24` is applied
+**engine-side** — *"the engine sizes billboards by `height_world`, so the bake need only
+match the ground at 30°."* So the bake's obligation is **azimuth 45° + elevation 30°
+(ground correct) + emit correct `world_metrics.height_world`**; an explicit in-bake
+height squash to 24 px/unit is **likely not required** (simpler than ADR-0018 first
+assumed). One spec line is in slight tension (*"the sprite's drawn height must equal
+`height_world × 24`"*), so **confirm against `crates/client_bevy/src/render.rs` which
+side applies the `×24`** before M3 height bakes — then reconcile ADR-0018/0019. Do not
+bake 3D height art until that side is confirmed.
 
-**Settle it with a height-bearing reference** — a 1 m / 2 m vertical pole that must
-measure **24 px / 48 px** of screen-Y rise from the foot (the ADR-0019 calibration
-gate) — or confirm against `crates/client_bevy/src/render.rs`. **Do not bake any 3D
-height art until the height scale is pinned and that check passes.**
+> **Reference-package defect (engine-side):** the corrected zip's `README.md` was not
+> updated — it still says *"`camera_elevation_degrees: 30` … That is wrong … bake at
+> 26.565°"*, contradicting every other (corrected) doc in the same package. Flagged for
+> the engine team; harmless to us (the README is not engine-consumed).
 
 ## Instruction when work resumes
 
