@@ -37,8 +37,13 @@ def main() -> int:
     ok = True
     pairs = [
         (SCHEMA / "external_asset.schema.json",
-         sorted(EX.glob("*.asset.json")) + [EX / "texture_starter" / "humanoid_textured.asset.json"]),
-        (SCHEMA / "animation_clips.schema.json", [EX / "animation" / "bird_v1_anim.json"]),
+         sorted(EX.glob("*.asset.json")) + [
+             EX / "texture_starter" / "humanoid_textured.asset.json",
+             EX / "animation" / "crow_jsonanim.asset.json",
+             EX / "grunt.asset.json",
+         ]),
+        (SCHEMA / "animation_clips.schema.json",
+         [EX / "animation" / "bird_v1_anim.json", EX / "animation" / "combat_biped_anim.json"]),
         (SCHEMA / "hitbox_spec.schema.json", [EX / "hitbox" / "humanoid_hitbox.json"]),
         (SCHEMA / "sprite_manifest.schema.json",
          sorted(REF.glob("*/manifest.json")) + [

@@ -30,9 +30,10 @@
     "thigh.R": "legs", "shin.R": "legs", "foot.R": "legs"
   },
   "states": {
-    "_note": "States a biped variant may deliver. A variant MUST deliver at least `idle`; others are optional. fps/playback/frames match pipeline/lockfiles/sprite_states.lock.json (the procedural biped library). Extra states beyond this list are allowed if the variant authors clips for them.",
-    "idle":   { "required": true,  "frames": 1, "fps": 1,  "playback": "loop" },
-    "walk":   { "required": false, "frames": 4, "fps": 8,  "playback": "loop" },
-    "attack": { "required": false, "frames": 3, "fps": 12, "playback": "once" }
+    "_note": "Canonical biped COMBAT set for RIGGED variants (clips authored as anim_clips_v1 -- see examples/animation/combat_biped_anim.json + examples/grunt.asset.json). A variant MUST deliver `idle`; move/punch/death are the standard actions, all 16-direction. `death` uses playback `hold` so its FINAL frame is the held, non-animated corpse -- no separate dead state needed. A NO-RIG biped instead gets the simpler procedural set idle/walk/attack from bake.bake_character_anim. Extra states beyond this list are allowed.",
+    "idle":  { "required": true,  "frames": 1, "fps": 1,  "playback": "loop" },
+    "move":  { "required": false, "frames": 6, "fps": 10, "playback": "loop" },
+    "punch": { "required": false, "frames": 4, "fps": 12, "playback": "once" },
+    "death": { "required": false, "frames": 6, "fps": 10, "playback": "hold" }
   }
 }

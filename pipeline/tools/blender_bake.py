@@ -163,7 +163,7 @@ def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = 
 
 
 def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations: dict,
-                  variant_id: str) -> tuple[dict, dict]:
+                  variant_id: str, default_state: str | None = None) -> tuple[dict, dict]:
     """R8: bake a RIGGED + ANIMATED glb into a MULTI-STATE, tight-cropped package by SAMPLING the
     glb's clips (blender_render_anim). `asset_animations` = {state: {clip, frames, fps, playback}}
     from the asset manifest. Same package shape as the procedural bake_character_anim (R5)."""
@@ -228,7 +228,7 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
                    "projection": "orthographic_pixel_iso_dimetric_2_to_1", "screen_y": "down", "tile_px": [64, 32]},
         "variant_id": variant_id, "variant_class": "character", "direction_count": DIRS,
         "frame_canvas": list(canvas), "logical_frame_canvas": list(canvas),
-        "default_state": "idle" if "idle" in asset_animations else sorted(asset_animations)[0],
+        "default_state": default_state or ("idle" if "idle" in asset_animations else sorted(asset_animations)[0]),
         "animations": animations,
         "atlases": {"color": {"path": "color_atlas.png", "size": list(color_atlas.size)},
                     "hitmask": {"path": "hitmask_atlas.png", "size": list(mask_atlas.size),

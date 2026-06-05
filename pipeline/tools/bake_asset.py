@@ -67,7 +67,8 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
                     raise SystemExit("bake_anim_from_json failed:\n" + (proc.stdout or "")[-1500:] + (proc.stderr or "")[-1500:])
                 mesh_for_bake = str(animated)
                 route = "Blender / rigged + animated (clips embedded from animation_clips JSON)"
-            manifest, _ = bake_animated(out, blender, mesh_for_bake, anims, variant_id)
+            manifest, _ = bake_animated(out, blender, mesh_for_bake, anims, variant_id,
+                                        default_state=asset.get("default_state"))
         else:
             manifest, _ = bake_blender(out, blender, str(mesh_path), variant_id)
             route = "Blender / static"

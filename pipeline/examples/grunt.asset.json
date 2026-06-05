@@ -1,0 +1,17 @@
+{
+  "asset_contract_version": "external_asset_v1",
+  "variant_id": "grunt",
+  "archetype": "biped",
+  "files": { "mesh": "../test_meshes/grunt.glb", "animation_clips": "animation/combat_biped_anim.json" },
+  "geometry": { "up": "y", "forward": "+x", "unit": "meter" },
+  "rig": "biped_v1",
+  "region_source": "material_name",
+  "default_state": "idle",
+  "animations": {
+    "idle":  { "clip": "idle",  "frames": 1, "fps": 1,  "playback": "loop" },
+    "move":  { "clip": "move",  "frames": 6, "fps": 10, "playback": "loop" },
+    "punch": { "clip": "punch", "frames": 4, "fps": 12, "playback": "once" },
+    "death": { "clip": "death", "frames": 6, "fps": 10, "playback": "hold" }
+  },
+  "notes": "CANONICAL rigged biped combat-unit template. Clone per unit: swap files.mesh for your biped (skinned to biped_v1, materials named head/torso/arms/legs) and keep animation_clips -- the clips target bone NAMES so one combat_biped_anim.json drives every biped. death playback=hold means its final frame is the non-animated corpse. bake_asset.py embeds the clips and bakes in one command."
+}

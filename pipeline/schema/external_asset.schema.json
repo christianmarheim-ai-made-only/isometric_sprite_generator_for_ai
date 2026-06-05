@@ -29,6 +29,7 @@
       }
     },
     "rig": { "type": "string", "description": "rig profile id (pipeline/schema/rig_profiles/<rig>.json). Omit for a static mesh -> procedural animation." },
+    "default_state": { "type": "string", "description": "the state shown when nothing is playing (must be an `animations` key). Omit -> engine uses `idle` if present, else the lexicographically-first state." },
     "region_source": { "enum": ["material_name", "vertex_attribute", "region_texture"], "description": "how HIT regions are tagged. Only material_name bakes today; the others are documented extensions." },
     "textures": {
       "type": "object",
