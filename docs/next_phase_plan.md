@@ -30,14 +30,14 @@ model-authoring package (`dist/model_authoring_contract_v1.zip`, GO-reviewed).
 | H2 | Close task #21: bump `manifest_version`→`sprite_manifest_v1` + `frame_canvas`→256², regen `contract_hash` + smoke/contract fixtures as one atomic change | only genuinely-open in-repo item; makes output read as production | S | high |
 | H3 | **Gate the biped-combat bake** (`grunt.asset.json` + `combat_biped_anim.json`), Blender-skip like R7 | the rigged JSON-clip→biped path has **zero** end-to-end coverage; only the bird is gated → silent regression | S | high |
 | H4 | **Gate the textured bake** (`humanoid_textured.glb` through `color_type='TEXTURE'`) asserting it differs from MATERIAL | the real-art texture path is never baked by any gate → silent Blender-shading regression | S | high |
-| H5 | **DONE** — atlas ceiling reconciled to one `MAX_PAGE_PX=4096` (`constants.py`); `validate_manifest` uses it + fails gracefully on a `pages` manifest instead of KeyError; `shard_atlas` overflow WARN → hard `OversizePageError` + non-zero exit | real contradiction; oversize atlases emit on a WARN and continue; validate_manifest KeyErrors on a `pages` manifest | M | high |
+| H5 | **DONE** — atlas ceiling reconciled to one `MAX_PAGE_PX=4096` (`constants.py`); `validate_debug_subset` uses it + fails gracefully on a `pages` manifest instead of KeyError; `shard_atlas` overflow WARN → hard `OversizePageError` + non-zero exit | real contradiction; oversize atlases emit on a WARN and continue; the debug-subset validator KeyError'd on a `pages` manifest | M | high |
 | H6 | **DONE** — `pipeline/tools/constants.py` (`REGION_RGB`, `GROUND_BAND=0.15`, `EYE_FRACTION=0.9`, `CANVAS/DIRS=256/16`, `PAD=4`, `MAX_PAGE_PX`) imported across `bake.py`, the 3 Blender render scripts, `hitbox_from_mesh.py`, `shard_atlas.py`, `build_log.py`; references reproduce byte-identically | `REGION_COLOR` duplicated ×3; the 0.15/0.9 metric magic numbers appear ×6 as unguarded literals that **must** agree for metric parity | M | med |
 | H7 | `manifest_version` enum in `sprite_manifest.schema.json` + a version↔fields↔loader compatibility table | 4 version strings validate as bare strings; the Rust loader hard-requires multistate fields, so a single-state `bake_v1` manifest is undeserializable by the reference loader | S | med |
-| H8 | **PARTIAL** — paged-manifest KeyError fixed (graceful error → Gate-1) + 2048 literal dropped for `MAX_PAGE_PX` this session. Remaining: rename → `validate_debug_subset.py` **or** fully generalize = open decision **D-validate** (see `production_readiness_plan.md §3`) | it's wired in only for arrow_pilot yet reads as the system contract | M | med |
+| H8 | **DONE** — renamed `validate_manifest.py` → `validate_debug_subset.py` (+ function + 3 importers + build step); it now reads honestly as the arrow-pilot debug-subset validator, Gate-1 is the system gate. (Paged-manifest KeyError + 2048→`MAX_PAGE_PX` fixed earlier.) The "fully generalize instead" alternative is closed in favour of the rename. | it's wired in only for arrow_pilot yet reads as the system contract | M | med |
 | H9 | `docs/state_vocabulary.md`: procedural `idle/walk/attack` (lockfile) vs rigged `idle/move/punch/death` (biped_v1) + which baker emits which | two "canonical" vocabularies; `walk`-vs-`move`/`attack`-vs-`punch` will bite engine state-machine wiring | S | med |
 | H10 | **DONE** — `hitbox_from_mesh.py` now imports `GROUND_BAND`/`EYE_FRACTION` from `constants.py` (the same source `bake.py` uses), so metric parity is structural, not by-convention | both name 0.15/0.9 independently; nothing enforces lockstep → silent metric drift | S | med |
 | H11 | **DONE** — gitignored `output/arrow_pilot/frames/` | tracked intermediates can go stale vs code | S | low |
-| H12 | Pin a Blender version for committed fixtures + non-skipping checksum vs recorded `blender_version` | parity gates SKIP without Blender, so committed Blender fixtures are never re-verified on a no-Blender machine → cross-version drift undetectable | M | low |
+| H12 | **DONE** — `reference/blender_goldens.lock.json` pins Blender 5.1.2 + golden checksums; `test_blender_goldens.py` verifies them NON-SKIPPING (no Blender) and warns on a local-version mismatch | parity gates SKIP without Blender, so committed Blender fixtures are never re-verified on a no-Blender machine → cross-version drift undetectable | M | low |
 
 ## 3. Production logging (per-batch build log)
 
@@ -46,7 +46,7 @@ model-authoring package (`dist/model_authoring_contract_v1.zip`, GO-reviewed).
 
 - **`pipeline/tools/build_log.py`** (~120 lines, no new deps): a `BuildLog` recorder with
   `start/end_stage` context managers, `file_sha256`, `git_commit` (cached, tolerant of no-git),
-  `packing_efficiency`. Reuses the `validate_manifest` `{checks,warnings,errors}` vocabulary.
+  `packing_efficiency`. Reuses the `validate_debug_subset` `{checks,warnings,errors}` vocabulary.
 - **Two artifacts:** (1) per-bake `output/<variant>/build_log.json` (`sprite_build_log_v1`, sorted
   keys, rounded floats — the diffable record); (2) per-batch `output/<batch>/build_index.json` +
   a one-screen human summary table from `produce_verify_set.py`.

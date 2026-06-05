@@ -39,7 +39,7 @@ from generate_arrow_pilot import (  # noqa: E402
     world_to_screen_vector, screen_label, diagnostic_label,
 )
 from contract_hash import compute_contract_hash, compute_individual_hashes  # noqa: E402
-from validate_manifest import validate_manifest  # noqa: E402
+from validate_debug_subset import validate_debug_subset  # noqa: E402
 
 VARIANT_ID = "arrow_probe"
 OUTPUT_DIR = PIPELINE_ROOT / "output" / "arrow_probe_blender"
@@ -207,7 +207,7 @@ def main() -> int:
     mask_atlas.save(OUTPUT_DIR / "hitmask_atlas.png")
     write_json(OUTPUT_DIR / "manifest.json", build_manifest(rects, expected, color_atlas.size, mask_atlas.size))
 
-    report = validate_manifest(OUTPUT_DIR / "manifest.json", PIPELINE_ROOT)
+    report = validate_debug_subset(OUTPUT_DIR / "manifest.json", PIPELINE_ROOT)
     if not report["ok"]:
         print("VALIDATION FAILED:")
         for e in report["errors"]:

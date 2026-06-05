@@ -13,7 +13,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from generate_arrow_pilot import main as generate_main  # noqa: E402
-from validate_manifest import validate_manifest  # noqa: E402
+from validate_debug_subset import validate_debug_subset  # noqa: E402
 
 
 def main() -> int:
@@ -29,7 +29,7 @@ def main() -> int:
         sys.argv = old_argv
 
     manifest = output / "manifest.json"
-    report = validate_manifest(manifest, pipeline_root)
+    report = validate_debug_subset(manifest, pipeline_root)
     if not report["ok"]:
         print("FAIL: valid manifest rejected")
         print(json.dumps(report, indent=2))
@@ -45,7 +45,7 @@ def main() -> int:
         data = json.loads(corrupt_manifest.read_text(encoding="utf-8"))
         data["contract_hash"] = "sha256:" + "0" * 64
         corrupt_manifest.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        corrupt_report = validate_manifest(corrupt_manifest, pipeline_root)
+        corrupt_report = validate_debug_subset(corrupt_manifest, pipeline_root)
         if corrupt_report["ok"]:
             print("FAIL: corrupted contract_hash was accepted")
             return 1

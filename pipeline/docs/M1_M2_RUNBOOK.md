@@ -28,7 +28,7 @@ frames/hitmask/*.png
 ## 2. Validate manifest and images
 
 ```bash
-python pipeline/tools/validate_manifest.py pipeline/output/arrow_pilot/manifest.json --report pipeline/output/arrow_pilot/validation_report.json
+python pipeline/tools/validate_debug_subset.py pipeline/output/arrow_pilot/manifest.json --report pipeline/output/arrow_pilot/validation_report.json
 ```
 
 Expected output:

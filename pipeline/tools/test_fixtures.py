@@ -27,7 +27,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from generate_arrow_pilot import main as generate_main  # noqa: E402
-from validate_manifest import validate_manifest  # noqa: E402
+from validate_debug_subset import validate_debug_subset  # noqa: E402
 
 
 def _regenerate() -> None:
@@ -102,7 +102,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         dst = Path(td) / "arrow_pilot"
         shutil.copytree(OUTPUT, dst)
-        report = validate_manifest(dst / "manifest.json", PIPELINE_ROOT)
+        report = validate_debug_subset(dst / "manifest.json", PIPELINE_ROOT)
         ok &= check("valid fixture accepted (ok=true)", report["ok"])
 
     # Invalid: each must be rejected with the expected error substring.
@@ -112,7 +112,7 @@ def main() -> int:
             shutil.copytree(OUTPUT, dst)
             try:
                 _apply(case, dst / "manifest.json")
-                report = validate_manifest(dst / "manifest.json", PIPELINE_ROOT)
+                report = validate_debug_subset(dst / "manifest.json", PIPELINE_ROOT)
                 passed = (not report["ok"]) and any(
                     case["expect_error_substring"] in e for e in report["errors"])
             except Exception as exc:  # noqa: BLE001

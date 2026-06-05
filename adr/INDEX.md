@@ -20,6 +20,12 @@ All ADRs are **Proposed** unless ratified by the engine/gameplay review group. T
 | ADR-0017 | Atlas/compression/streaming deferred until measured | M4/M5 |
 | ADR-0018 | Camera elevation 30° (confirmed); height pinned by an explicit pixel scale | M3 |
 | ADR-0019 | Height-calibration probe + gate before height bakes | M2A/M3 |
+| ADR-0020 | Metallic/specular sprite materials — baked-static v1; dynamic-lit parked | — (parked) |
+| ADR-0021 | M2A equipment-layering execution stance (affirms ADR-0011) | — (parked; first equipped character) |
+| ADR-0022 | Lock 256² as the engine-facing logical frame canvas | Task #21 / D-canvas (engine sign-off) |
+| ADR-0023 | `world_scale_multiplier` deferred; measured height is sufficient | — (parked) |
+
+**ADR-0020 – ADR-0023 are explicitly PARKED** (Proposed, recorded for later review, not scheduled): metallic materials, M2A execution detail, the 256² canvas lock, and the world-scale multiplier. They capture decisions + recommendations so a future session can ratify cold. See each ADR's `Related:` line for the source investigation doc.
 
 ## Review order
 

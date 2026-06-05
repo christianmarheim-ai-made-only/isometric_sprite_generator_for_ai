@@ -195,13 +195,13 @@ thread the `batch_id`.
 
 There is a **live size-ceiling contradiction** being fixed **THIS session**:
 
-- `validate_manifest.py` hard-codes **2048** (and KeyErrors on a `pages` manifest).
+- `validate_debug_subset.py` hard-codes **2048** (and KeyErrors on a `pages` manifest).
 - `shard_atlas.py` uses **4096** and only **WARNs** on overflow.
 
 **Fix landing this session (`next_phase_plan.md` H5):** a single enforced **`MAX_PAGE_PX = 4096`** in
 a **shared constants module**, imported by `shard_atlas.py`, `build_log.py` (which already mirrors
 `MAX_PAGE_PX = 4096` with a "keep in sync" comment — exactly the duplication the module removes), and
-`validate_manifest.py`. The 4096 ceiling is what lets the §1 grunt (2050 × 2289) pass as a single
+`validate_debug_subset.py`. The 4096 ceiling is what lets the §1 grunt (2050 × 2289) pass as a single
 page; a 2048 ceiling would wrongly reject it.
 
 **FUTURE (do NOT build now):** the **within-state greedy page-split** — when a *single* state's

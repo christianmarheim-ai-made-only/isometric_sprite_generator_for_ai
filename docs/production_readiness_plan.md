@@ -21,7 +21,7 @@ user.
 | **Clips** | Full 9-clip biped vocabulary | `combat_biped_anim.json` + `grunt.asset.json` now declare `idle/walk/crouch_idle/crouch_walk/jump/fall/hit/punch/death` (464 frames, 16 dir). `test_combat_bake` + `test_preview` assert the 9-state set. | `test_combat_bake`: 9 states, **16/16 distinct directions every state** (no 180° aliasing), regions {1,2,3,4}, log clean |
 | **B1** | Blender `once`-clips never sampled their terminal/held pose | `blender_render_anim.py`: `denom = nf if loop else nf-1` so the last sprite frame **is** the authored terminal (the held corpse/settle). `blender_bake.py` now threads `playback` into the render spec (was dropped). | `test_combat_bake`, `test_rigged_anim` |
 | **B2** | Gate-1 false-accepted `playback:"hold"` | `gate_engine_accept.py` enum → `loop\|once` only (matches the engine + every repo schema). Doc drift in `BEVY_LOADER_INTEGRATION.md` fixed. | `gate1_engine_accept`, `test_gates` |
-| **T4** | Atlas size-ceiling contradiction (2048 vs 4096) | One enforced `MAX_PAGE_PX=4096`. `validate_manifest` uses it + fails gracefully on a paged manifest instead of KeyError-ing (it is the single-page debug-subset validator). `shard_atlas` promotes the oversize **WARN → hard `OversizePageError` + non-zero exit**. | `validate`, shard path |
+| **T4** | Atlas size-ceiling contradiction (2048 vs 4096) | One enforced `MAX_PAGE_PX=4096`. `validate_debug_subset` (renamed from `validate_manifest`) uses it + fails gracefully on a paged manifest instead of KeyError-ing (it is the single-page debug-subset validator). `shard_atlas` promotes the oversize **WARN → hard `OversizePageError` + non-zero exit**. | `validate`, shard path |
 | **T5** | 4-way magic-number drift (`REGION_COLOR`, ground-band `0.15`, eye `0.9`, `MAX_PAGE_PX`) | New `pipeline/tools/constants.py` is the single source; `bake.py`, the three Blender render scripts, `hitbox_from_mesh.py`, `shard_atlas.py`, `build_log.py` import it. Values byte-identical → references reproduce. | `test_references` (byte-identity), all Blender gates |
 | **T6** | "Which hitmask came from which model?" had no spine | `build_log` now hashes output artifacts (`outputs.artifacts.{color,hitmask}_atlas`) + records the real `rig`; `bake_asset` stamps a self-describing `provenance` block into the shipped `manifest.json` (asset/mesh/clips sha, rig, `contract_hash`, `lockfile_hashes`, build-log pointer); `build_index.json` enriched with `batch_id` + `contract_hash` + per-variant build-log pointer + model→hitmask sha link. | `test_combat_bake` (log clean), batch run |
 | **T1** | Shipped contract zip was stale (4-clip template) | Regenerated `dist/model_authoring_contract_v1.zip` (41 files) from live `pipeline/examples`. New `test_dist_drift` gate fails CI if the zip ever drifts from a fresh stage again. | `test_dist_drift` |
@@ -57,31 +57,35 @@ frames may legally share a rect. Mechanism + exact helper signature + regen cost
 
 ---
 
-## 3. OPEN DECISIONS — need the user
+## 3. DECISIONS — parked as ADRs (0020–0023) or resolved
 
-| ID | Question | Blocks |
+| ID | Question | Status |
 |---|---|---|
-| **D-canvas** (Task #21) | Is **256²** locked as the engine-facing logical frame canvas? If yes: bump schema version, regen `contract_hash` + fixtures atomically. The one genuinely-pending committed task. | schema-version bump |
-| **D1** | M2A layering: **baked-variants** (recommended) vs **runtime-overlay**? | all M2A executable work |
-| **D6** | Add an optional art-direction **`world_scale_multiplier`** (exaggerate a creature's on-screen size beyond its measured height), or close ADR-0018 as "measured height is sufficient"? | M4 roster scale |
-| **D-validate scope** | Rename `validate_manifest.py` → `validate_debug_subset.py` (honest: it's arrow-pilot-specific, Gate-1 is the real system gate), or generalize it? | naming/clarity only |
-| **D-blender-fixture** | Pin a Blender version + add a non-skipping checksum vs recorded `blender_version`, so committed Blender goldens are verified on no-Blender CI? | CI coverage |
+| **D-canvas** (Task #21) | Lock **256²** as the engine-facing logical frame canvas? | **Parked → ADR-0022** — needs a 30-sec engine sign-off, then bump `manifest_version` + regen `contract_hash`/fixtures atomically |
+| **D1** | M2A layering: baked-variants vs runtime-overlay? | **Parked → ADR-0021** (affirms ADR-0011: baked-first + curated cap); gated to the first equipped character |
+| **D-metallic** | Metallic/specular sprites (4 sub-decisions) | **Parked → ADR-0020** — baked-static is the v1 path; dynamic-lit is gated on the engine gaining a light rig |
+| **D6** | Optional art-direction `world_scale_multiplier`? | **Parked → ADR-0023** — deferred; measured `height_world × 24` is already faithful |
+| **D-validate scope** | Rename `validate_manifest.py`? | **DONE** — renamed → `validate_debug_subset.py` (+ function + importers + build step) |
+| **D-blender-fixture** | Pin Blender + non-skipping checksum? | **DONE** — `reference/blender_goldens.lock.json` + `test_blender_goldens.py` (non-skipping, warns on local-version mismatch) |
 
 ---
 
-## 4. Harden-next (not blocking; deferred to keep this push verifiable)
+## 4. Harden-next (not blocking)
 
-- **Loop-seam + anchor-drift gate** — assert each `loop` clip's frame N-1→0 step is within the
-  per-step delta band, and the rendered silhouette centroid stays on-anchor across a clip (the
-  per-frame re-rooting currently *masks* drift rather than detecting it). Fold the `hit`
-  recoil-then-settle monotonicity check in here.
+- **Loop-seam + anchor-drift gate** — **DONE** (`test_loop_seam.py`, non-skipping on
+  `reference/humanoid_anim`): per `loop` clip, the frame N-1→0 wrap delta must be within 2× the
+  largest in-clip step, the per-frame anchor must be constant, and the silhouette centroid must
+  stay within 20% of the canvas across the clip. Still open to fold in: the `hit` once-clip
+  recoil-then-settle monotonicity check.
 - **Reverse provenance index** — `provenance_index.json = {sha: {variant, kind, build_log}}` over
-  every input+output sha; pure assembly now that T6 emits output hashes.
+  every input+output sha; pure assembly now that T6 emits output hashes. (Still open.)
 
 ---
 
 ## 5. Verification
 
-Full gate: `python pipeline/tools/build.py --ci` (24 steps incl. the cargo engine load-test and the
-Blender bakes; Blender steps skip where Blender is absent). Reference byte-reproducibility and Gate-1
-acceptance hold across all three committed references after the constants refactor.
+Full gate: `python pipeline/tools/build.py --ci` (**26 steps** incl. the cargo engine load-test and
+the Blender bakes; Blender steps skip where Blender is absent, but `test_loop_seam` and
+`test_blender_goldens` are **non-skipping** so they verify committed goldens even on a no-Blender
+box). Reference byte-reproducibility and Gate-1 acceptance hold across all three committed references
+after the constants refactor.

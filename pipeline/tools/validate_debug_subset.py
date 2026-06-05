@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Validate a sprite manifest against the M1/M2 debug subset lockfiles and images."""
+"""Validate the M1/M2 arrow-pilot DEBUG-SUBSET manifest against its lockfiles + images.
+
+NOTE the name: this is NOT the system contract gate. It is the single-page, full-canvas
+debug-subset validator wired only to the arrow pilot (`output/arrow_pilot/manifest.json`); it
+asserts pilot-specific shape (full-canvas rects, a single `idle` state, the debug-subset
+lockfiles). The real engine-acceptance gate for ALL package shapes is `gate_engine_accept.py`
+(Gate-1). Renamed from `validate_manifest.py` to stop it reading as the system validator
+(D-validate decision)."""
 from __future__ import annotations
 
 import argparse
@@ -116,12 +123,12 @@ def validate_images(manifest_path: Path, manifest: dict[str, Any], reporter: Rep
     color_info = manifest["atlases"]["color"]
     mask_info = manifest["atlases"]["hitmask"]
     # This is the SINGLE-PAGE debug-subset validator (see module docstring + the
-    # D-validate_manifest-scope decision in docs/next_phase_plan.md). Paged atlases are accepted by
+    # D-validate decision in docs/next_phase_plan.md). Paged atlases are accepted by
     # gate_engine_accept (Gate-1) + the build log's oversize_atlas_page check -- not here. Detect a
     # paged manifest and fail gracefully instead of KeyError-ing on the absent single-page "path".
     if "pages" in color_info or "pages" in mask_info:
         raise ValidationFailure(
-            "validate_manifest is single-page only; use gate_engine_accept for paged atlases")
+            "validate_debug_subset is single-page only; use gate_engine_accept for paged atlases")
     color_path = base / color_info["path"]
     mask_path = base / mask_info["path"]
     reporter.assert_true(color_path.exists(), f"color atlas exists: {color_info['path']}")
@@ -262,7 +269,7 @@ def validate_camera(manifest: dict[str, Any], reporter: Reporter) -> None:
     reporter.assert_true(cam.get("screen_y") == "down", "camera.screen_y == down")
 
 
-def validate_manifest(manifest_path: Path, pipeline_root: Path) -> dict[str, Any]:
+def validate_debug_subset(manifest_path: Path, pipeline_root: Path) -> dict[str, Any]:
     reporter = Reporter()
     manifest = load_json(manifest_path)
     schema_path = pipeline_root / "schema" / "sprite_manifest.schema.json"
@@ -298,7 +305,7 @@ def main() -> int:
     parser.add_argument("--report", type=Path, default=None)
     args = parser.parse_args()
 
-    report = validate_manifest(args.manifest.resolve(), args.pipeline_root.resolve())
+    report = validate_debug_subset(args.manifest.resolve(), args.pipeline_root.resolve())
     if args.report:
         write_json(args.report, report)
     print(json.dumps({k: v for k, v in report.items() if k != "checks"}, indent=2, sort_keys=True))

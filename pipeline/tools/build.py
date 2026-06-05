@@ -31,8 +31,8 @@ STEPS = [
     ("test_fixtures", [str(SCRIPT_DIR / "test_fixtures.py")]),
     ("test_lint_source", [str(SCRIPT_DIR / "test_lint_source.py")]),
     ("test_render3d", [str(SCRIPT_DIR / "test_render3d.py")]),
-    ("validate", [
-        str(SCRIPT_DIR / "validate_manifest.py"),
+    ("validate_debug_subset", [
+        str(SCRIPT_DIR / "validate_debug_subset.py"),
         str(OUTPUT / "manifest.json"),
         "--report", str(OUTPUT / "validation_report.json"),
     ]),
@@ -52,6 +52,8 @@ STEPS = [
     ("test_texture_pass", [str(SCRIPT_DIR / "test_texture_pass.py")]),
     ("test_preview", [str(SCRIPT_DIR / "test_preview.py")]),
     ("test_dist_drift", [str(SCRIPT_DIR / "test_dist_drift.py")]),
+    ("test_loop_seam", [str(SCRIPT_DIR / "test_loop_seam.py")]),
+    ("test_blender_goldens", [str(SCRIPT_DIR / "test_blender_goldens.py")]),
 ]
 
 

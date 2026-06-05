@@ -1,0 +1,15 @@
+{
+  "schema": "blender_goldens_lock_v1",
+  "note": "Checksums of the committed Blender-baked reference goldens + the Blender version they were baked with. test_blender_goldens.py verifies these WITHOUT Blender (non-skipping), so a no-Blender CI machine still catches drift/corruption of committed Blender output -- which the Blender parity gates (which SKIP without Blender) cannot. Re-bake + update this lock atomically when intentionally regenerating a golden.",
+  "blender_version_pin": "5.1.2",
+  "goldens": {
+    "humanoid_blender": {
+      "blender_version": "5.1.2",
+      "files": {
+        "color_atlas.png": "70e2b5cd8c0c5c4deb2843bb325dfaaf924bb1b7aee8ff8d65aa1e0166220ee2",
+        "hitmask_atlas.png": "a5170d954d9f799103ebae401991c4af7747e6706ae7c0392c572c5c2ee028a4",
+        "manifest.json": "9c3bf7dcf25c427d6b03cfc458c1855b3ebe70eb867229f375d404eadb48f3ac"
+      }
+    }
+  }
+}

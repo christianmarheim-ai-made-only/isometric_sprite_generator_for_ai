@@ -21,7 +21,7 @@ the regression tests, and exits nonzero if any step fails.
 ## Step by step
 
 1. **Generate:** `python pipeline/tools/generate_arrow_pilot.py --clean`
-2. **Validate:** `python pipeline/tools/validate_manifest.py pipeline/output/arrow_pilot/manifest.json --report pipeline/output/arrow_pilot/validation_report.json` → expect `ok: true`
+2. **Validate (debug subset):** `python pipeline/tools/validate_debug_subset.py pipeline/output/arrow_pilot/manifest.json --report pipeline/output/arrow_pilot/validation_report.json` → expect `ok: true`
 3. **Smoke test:** `python pipeline/tools/smoke_test.py` → `PASS valid` / `PASS corrupted-hash-rejected`
 4. **Regression tests:**
    - `python pipeline/tools/test_contract_hash.py`
