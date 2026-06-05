@@ -1,0 +1,130 @@
+[
+  {
+    "direction": 0,
+    "screen_direction_vector": [
+      0.894427,
+      0.447214
+    ],
+    "world_yaw_degrees": 0.0
+  },
+  {
+    "direction": 1,
+    "screen_direction_vector": [
+      0.637952,
+      0.770076
+    ],
+    "world_yaw_degrees": 22.5
+  },
+  {
+    "direction": 2,
+    "screen_direction_vector": [
+      0.0,
+      1.0
+    ],
+    "world_yaw_degrees": 45.0
+  },
+  {
+    "direction": 3,
+    "screen_direction_vector": [
+      -0.637952,
+      0.770076
+    ],
+    "world_yaw_degrees": 67.5
+  },
+  {
+    "direction": 4,
+    "screen_direction_vector": [
+      -0.894427,
+      0.447214
+    ],
+    "world_yaw_degrees": 90.0
+  },
+  {
+    "direction": 5,
+    "screen_direction_vector": [
+      -0.97922,
+      0.202803
+    ],
+    "world_yaw_degrees": 112.5
+  },
+  {
+    "direction": 6,
+    "screen_direction_vector": [
+      -1.0,
+      0.0
+    ],
+    "world_yaw_degrees": 135.0
+  },
+  {
+    "direction": 7,
+    "screen_direction_vector": [
+      -0.97922,
+      -0.202803
+    ],
+    "world_yaw_degrees": 157.5
+  },
+  {
+    "direction": 8,
+    "screen_direction_vector": [
+      -0.894427,
+      -0.447214
+    ],
+    "world_yaw_degrees": 180.0
+  },
+  {
+    "direction": 9,
+    "screen_direction_vector": [
+      -0.637952,
+      -0.770076
+    ],
+    "world_yaw_degrees": 202.5
+  },
+  {
+    "direction": 10,
+    "screen_direction_vector": [
+      -0.0,
+      -1.0
+    ],
+    "world_yaw_degrees": 225.0
+  },
+  {
+    "direction": 11,
+    "screen_direction_vector": [
+      0.637952,
+      -0.770076
+    ],
+    "world_yaw_degrees": 247.5
+  },
+  {
+    "direction": 12,
+    "screen_direction_vector": [
+      0.894427,
+      -0.447214
+    ],
+    "world_yaw_degrees": 270.0
+  },
+  {
+    "direction": 13,
+    "screen_direction_vector": [
+      0.97922,
+      -0.202803
+    ],
+    "world_yaw_degrees": 292.5
+  },
+  {
+    "direction": 14,
+    "screen_direction_vector": [
+      1.0,
+      -0.0
+    ],
+    "world_yaw_degrees": 315.0
+  },
+  {
+    "direction": 15,
+    "screen_direction_vector": [
+      0.97922,
+      0.202803
+    ],
+    "world_yaw_degrees": 337.5
+  }
+]

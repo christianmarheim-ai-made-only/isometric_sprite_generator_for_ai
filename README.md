@@ -13,11 +13,14 @@ blended mask value).
 - **R1 — headless 3D renderer** — done: `pipeline/tools/render3d.py`, a numpy
   orthographic rasterizer whose camera matches the engine's ground projection to
   floating-point precision.
-- **R2–R6** — spec-resolved in **[docs/build_plan_R1_R6_review.md](docs/build_plan_R1_R6_review.md)**,
-  the **authoritative forward plan**: engine-shaped manifest + bake orchestrator (R2),
-  acceptance gates + calibration (R3), real-mesh + hit-proxy R8 hitmask + metrics (R4),
-  animation/crop + full manifest convergence (R5), first reference character end-to-end +
-  engine load-test (R6).
+- **R2 ✓** engine-shaped manifest + Gate-1 + bake orchestrator. **R3 ✓** acceptance gates
+  (direction, rendered-pixel based; elevation/foreshortening). **R4 ✓** real-mesh humanoid +
+  hit-proxy R8 hitmask + measured metrics. **R6 ✓** first reference character
+  (`pipeline/reference/humanoid_ref/`) + a real `cargo` engine load-test (`bevy_reference`,
+  the vendored engine `parse_manifest` accept/reject). **R5** (multi-state animation,
+  tight-crop) is deferred — blocked on the engine (one frame per direction) + a frame-canvas
+  sizing decision; **R7** (Blender/glTF) needs Blender. Plan:
+  **[docs/build_plan_R1_R6_review.md](docs/build_plan_R1_R6_review.md)**.
 
 One green build gate (`build.py --ci`, all steps green):
 
