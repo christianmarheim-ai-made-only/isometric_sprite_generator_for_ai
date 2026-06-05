@@ -8,6 +8,7 @@ Run: python pipeline/tools/test_render3d.py   (exit 0 = all pass)
 """
 from __future__ import annotations
 
+import json
 import math
 import sys
 from pathlib import Path
@@ -15,6 +16,7 @@ from pathlib import Path
 import numpy as np
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+PIPELINE_ROOT = SCRIPT_DIR.parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
@@ -41,6 +43,20 @@ def main() -> int:
         exp = ground_screen_direction(yaw)
         worst = max(worst, float(np.linalg.norm(v - exp)))
     ok &= check(f"camera ground direction matches oracle for all 16 (worst {worst:.2e})", worst < 1e-6)
+
+    # Independent cross-check: vs the VENDORED engine oracle (not a sibling function).
+    oracle_path = PIPELINE_ROOT / "schema" / "engine" / "expected_facing_table.game_iso_v1.json"
+    if oracle_path.exists():
+        oracle = {e["direction"]: e["screen_direction_vector"] for e in json.loads(oracle_path.read_text(encoding="utf-8"))}
+        worst_o = 0.0
+        for i in range(16):
+            yaw = i * (2 * math.pi / 16)
+            raw, _ = project_raw(np.array([[math.cos(yaw), math.sin(yaw), 0.0]]))
+            v = raw[0] / (np.linalg.norm(raw[0]) or 1.0)
+            worst_o = max(worst_o, float(np.linalg.norm(v - np.array(oracle[i]))))
+        ok &= check(f"camera matches the INDEPENDENT vendored engine oracle (worst {worst_o:.2e})", worst_o < 1e-2)
+    else:
+        ok &= check("vendored engine oracle present", False)
 
     # 2. dir00 (+X) projects down-right = [0.894, 0.447] (the golden dir00 vector).
     raw0, _ = project_raw(np.array([[1.0, 0.0, 0.0]]))
