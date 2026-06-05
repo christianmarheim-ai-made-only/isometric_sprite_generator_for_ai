@@ -77,6 +77,26 @@ The unifying principle this ADR adopts: **STATIC, per-unit visual identity is re
    the body) produces no depth separation and cannot be occluded this way. Same anchor machinery as a
    held weapon (ADR-0021 socket projection) — a hand-cast spell and a held sword both bind to a
    per-creature point at a per-creature height.
+6. **Many effects at once, many instances, and changing counts all scale for FREE — by multiplying
+   entities, never by baking.** Three runtime-composition dynamics, each with zero pipeline cost:
+   - **Multiple DISTINCT effects simultaneously** (a ring around the legs **and** a trio of fireballs
+     at the shoulders) = multiple overlay entities, each bound to a **different named anchor**. The
+     socket set a creature already exposes (shoulders, belt/pelvis, hands, back…) provides those
+     locations — `core` (B.5) generalizes to *any named socket can host an effect*, each at its own
+     per-creature height. Every entity depth-sorts independently, so each occludes correctly on its own.
+   - **Multiple INSTANCES of one effect** (the trio) = the engine spawns **one** baked fireball sheet
+     **N times** at N orbit phases around the anchor. The pipeline bakes a single sheet; the count and
+     arrangement are runtime. Each instance is its own depth-sorted entity → some in front of the
+     shoulder, some behind, correctly.
+   - **Dynamic count** (throw one → N−1) = pure runtime **spawn/despawn** of effect entities — gameplay
+     state, **not baked data**, zero contract impact. (Effect entities batch on the shared effect
+     atlas, so the cost is *sprites, not bakes*.)
+   **DISCRETE vs CONTINUOUS occlusion:** discrete orbs (fireballs, each a separate entity) wrap
+   front/behind for free (B.5). A **continuous loop** (a ring) is a single card at one depth and
+   **cannot** wrap — near arc over the legs, far arc behind — under per-entity sort. Render it as a
+   **front-arc + back-arc pair** (two entities depth-offset around the anchor) to wrap correctly, or
+   accept a whole-ring-at-one-depth for cheap. This is the one place effect multiplicity meets the
+   height-ignores-depth caveat (B.5).
 
 ## Consequences
 
@@ -87,6 +107,9 @@ The unifying principle this ADR adopts: **STATIC, per-unit visual identity is re
   avoided entirely.
 - Both paths reuse machinery we already have (per-sprite tint, depth-ordered entities, the region-mask
   emitter, ADR-0012's effect renderables) — no speculative engine rebuild.
+- **Arbitrary simultaneous effects, multi-instance sets, and changing counts** (a ring + a depleting
+  trio of fireballs) cost only entities + spawn/despawn (B.6) — never a re-bake, a new atlas, or a
+  contract change.
 
 ### Negative
 - Uniform tint **cannot selectively recolor** (whole-sprite multiply only); selective recolor is gated
@@ -107,3 +130,8 @@ The unifying principle this ADR adopts: **STATIC, per-unit visual identity is re
   regions is likely too coarse for arbitrary recolor zones — probably a separate small index mask.)
 - Greyscale-authoring convention: do we add a pipeline check/warning that a creature declared
   `recolorable` is actually low-saturation (so tints read), mirroring the build-log detector pattern?
+- **Which sockets are effect-bindable**, and do they carry per-anchor orbit defaults (radius, plane,
+  instance spacing) as emitted data or purely game-side? (additive either way; B.6.)
+- **Continuous-loop effects** (rings/auras that wrap the body) need a front-arc/back-arc split
+  convention engine-side (B.6) — define it when the first wrapping effect ships; discrete-orb sets
+  (fireballs) need nothing.
