@@ -1,0 +1,17 @@
+{
+  "asset_contract_version": "external_asset_v1",
+  "variant_id": "sparrow",
+  "archetype": "bird",
+  "files": { "mesh": "sparrow.glb" },
+  "geometry": { "up": "y", "forward": "+x", "unit": "meter" },
+  "rig": "bird_v1",
+  "region_source": "material_name",
+  "textures": { "base_color": "sparrow_basecolor.png" },
+  "animations": {
+    "idle":  { "clip": "idle",  "frames": 1, "fps": 1,  "playback": "loop" },
+    "fly":   { "clip": "fly",   "frames": 4, "fps": 12, "playback": "loop" },
+    "glide": { "clip": "glide", "frames": 1, "fps": 1,  "playback": "hold" }
+  },
+  "world_metrics": { "height_world": 0.22, "footprint_radius_world": 0.12 },
+  "notes": "TEMPLATE for the 'many birds, one rig' case: a bird variant skinned to bird_v1; idle/fly/glide come from the shared bird_v1 animation library (clips target bone NAMES, so they replay on any bird mesh). sparrow.glb/.png are illustrative -- lint this template with --no-files."
+}

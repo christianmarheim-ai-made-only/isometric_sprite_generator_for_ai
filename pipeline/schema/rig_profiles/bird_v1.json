@@ -1,0 +1,23 @@
+{
+  "rig_profile": "bird_v1",
+  "description": "Body-only bird skeleton -- the shared rig for the 'many birds, one rig' reuse case. Every bird mesh skins to these bone names; the bird animation library (idle/fly/glide) is authored once against them. Bind pose: wings level, feet at the origin on z=0, beak facing +X.",
+  "bones": [
+    { "name": "root", "parent": null },
+    { "name": "body", "parent": "root" },
+    { "name": "neck", "parent": "body" },
+    { "name": "head", "parent": "neck" },
+    { "name": "wing.L", "parent": "body" },
+    { "name": "wingtip.L", "parent": "wing.L" },
+    { "name": "wing.R", "parent": "body" },
+    { "name": "wingtip.R", "parent": "wing.R" },
+    { "name": "tail", "parent": "body" },
+    { "name": "leg.L", "parent": "body" },
+    { "name": "leg.R", "parent": "body" }
+  ],
+  "region_by_bone": {
+    "head": "head", "neck": "head",
+    "body": "torso", "tail": "torso",
+    "wing.L": "arms", "wingtip.L": "arms", "wing.R": "arms", "wingtip.R": "arms",
+    "leg.L": "legs", "leg.R": "legs"
+  }
+}

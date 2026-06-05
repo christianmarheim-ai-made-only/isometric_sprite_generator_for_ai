@@ -42,6 +42,7 @@ STEPS = [
     ("test_multistate", [str(SCRIPT_DIR / "test_multistate.py")]),
     ("test_references", [str(SCRIPT_DIR / "test_references.py")]),
     ("test_mesh_input", [str(SCRIPT_DIR / "test_mesh_input.py")]),
+    ("test_external_asset", [str(SCRIPT_DIR / "test_external_asset.py")]),
     ("test_engine_load", [str(SCRIPT_DIR / "test_engine_load.py")]),
     ("test_blender_parity", [str(SCRIPT_DIR / "test_blender_parity.py")]),
 ]

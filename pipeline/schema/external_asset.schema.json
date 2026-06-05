@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external_asset.schema.json",
+  "title": "External asset manifest (external_asset_v1)",
+  "description": "What an external producer delivers alongside a 3D model so the game_iso_v1 pipeline can read it. See docs/external_asset_contract.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["asset_contract_version", "variant_id", "archetype", "files"],
+  "properties": {
+    "asset_contract_version": { "const": "external_asset_v1" },
+    "variant_id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+    "archetype": { "type": "string", "description": "logical family, e.g. biped, bird; selects the shared rig + animation library" },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mesh": { "type": "string", "description": "glb (preferred) or obj, relative to this manifest. Omit for an animation-library-only delivery." }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "up": { "enum": ["y", "z"], "description": "source up axis (glTF=y); pipeline converts to +Z" },
+        "forward": { "enum": ["+x", "+y", "-x", "-y"], "description": "facing of the bind pose; pipeline rotates to +X = direction 0" },
+        "unit": { "const": "meter" }
+      }
+    },
+    "rig": { "type": "string", "description": "rig profile id (pipeline/schema/rig_profiles/<rig>.json). Omit for a static mesh -> procedural animation." },
+    "region_source": { "enum": ["material_name", "vertex_attribute", "region_texture"], "description": "how HIT regions are tagged (material_name ships today)" },
+    "textures": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "named texture maps relative to this manifest, e.g. base_color, normal, roughness"
+    },
+    "animations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["frames", "fps", "playback"],
+        "properties": {
+          "clip": { "type": "string", "description": "glTF animation clip name (defaults to the state key)" },
+          "frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction" },
+          "fps": { "type": "number", "exclusiveMinimum": 0 },
+          "playback": { "enum": ["loop", "once", "hold"] }
+        }
+      },
+      "description": "state name -> clip; the pipeline samples each clip into `frames` poses x 16 directions"
+    },
+    "world_metrics": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "height_world": { "type": "number", "exclusiveMinimum": 0 },
+        "footprint_radius_world": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "description": "optional override; otherwise measured from the mesh"
+    },
+    "notes": { "type": "string" }
+  }
+}

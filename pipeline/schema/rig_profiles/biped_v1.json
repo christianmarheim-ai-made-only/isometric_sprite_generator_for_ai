@@ -1,0 +1,31 @@
+{
+  "rig_profile": "biped_v1",
+  "description": "Body-only biped skeleton. A mesh declaring rig=biped_v1 MUST skin to these exact bone names so shared biped animations apply. Bind pose: relaxed A-pose, feet at the origin on z=0, facing +X.",
+  "bones": [
+    { "name": "root", "parent": null },
+    { "name": "hips", "parent": "root" },
+    { "name": "spine", "parent": "hips" },
+    { "name": "chest", "parent": "spine" },
+    { "name": "head", "parent": "chest" },
+    { "name": "arm.L", "parent": "chest" },
+    { "name": "forearm.L", "parent": "arm.L" },
+    { "name": "hand.L", "parent": "forearm.L" },
+    { "name": "arm.R", "parent": "chest" },
+    { "name": "forearm.R", "parent": "arm.R" },
+    { "name": "hand.R", "parent": "forearm.R" },
+    { "name": "thigh.L", "parent": "hips" },
+    { "name": "shin.L", "parent": "thigh.L" },
+    { "name": "foot.L", "parent": "shin.L" },
+    { "name": "thigh.R", "parent": "hips" },
+    { "name": "shin.R", "parent": "thigh.R" },
+    { "name": "foot.R", "parent": "shin.R" }
+  ],
+  "region_by_bone": {
+    "head": "head",
+    "spine": "torso", "chest": "torso", "hips": "torso",
+    "arm.L": "arms", "forearm.L": "arms", "hand.L": "arms",
+    "arm.R": "arms", "forearm.R": "arms", "hand.R": "arms",
+    "thigh.L": "legs", "shin.L": "legs", "foot.L": "legs",
+    "thigh.R": "legs", "shin.R": "legs", "foot.R": "legs"
+  }
+}
