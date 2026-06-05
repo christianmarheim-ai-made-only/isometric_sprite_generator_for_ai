@@ -1,5 +1,10 @@
 # Sprite Pipeline — Implementation Plan: Next Slices
 
+> 🗄️ **ARCHIVED / HISTORY-ONLY (R1–R7 all shipped).** The authoritative tracker is now
+> **[next_phase_plan.md](next_phase_plan.md)** — current state, housekeeping backlog, the production
+> log + previewer designs, atlas-optimization findings, M2A readiness, and the recommended sequence.
+> Everything below is kept for history only; do **not** take "next" work from §8.
+>
 > ⚠️ **LEGACY / SUPERSEDED for R2–R6.** This is the M1/M2 + early-setup plan (slices
 > P0–P5, C0–C9), now **shipped** as the R1-equivalent foundation. The **authoritative
 > forward plan is [build_plan_R1_R6_review.md](build_plan_R1_R6_review.md)** (slices
