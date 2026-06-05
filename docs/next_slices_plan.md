@@ -264,8 +264,8 @@ _Updated by each loop iteration._
 | P0 | done | runbook.md + m1_arrow_pilot_review.md |
 | P1 | done | build.py + test_fixtures + repo-relative report path |
 | C0 | done | naming_conventions.md |
-| C2 | next | body regions only |
-| C4 | todo | body-only metrics |
+| C2 | done | region_assignment_policy.md |
+| C4 | next | body-only metrics |
 | P3 | todo | schema + body examples |
 | P4 | todo | linter v1 + fixtures |
 | P2 | todo · blocked:blender (.blend/render) | tooling+descriptor doable now |
