@@ -19,6 +19,7 @@ import math
 import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -138,9 +139,15 @@ def bake_character(out: Path, canvas_px: int = 256, variant_id: str = "humanoid_
     color_atlas.save(out / "color_atlas.png")
     mask_atlas.save(out / "hitmask_atlas.png")
 
-    bmin = tuple(float(v) for v in verts.min(axis=0))
-    bmax = tuple(float(v) for v in verts.max(axis=0))
-    metrics = compute_world_metrics(bmin, bmax, eye_z=round(bmax[2] * 0.9, 4))
+    height = float(verts[:, 2].max())
+    # footprint = GROUND-CONTACT horizontal extent (legs/feet), NOT the widest above-ground
+    # cross-section (arms): the engine consumes footprint_radius_world as the collision/LOS
+    # radius, so an above-ground appendage must not inflate it (docs/world_metrics_policy.md).
+    z_floor = float(verts[:, 2].min())
+    ground = verts[verts[:, 2] <= z_floor + 0.15 * height]
+    foot_r = float(np.max(np.abs(ground[:, :2])))
+    metrics = compute_world_metrics((-foot_r, -foot_r, 0.0), (foot_r, foot_r, height),
+                                    eye_z=round(height * 0.9, 4))
 
     tip_len = canvas_px * 0.1
     manifest_frames, expected = [], []

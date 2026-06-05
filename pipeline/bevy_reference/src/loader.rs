@@ -135,6 +135,11 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
             m.direction_count
         ));
     }
+    // Atlas dimensions, parsed up front so each frame's rect can be bounds-checked below.
+    let [aw, ah] = m.atlases.color.size;
+    if aw == 0 || ah == 0 {
+        return Err("atlases.color.size dimensions must be > 0".to_string());
+    }
     let mut slots: Vec<Option<FrameDef>> = vec![None; m.direction_count];
     for fr in &m.frames {
         if fr.direction >= m.direction_count {
@@ -146,6 +151,14 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
         let [x, y, w, h] = fr.rect;
         if w == 0 || h == 0 {
             return Err(format!("frame {} has a zero-size rect", fr.direction));
+        }
+        // The rect must lie within the declared atlas, else Bevy's TextureAtlasLayout
+        // clamps it or samples padding/garbage. (u64 avoids u32 overflow on a hostile rect.)
+        if x as u64 + w as u64 > aw as u64 || y as u64 + h as u64 > ah as u64 {
+            return Err(format!(
+                "frame {} rect [{x}, {y}, {w}, {h}] exceeds the atlas {aw}x{ah}",
+                fr.direction
+            ));
         }
         if slots[fr.direction].is_some() {
             return Err(format!("duplicate frame for direction {}", fr.direction));
@@ -192,7 +205,6 @@ pub fn parse_manifest(json: &str) -> Result<LoadedSprite, String> {
         }
     };
 
-    let [aw, ah] = m.atlases.color.size;
     Ok(LoadedSprite {
         variant: SpriteVariant {
             directions: m.direction_count,

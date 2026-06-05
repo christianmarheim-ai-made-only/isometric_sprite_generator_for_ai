@@ -726,7 +726,7 @@
   "variant_id": "humanoid_ref",
   "world_metrics": {
     "eye_height_world": 1.62,
-    "footprint_radius_world": 0.38,
+    "footprint_radius_world": 0.3,
     "height_world": 1.8,
     "unit": "meter"
   }

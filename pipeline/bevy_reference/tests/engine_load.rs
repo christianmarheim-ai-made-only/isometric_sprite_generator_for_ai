@@ -41,3 +41,20 @@ fn loader_actually_rejects_bad_metrics() {
         "world_metrics":{"height_world":1.0,"footprint_radius_world":0.2,"eye_height_world":5.0}}"#;
     assert!(parse_manifest(bad).is_err(), "eye_height_world > height_world must be rejected");
 }
+
+#[test]
+fn loader_rejects_rect_exceeding_atlas() {
+    // rect x+w = 5+8 = 13 > atlas width 10 -> the engine (and the vendored loader) reject.
+    let bad = r#"{"camera":{"id":"game_iso_v1"},"variant_class":"probe","direction_count":1,
+        "frame_canvas":[10,10],"atlases":{"color":{"path":"c.png","size":[10,10]}},
+        "frames":[{"direction":0,"rect":[5,0,8,8],"anchor":[5,9]}]}"#;
+    assert!(parse_manifest(bad).is_err(), "a rect exceeding the atlas must be rejected");
+}
+
+#[test]
+fn loader_rejects_zero_size_atlas() {
+    let bad = r#"{"camera":{"id":"game_iso_v1"},"variant_class":"probe","direction_count":1,
+        "frame_canvas":[10,10],"atlases":{"color":{"path":"c.png","size":[0,0]}},
+        "frames":[{"direction":0,"rect":[0,0,8,8],"anchor":[5,9]}]}"#;
+    assert!(parse_manifest(bad).is_err(), "a zero-size atlas must be rejected");
+}

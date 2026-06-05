@@ -59,6 +59,23 @@ def main() -> int:
             m["height_world"] > 0 and m["footprint_radius_world"] > 0 and 0 < eye <= m["height_world"],
         )
 
+        # R4 review: footprint must be the standing (ground) footprint, not the arm span.
+        from meshes import humanoid as _humanoid
+        verts = _humanoid()[0]
+        full_xy = float(np.max(np.abs(verts[:, :2])))
+        ok &= check(
+            f"footprint is the ground footprint, not the arm span (foot={m['footprint_radius_world']} < full_xy {full_xy:.3f})",
+            m["footprint_radius_world"] < full_xy - 0.02,
+        )
+
+        # R4 review: color alpha>0 iff hitmask region>0, per frame rect (alignment invariant).
+        color = np.asarray(Image.open(out / "color_atlas.png").convert("RGBA"))
+        aligned = all(
+            np.array_equal(color[y:y + h, x:x + w, 3] > 0, mask[y:y + h, x:x + w] > 0)
+            for (x, y, w, h) in (f["rect"] for f in manifest["frames"])
+        )
+        ok &= check("color alpha>0 iff hitmask region>0 (per frame rect)", aligned)
+
     print("ALL PASS" if ok else "SOME FAILED")
     return 0 if ok else 1
 
