@@ -90,15 +90,14 @@ rules). Geometry: `sin(elevation)=0.5 → 30°` for the 2:1 ground tile; `arctan
 is the on-screen tile-edge angle, **not** the camera elevation (a 26.565° camera would
 render ≈2.236:1 — wrong). This matches ADR-0018.
 
-**Height — clarified by the corrected docs:** `HEIGHT_SCREEN_SCALE = 24` is applied
-**engine-side** — *"the engine sizes billboards by `height_world`, so the bake need only
-match the ground at 30°."* So the bake's obligation is **azimuth 45° + elevation 30°
-(ground correct) + emit correct `world_metrics.height_world`**; an explicit in-bake
-height squash to 24 px/unit is **likely not required** (simpler than ADR-0018 first
-assumed). One spec line is in slight tension (*"the sprite's drawn height must equal
-`height_world × 24`"*), so **confirm against `crates/client_bevy/src/render.rs` which
-side applies the `×24`** before M3 height bakes — then reconcile ADR-0018/0019. Do not
-bake 3D height art until that side is confirmed.
+**Height — RESOLVED (read `crates/client_bevy/src/render.rs`):** `render.rs::sprite_size`
+sets on-screen **height = `height_world × 24`** and **width = height × frame_aspect**
+(`rect.w/rect.h`). The `×24` is applied **engine-side**. So the bake's obligation is
+**azimuth 45° + elevation 30°** (correct ground + height *foreshortening*, which fixes the
+frame's aspect + internal proportions) **+ emit correct `world_metrics.height_world`** —
+**no in-bake `×24`**. ADR-0018/0019 reconciled accordingly (see their Resolution sections).
+The bake-side calibration is therefore a *foreshortening/aspect* check at 30° (R3), not a
+24-px/unit check.
 
 > **Reference-package defect (engine-side):** the corrected zip's `README.md` was not
 > updated — it still says *"`camera_elevation_degrees: 30` … That is wrong … bake at

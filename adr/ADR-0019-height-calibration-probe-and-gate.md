@@ -48,3 +48,12 @@ Not part of M1/M2 (flat arrow). The probe is added at M2A, before the first heig
 - Reference heights and tolerance (±1 px? sub-pixel?).
 - Should the probe also calibrate eye height (ADR-0007) for muzzle/projectile alignment?
 - Merge the height probe with the arrow direction probe into one calibration asset?
+
+## Resolution (2026-06-05, from engine `render.rs`)
+
+The engine sizes sprites by `height_world × 24` (`render.rs::sprite_size`), so the
+calibration is **bake-side foreshortening**, not "24 px/unit in the bake." The probe
+verifies that a known-proportion 3D object, rendered through the **30°** camera, has the
+**rendered aspect / internal proportions** the 30° projection predicts (a wrong elevation
+shows up here as a wrong aspect). The engine-side `2 m → 48 px` (`height_world×24`) is a
+separate **engine** test, not a bake gate. Gate this before any 3D height bake.

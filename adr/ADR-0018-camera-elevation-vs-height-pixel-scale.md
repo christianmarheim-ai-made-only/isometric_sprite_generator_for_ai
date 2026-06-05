@@ -79,3 +79,20 @@ The arrow pilot is flat (no height) and uses only the ground projection, so it i
 - Carry the engine `HEIGHT_SCREEN_SCALE` as a manifest/contract field.
 - Choose the height-scale mechanism (anamorphic camera vs post-scale).
 - Does the height factor interact with per-variant scale (large/small creatures)?
+
+## Resolution (2026-06-05, from engine `render.rs`)
+
+Confirmed against the authority (`crates/client_bevy/src/render.rs::sprite_size`):
+the engine sets on-screen **height = `height_world × HEIGHT_SCREEN_SCALE` (24)** and
+**width = height × frame_aspect** (`rect.w/rect.h`). So `×24` is applied **engine-side**,
+not in the bake. This **supersedes Decision point 1's "set the height scale explicitly to
+24 in the bake."** The corrected decision:
+
+- The bake renders at azimuth 45° + **elevation 30°** (ground + correct height
+  *foreshortening*, which fixes the frame's aspect and internal vertical proportions) and
+  emits a correct `world_metrics.height_world`. It does **not** apply an in-bake `×24` /
+  anamorphic squash.
+- The engine owns absolute on-screen size (`height_world×24` tall, width = height ×
+  frame-aspect). Elevation `30°` is still the one irreversible thing to get right (it bakes
+  the foreshortening / aspect); `26.565°` remains the screen tile-edge angle, not the camera.
+- Validator/runtime still assert `camera_elevation_degrees == 30` and valid `world_metrics`.
