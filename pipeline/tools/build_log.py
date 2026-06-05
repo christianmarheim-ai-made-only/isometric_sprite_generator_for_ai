@@ -83,8 +83,49 @@ def _artifacts(out_dir: Path) -> dict:
     return arts
 
 
+def _metrics_mismatch(manifest: dict, authored, tol: float = 0.25):
+    """Authored world_metrics height vs the bake's MEASURED height. A large gap means the glb baked
+    at the wrong scale or ORIENTATION (e.g. baked lying down -> measured height collapses). Height
+    only -- footprint legitimately differs (measured foot-stance vs declared body radius)."""
+    if not authored:
+        return None
+    ah = authored.get("height_world")
+    mh = (manifest.get("world_metrics") or {}).get("height_world")
+    if not (isinstance(ah, (int, float)) and ah > 0 and isinstance(mh, (int, float))):
+        return None
+    d = abs(mh - ah) / ah
+    if d > tol:
+        return {"code": "world_metrics_mismatch", "severity": "error",
+                "detail": f"authored height_world {ah} vs measured {round(mh, 3)} "
+                          f"({round(d * 100)}% off, > {round(tol * 100)}%) -- wrong scale or orientation "
+                          f"(e.g. the model baked lying down)"}
+    return None
+
+
+def _non_upright(manifest: dict, archetype, land_tol: float = 0.35, med_tol: float = 1.0):
+    """A biped sprite should be PORTRAIT (taller than wide) in nearly every direction. A landscape
+    silhouette means it baked lying down / wrong up-axis -- the failure that passes Gate-1 AND
+    16/16-direction-distinctness silently (a flat character still spins into 16 distinct frames).
+    Archetype-gated: a bird's wings are legitimately wide."""
+    if archetype != "biped":
+        return None
+    asp = [f["rect"][2] / f["rect"][3] for f in manifest.get("frames", [])
+           if f.get("rect") and len(f["rect"]) == 4 and f["rect"][3] > 0]
+    if not asp:
+        return None
+    med = sorted(asp)[len(asp) // 2]
+    land = sum(1 for a in asp if a > 1.15) / len(asp)
+    if med > med_tol or land > land_tol:
+        return {"code": "non_upright_biped", "severity": "error",
+                "detail": f"biped silhouette not portrait: median aspect {round(med, 2)} (> {med_tol}) "
+                          f"or {round(land * 100)}% of frames landscape (> {round(land_tol * 100)}%) "
+                          f"-- likely baked lying down / wrong up-axis"}
+    return None
+
+
 def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=None, clips=None,
-                    rig=None, gate_reasons=None, meta: dict | None = None, stages=None) -> dict:
+                    rig=None, archetype=None, authored_metrics=None,
+                    gate_reasons=None, meta: dict | None = None, stages=None) -> dict:
     """Assemble + write out_dir/build_log.json and return the log dict."""
     out_dir = Path(out_dir)
     meta = meta or {}
@@ -96,10 +137,19 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
     for s in meta.get("missing_clips", []):
         warnings.append({"code": "missing_clip_rest_pose", "severity": "warn",
                          "detail": f"state '{s}': clip absent from the glb -> rendered the REST pose, not animated"})
+    for nm in meta.get("degenerate_uv_materials", []):
+        warnings.append({"code": "degenerate_uv", "severity": "warn",
+                         "detail": f"material '{nm}' has collapsed UVs -> textured but renders FLAT per-material (no detail)"})
     eff, over = _packing(manifest)
     if over:
         warnings.append({"code": "oversize_atlas_page", "severity": "error",
                          "detail": f"an atlas page exceeds {MAX_PAGE_PX}px"})
+    mm = _metrics_mismatch(manifest, authored_metrics)
+    if mm:
+        warnings.append(mm)
+    nu = _non_upright(manifest, archetype)
+    if nu:
+        warnings.append(nu)
 
     anims = manifest.get("animations") or {}
     gate1_ok = not gate_reasons
@@ -179,6 +229,7 @@ def write_build_index(batch_dir, logs: list, batch_id=None) -> list:
             "frames": l["outputs"]["frame_count"],
             "packing_efficiency": l["outputs"]["packing_efficiency"],
             "warnings": len(l["warnings"]),
+            "warning_codes": sorted({w["code"] for w in l["warnings"]}),
             "commit": l["environment"]["git"].get("commit"),
             "build_log": f"{l['variant_id']}/build_log.json",
             "mesh_sha256": (inp.get("mesh") or {}).get("sha256"),

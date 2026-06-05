@@ -130,7 +130,11 @@ def main() -> int:
     print(f"VERIFY SET: {len(rows)} packages -> {VERIFY}")
     print(f"INDEX: {VERIFY / 'INDEX.md'}  |  BUILD INDEX: {VERIFY / 'build_index.json'}")
     if total_warn:
-        print(f"WARNINGS this batch: {total_warn} (see per-variant build_log.json)")
+        print(f"WARNINGS this batch: {total_warn} (codes below; full detail in per-variant build_log.json)")
+        for r in idx:
+            if r.get("warning_codes"):
+                mark = "FAIL" if not r.get("ok", True) else "warn"
+                print(f"  [{mark}] {r['variant']}: {', '.join(r['warning_codes'])}")
     if failed:
         print(f"GATE FAILURES: {failed}")
         return 1

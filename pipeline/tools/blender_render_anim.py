@@ -62,6 +62,20 @@ region_of = {m.name: region_for_name(m.name) for m in obj.data.materials if m}
 region_fallback = sorted(n for n in region_of if not any(kw in n.lower() for kw, _ in REGION_KEYWORDS))
 has_tex = any(m and m.use_nodes and any(n.type == 'TEX_IMAGE' and n.image
               for n in m.node_tree.nodes) for m in obj.data.materials)
+# Degenerate-UV detection: a material whose faces all sample ~one UV point collapses the embedded
+# atlas to a single flat swatch (textured-but-renders-flat). Only meaningful when a texture exists.
+degenerate_uv = []
+if has_tex and obj.data.uv_layers:
+    _uv = obj.data.uv_layers.active.data
+    for _mi, _mat in enumerate(obj.data.materials):
+        if _mat is None:
+            continue
+        _loops = [li for poly in obj.data.polygons if poly.material_index == _mi for li in poly.loop_indices]
+        if _loops:
+            _u = [_uv[li].uv[0] for li in _loops]
+            _v = [_uv[li].uv[1] for li in _loops]
+            if max(max(_u) - min(_u), max(_v) - min(_v)) < 1e-4:
+                degenerate_uv.append(_mat.name)
 for _m in obj.data.materials:  # show the real PBR base color in MATERIAL mode (Workbench reads diffuse_color)
     if _m and _m.use_nodes:
         _b = next((n for n in _m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
@@ -161,6 +175,7 @@ meta = {
     "poses": [[s, fi] for (s, fi, _, _) in poses],
     "region_fallback_materials": region_fallback,
     "missing_clips": missing_clips,
+    "degenerate_uv_materials": degenerate_uv,
     "blender_version": bpy.app.version_string,
 }
 json.dump(meta, open(os.path.join(OUT, "anim_meta.json"), "w"), indent=2)

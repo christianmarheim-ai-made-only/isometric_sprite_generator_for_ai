@@ -94,7 +94,8 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
     clips_path = (base / clips_rel).resolve() if clips_rel else None
     rig = asset.get("rig")
     log = write_build_log(out, manifest, route, asset_path=manifest_path, mesh=mesh_path,
-                          clips=clips_path, rig=rig, gate_reasons=[], meta=meta,
+                          clips=clips_path, rig=rig, archetype=asset.get("archetype"),
+                          authored_metrics=asset.get("world_metrics"), gate_reasons=[], meta=meta,
                           stages=[{"name": "bake", "ms": bake_ms}])
     # Self-describing provenance in the shipped manifest: which model+clips+rig+lockfiles made it.
     block = stamp_provenance(out / "manifest.json", asset_path=manifest_path, mesh=mesh_path,
