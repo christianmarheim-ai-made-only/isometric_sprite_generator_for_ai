@@ -7,10 +7,10 @@ last so the written report matches the final regenerated output.
   python pipeline/tools/build.py        # full sub-tool output
   python pipeline/tools/build.py --ci   # one PASS/FAIL line per step + summary
 """
-# Status: R1 (render3d) is implemented and this 8-step gate is green. The forward plan
+# Status: R1-R3 implemented and this gate is green (11 steps as of R3). The forward plan
 # R2-R6 is spec-resolved in docs/build_plan_R1_R6_review.md (authoritative; R-naming).
 # New gates are appended to STEPS as slices land: Gate-1 (engine-acceptance) in R2;
-# Gate-2 (direction) + Gate-3 (elevation/foreshortening) in R3.
+# Gate-2 (direction, rendered-pixel based) + Gate-3 (elevation/foreshortening) in R3.
 from __future__ import annotations
 
 import argparse

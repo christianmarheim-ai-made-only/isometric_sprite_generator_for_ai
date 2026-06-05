@@ -44,7 +44,10 @@ def main() -> int:
         worst = max(worst, float(np.linalg.norm(v - exp)))
     ok &= check(f"camera ground direction matches oracle for all 16 (worst {worst:.2e})", worst < 1e-6)
 
-    # Independent cross-check: vs the VENDORED engine oracle (not a sibling function).
+    # Cross-check vs the VENDORED engine oracle. NB this is a constants/transcription
+    # guard, not an independent algorithm: the oracle encodes the same closed-form 2:1
+    # projection, so it confirms the constants weren't fat-fingered. The truly external
+    # anchors are the hardcoded cardinal golden vectors below.
     oracle_path = PIPELINE_ROOT / "schema" / "engine" / "expected_facing_table.game_iso_v1.json"
     if oracle_path.exists():
         oracle = {e["direction"]: e["screen_direction_vector"] for e in json.loads(oracle_path.read_text(encoding="utf-8"))}
@@ -54,7 +57,7 @@ def main() -> int:
             raw, _ = project_raw(np.array([[math.cos(yaw), math.sin(yaw), 0.0]]))
             v = raw[0] / (np.linalg.norm(raw[0]) or 1.0)
             worst_o = max(worst_o, float(np.linalg.norm(v - np.array(oracle[i]))))
-        ok &= check(f"camera matches the INDEPENDENT vendored engine oracle (worst {worst_o:.2e})", worst_o < 1e-2)
+        ok &= check(f"camera matches the vendored engine oracle [constants guard] (worst {worst_o:.2e})", worst_o < 1e-2)
     else:
         ok &= check("vendored engine oracle present", False)
 
@@ -62,6 +65,17 @@ def main() -> int:
     raw0, _ = project_raw(np.array([[1.0, 0.0, 0.0]]))
     d0 = raw0[0] / np.linalg.norm(raw0[0])
     ok &= check("dir00 == [0.894, 0.447]", abs(d0[0] - 0.894427) < 1e-4 and abs(d0[1] - 0.447214) < 1e-4)
+
+    # 2b. Cardinal screen directions are EXACT external anchors, independent of the
+    # oracle file: dir02 down, dir06 left, dir10 up, dir14 right.
+    golden = {2: (0.0, 1.0), 6: (-1.0, 0.0), 10: (0.0, -1.0), 14: (1.0, 0.0)}
+    gworst = 0.0
+    for i, (gx, gy) in golden.items():
+        yaw = i * (2 * math.pi / 16)
+        raw, _ = project_raw(np.array([[math.cos(yaw), math.sin(yaw), 0.0]]))
+        u = raw[0] / np.linalg.norm(raw[0])
+        gworst = max(gworst, abs(u[0] - gx), abs(u[1] - gy))
+    ok &= check(f"cardinal goldens dir02/06/10/14 exact (worst {gworst:.2e})", gworst < 1e-4)
 
     # 3. A cube renders to a non-empty RGBA frame at the canvas size.
     v, f = meshes.cube(1.0)

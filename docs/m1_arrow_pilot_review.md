@@ -24,13 +24,13 @@ facing is correct in pixels, not just in metadata.
   rect-inside-atlas; `rect` dims == `frame_canvas`; `mask_rect` dims == `rect`;
   anchor/sockets/boxes within the per-frame rect; `origin` socket == anchor;
   alpha < 8/255 ⇒ mask 0; mask values in palette; boxes bound their region's mask
-  pixels; dense directions `0..N-1`; world yaw == direction lower edge; the
+  pixels; dense directions `0..N-1`; world yaw == direction bin center (i·360/N); the
   dir02-down / dir10-up diagnostic; world metrics positive with `eye ≤ height`.
 - **Rust reference loader.** `hit_test` has the anchor Y-flip and the scale term
   (`frame_pixel = screen_offset / render_scale + anchor`);
   `critical_runtime_asserts` mirrors `contract_hash` + `state_contract_version` +
-  `eye ≤ height`; `direction_bin16` matches the contract with a `.min(15)` edge
-  guard.
+  `eye ≤ height`; `direction_index` round-bins to the nearest frame center, matching
+  the contract and engine `sprite.rs::direction_index`.
 
 ## Fix pass (commit `f7e2750`)
 

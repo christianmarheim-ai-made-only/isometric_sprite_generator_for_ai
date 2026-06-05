@@ -2,10 +2,18 @@
 """Gate 1 — engine acceptance: would the engine loader accept this manifest? (R2)
 
 Validates a manifest against the VENDORED engine schema
-(pipeline/schema/engine/manifest.schema.json — the exact contract the engine loader
-`crates/client_bevy/src/sprite.rs::parse_manifest` enforces) PLUS the two cross-field
-rules the schema cannot express: `frames.len == direction_count`, and directions
-`0..N-1` unique + fully covered (and each `rect` w,h > 0).
+(pipeline/schema/engine/manifest.schema.json — the engine team's PUBLISHED contract)
+PLUS the cross-field rules JSON Schema cannot express, mirroring the loader
+`crates/client_bevy/src/sprite.rs::parse_manifest`:
+  - frames.len == direction_count, directions 0..N-1 unique + fully covered;
+  - each rect w,h > 0;
+  - eye_height_world <= height_world for non-probe variants (WorldMetrics::validate).
+
+Fidelity note: the vendored schema is the engine's published contract and is in a few
+places STRICTER than the bare loader (direction_count enum [1,2,4,8,16] vs the loader's
+>0; world_metrics value floors and the variant_class enum apply to all variants, while
+the loader ignores a probe's metrics). Those are all in the SAFE (false-reject)
+direction, so the gate never admits a manifest the loader would reject.
 
 Run: python pipeline/tools/gate_engine_accept.py [manifest.json]   (exit 0 = accepted)
 """
@@ -42,6 +50,14 @@ def engine_accept(manifest: dict) -> list[str]:
         rect = f.get("rect", [])
         if not (len(rect) == 4 and rect[2] > 0 and rect[3] > 0):
             errors.append(f"frame dir {f.get('direction')}: rect w,h must be > 0 (got {rect})")
+
+    # Loader cross-field rule the schema cannot express: for non-probe variants the
+    # engine rejects eye_height_world > height_world (sprite.rs WorldMetrics::validate).
+    if manifest.get("variant_class") != "probe":
+        wm = manifest.get("world_metrics") or {}
+        h, e = wm.get("height_world"), wm.get("eye_height_world")
+        if isinstance(h, (int, float)) and isinstance(e, (int, float)) and e > h:
+            errors.append(f"world_metrics.eye_height_world ({e}) must be <= height_world ({h})")
     return errors
 
 

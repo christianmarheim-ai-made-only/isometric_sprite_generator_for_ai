@@ -211,7 +211,7 @@ def validate_directions(manifest: dict[str, Any], reporter: Reporter) -> None:
     reporter.assert_true(seen_dirs == list(range(direction_count)), "idle directions are dense 0..N-1")
     for frame in manifest["frames"]:
         expected_degrees = frame["direction"] * 360.0 / direction_count
-        reporter.assert_true(abs(frame["world_yaw_degrees"] - expected_degrees) < 1e-5, f"dir{frame['direction']:02d}: world yaw equals direction lower edge")
+        reporter.assert_true(abs(frame["world_yaw_degrees"] - expected_degrees) < 1e-5, f"dir{frame['direction']:02d}: world yaw equals direction bin center (i*360/N)")
 
     # M1 diagnostic pair.
     by_dir = {f["direction"]: f for f in manifest["frames"]}

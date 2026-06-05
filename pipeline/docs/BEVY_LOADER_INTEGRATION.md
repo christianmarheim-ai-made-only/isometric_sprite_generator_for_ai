@@ -15,17 +15,18 @@ When loading a sprite manifest, the engine should fail closed if:
 
 ## Direction bin
 
-Use world yaw, not screen angle:
+Use world yaw (not screen angle). Binning is ROUND-to-nearest, matching the engine
+`sprite.rs::direction_index` and the locked contract (`sprite_contract.lock.json`
+`facing.runtime_binning`):
 
 ```rust
-let bin16 = direction_bin16(world_angle_radians);
+let dir = direction_index(world_angle_radians, n); // round(yaw / (TAU/n)) mod n
 ```
 
-Reduced direction counts collapse from 16 by integer division:
-
-```rust
-let dir_n = collapse_bin16(bin16, n);
-```
+`n` is the variant's `direction_count`. Frame `i` renders at yaw `i * TAU/n` — the bin
+CENTER, never a lower edge. `direction_bin16` is the `n == 16` case; `collapse_bin16`
+re-bins a 16-index to a coarser `n`, but prefer `direction_index` on the continuous
+facing when you have it.
 
 ## Anchor conversion
 

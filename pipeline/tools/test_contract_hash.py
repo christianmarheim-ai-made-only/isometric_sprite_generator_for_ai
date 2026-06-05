@@ -56,7 +56,7 @@ def main() -> int:
             "notes": "test-only extra variant",
             "required_sockets": ["origin"],
             "supported_states": ["idle"],
-            "variant_class": "debug_direction_pilot",
+            "variant_class": "probe",
         }
         _dump(variants_path, variants)
         ok &= check(

@@ -19,7 +19,7 @@ blended mask value).
   animation/crop + full manifest convergence (R5), first reference character end-to-end +
   engine load-test (R6).
 
-One green build gate (currently 8/8):
+One green build gate (`build.py --ci`, all steps green):
 
 ```bash
 pip install -r requirements.txt
