@@ -32,9 +32,8 @@ from render3d import render_directions, ground_screen_direction, compute_fit  # 
 from gate_engine_accept import engine_accept  # noqa: E402
 from measure_metrics import compute_world_metrics  # noqa: E402
 from contract_hash import compute_contract_hash  # noqa: E402
+from constants import PAD, DIRS, GROUND_BAND, EYE_FRACTION  # noqa: E402
 
-PAD = 4
-DIRS = 16
 MESHES = {"cube": meshes.cube, "pole": meshes.pole, "arrow": meshes.arrow_wedge}
 LOCKFILES = PIPELINE_ROOT / "lockfiles"
 
@@ -186,10 +185,10 @@ def _bake_mesh_character(verts, faces, face_region, out: Path, canvas_px: int, v
     # cross-section (arms): the engine consumes footprint_radius_world as the collision/LOS
     # radius, so an above-ground appendage must not inflate it (docs/world_metrics_policy.md).
     z_floor = float(verts[:, 2].min())
-    ground = verts[verts[:, 2] <= z_floor + 0.15 * height]
+    ground = verts[verts[:, 2] <= z_floor + GROUND_BAND * height]
     foot_r = float(np.max(np.abs(ground[:, :2])))
     metrics = compute_world_metrics((-foot_r, -foot_r, 0.0), (foot_r, foot_r, height),
-                                    eye_z=round(height * 0.9, 4))
+                                    eye_z=round(height * EYE_FRACTION, 4))
 
     tip_len = canvas_px * 0.1
     manifest_frames, expected = [], []
@@ -291,10 +290,10 @@ def bake_character_anim(out: Path, canvas_px: int = 256, variant_id: str = "huma
 
     height = float(rest_verts[:, 2].max())
     z_floor = float(rest_verts[:, 2].min())
-    ground = rest_verts[rest_verts[:, 2] <= z_floor + 0.15 * height]
+    ground = rest_verts[rest_verts[:, 2] <= z_floor + GROUND_BAND * height]
     foot_r = float(np.max(np.abs(ground[:, :2])))
     metrics = compute_world_metrics((-foot_r, -foot_r, 0.0), (foot_r, foot_r, height),
-                                    eye_z=round(height * 0.9, 4))
+                                    eye_z=round(height * EYE_FRACTION, 4))
 
     tip_len = canvas_px * 0.1
     manifest_frames, expected = [], []

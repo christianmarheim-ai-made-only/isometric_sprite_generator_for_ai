@@ -26,11 +26,10 @@ STATES_JSON = argv[3] if len(argv) > 3 and argv[3] else None
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, TOOLS)
 from mesh_io import region_for_name, REGION_KEYWORDS  # noqa: E402
+from constants import CANVAS, REGION_RGB, PREVIEW_BG_RGB  # noqa: E402
 
-REGION_COLOR = {0: (0.10, 0.10, 0.10), 1: (0.86, 0.22, 0.22), 2: (0.22, 0.70, 0.36),
-                3: (0.27, 0.47, 0.95), 4: (0.93, 0.79, 0.20)}
+REGION_COLOR = {0: PREVIEW_BG_RGB, **REGION_RGB}
 SINGLE = (0.62, 0.64, 0.68)
-CANVAS = 256
 ANGLES = [("front", 0.0, 8.0), ("threeq", 40.0, 22.0), ("side", 90.0, 8.0)]  # (name, az_deg, elev_deg)
 
 bpy.ops.wm.read_factory_settings(use_empty=True)

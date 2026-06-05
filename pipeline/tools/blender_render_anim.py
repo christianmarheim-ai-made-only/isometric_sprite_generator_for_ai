@@ -18,11 +18,11 @@ OUT, TOOLS, MESH_FILE, STATES_JSON = argv[0], argv[1], argv[2], argv[3]
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, TOOLS)
 from mesh_io import region_for_name, REGION_KEYWORDS  # noqa: E402
+from constants import CANVAS, DIRS, GROUND_BAND, REGION_RGB  # noqa: E402
 
 states = json.loads(open(STATES_JSON, encoding="utf-8").read())
-CANVAS, DIRS = 256, 16
 COS30, SIN30, INV2 = math.cos(math.radians(30.0)), 0.5, 1.0 / math.sqrt(2.0)
-REGION_COLOR = {1: (0.86, 0.22, 0.22), 2: (0.22, 0.70, 0.36), 3: (0.27, 0.47, 0.95), 4: (0.93, 0.79, 0.20)}
+REGION_COLOR = REGION_RGB
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
@@ -98,11 +98,16 @@ poses = []  # (state, frame_index, action_name|None, frame_value|None)
 missing_clips = []  # declared states whose clip is absent from the glb -> rendered as the REST pose
 for state, spec in states.items():
     clip, nf = spec.get("clip", state), spec["frames"]
+    playback = spec.get("playback", "loop")
     act = actions.get(clip)
     if act:
         f0, f1 = act.frame_range
+        # loop: half-open [f0,f1) -- the authored seam frame N+1 == frame 1 is skipped (samples
+        # fi/nf). once: closed [f0,f1] -- the LAST sprite frame must BE the authored terminal/held
+        # pose (the engine holds it as the corpse/settle), so sample fi/(nf-1) to land on f1.
+        denom = nf if playback == "loop" else max(nf - 1, 1)
         for fi in range(nf):
-            poses.append((state, fi, clip, f0 + (f1 - f0) * (fi / nf)))
+            poses.append((state, fi, clip, f0 + (f1 - f0) * (fi / denom)))
     else:
         missing_clips.append(state)
         poses.append((state, 0, None, None))

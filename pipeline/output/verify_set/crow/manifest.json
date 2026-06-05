@@ -3722,6 +3722,29 @@
     256
   ],
   "manifest_version": "sprite_manifest_multistate_v1",
+  "provenance": {
+    "asset": {
+      "bytes": 538,
+      "path": "C:\\Code\\isometric_sprite_generator_for_ai\\pipeline\\examples\\crow.asset.json",
+      "sha256": "05d440e098f771070d1a6b82d9aa3c6ab2cc694a5eabeec6f38179c04ee17176"
+    },
+    "batch_id": null,
+    "build_log": "build_log.json",
+    "clips": null,
+    "contract_hash": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
+    "lockfile_hashes": {
+      "sprite_contract.lock.json": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
+      "sprite_states.lock.json": "sha256:6d8e1981e9b86d334c3527e9918104270ed04531d7d8b6babec194a8ae6e2c88",
+      "sprite_variants.lock.json": "sha256:eb9a206bbab46887b2203cf91819f293a0fc340adfeb52da18c8338587268bd1"
+    },
+    "mesh": {
+      "bytes": 28372,
+      "path": "C:\\Code\\isometric_sprite_generator_for_ai\\pipeline\\test_meshes\\crow.glb",
+      "sha256": "c51b741e5236c03b113e16c45ea8ca8e46ee10fe4a45228716e3a690c8211795"
+    },
+    "rig": "bird_v1",
+    "schema": "sprite_provenance_v1"
+  },
   "state_contract_version": "sprite_states_multistate_v1",
   "variant_class": "character",
   "variant_id": "crow",

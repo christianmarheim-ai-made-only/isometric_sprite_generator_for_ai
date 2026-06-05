@@ -17,6 +17,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from contract_hash import compute_contract_hash, compute_individual_hashes  # noqa: E402
+from constants import MAX_PAGE_PX  # noqa: E402
 
 ALLOWED_MASK_VALUES = {0, 1, 2, 3, 4, 5, 6, 7}
 TAU = 2 * math.pi
@@ -114,6 +115,13 @@ def validate_images(manifest_path: Path, manifest: dict[str, Any], reporter: Rep
     base = manifest_path.parent
     color_info = manifest["atlases"]["color"]
     mask_info = manifest["atlases"]["hitmask"]
+    # This is the SINGLE-PAGE debug-subset validator (see module docstring + the
+    # D-validate_manifest-scope decision in docs/next_phase_plan.md). Paged atlases are accepted by
+    # gate_engine_accept (Gate-1) + the build log's oversize_atlas_page check -- not here. Detect a
+    # paged manifest and fail gracefully instead of KeyError-ing on the absent single-page "path".
+    if "pages" in color_info or "pages" in mask_info:
+        raise ValidationFailure(
+            "validate_manifest is single-page only; use gate_engine_accept for paged atlases")
     color_path = base / color_info["path"]
     mask_path = base / mask_info["path"]
     reporter.assert_true(color_path.exists(), f"color atlas exists: {color_info['path']}")
@@ -126,9 +134,10 @@ def validate_images(manifest_path: Path, manifest: dict[str, Any], reporter: Rep
     reporter.assert_true(mask.mode == "L", "hitmask atlas mode is L/R8")
     reporter.assert_true(list(color.size) == color_info["size"], "color atlas size matches manifest")
     reporter.assert_true(list(mask.size) == mask_info["size"], "hitmask atlas size matches manifest")
-    max_size = [2048, 2048]
-    reporter.assert_true(color.size[0] <= max_size[0] and color.size[1] <= max_size[1], "color atlas within 2048x2048 debug/contract max")
-    reporter.assert_true(mask.size[0] <= max_size[0] and mask.size[1] <= max_size[1], "hitmask atlas within 2048x2048 debug/contract max")
+    reporter.assert_true(color.size[0] <= MAX_PAGE_PX and color.size[1] <= MAX_PAGE_PX,
+                         f"color atlas within {MAX_PAGE_PX}x{MAX_PAGE_PX} page max")
+    reporter.assert_true(mask.size[0] <= MAX_PAGE_PX and mask.size[1] <= MAX_PAGE_PX,
+                         f"hitmask atlas within {MAX_PAGE_PX}x{MAX_PAGE_PX} page max")
     return color, mask
 
 

@@ -32,8 +32,9 @@ from render3d import ground_screen_direction  # noqa: E402
 from measure_metrics import compute_world_metrics  # noqa: E402
 from gate_engine_accept import engine_accept  # noqa: E402
 from bake import _pack, _contract_fields, shelf_place, place_into  # noqa: E402  (reuse packers)
+from constants import CANVAS, DIRS, EYE_FRACTION  # noqa: E402
 
-CANVAS, DIRS = 256, 16
+
 
 
 def _srgb(c: float) -> float:
@@ -117,7 +118,7 @@ def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = 
     height = float(meta["mesh_height"])
     foot_r = float(meta["mesh_footprint"])
     metrics = compute_world_metrics((-foot_r, -foot_r, 0.0), (foot_r, foot_r, height),
-                                    eye_z=round(height * 0.9, 4))
+                                    eye_z=round(height * EYE_FRACTION, 4))
 
     ax = round(meta["anchor_frac"][0] * CANVAS, 3)
     ay = round(meta["anchor_frac"][1] * CANVAS, 3)
@@ -168,7 +169,8 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
     glb's clips (blender_render_anim). `asset_animations` = {state: {clip, frames, fps, playback}}
     from the asset manifest. Same package shape as the procedural bake_character_anim (R5)."""
     out.mkdir(parents=True, exist_ok=True)
-    states_spec = {s: {"clip": a.get("clip", s), "frames": a["frames"]} for s, a in asset_animations.items()}
+    states_spec = {s: {"clip": a.get("clip", s), "frames": a["frames"],
+                       "playback": a.get("playback", "loop")} for s, a in asset_animations.items()}
     states_json = out / "_states.json"
     states_json.write_text(json.dumps(states_spec), encoding="utf-8")
     proc = subprocess.run(
@@ -202,7 +204,7 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
     mask_atlas.save(out / "hitmask_atlas.png")
 
     height, foot_r = float(meta["mesh_height"]), float(meta["mesh_footprint"])
-    metrics = compute_world_metrics((-foot_r, -foot_r, 0.0), (foot_r, foot_r, height), eye_z=round(height * 0.9, 4))
+    metrics = compute_world_metrics((-foot_r, -foot_r, 0.0), (foot_r, foot_r, height), eye_z=round(height * EYE_FRACTION, 4))
     ax, ay = round(meta["anchor_frac"][0] * CANVAS, 3), round(meta["anchor_frac"][1] * CANVAS, 3)
     tip_len = CANVAS * 0.1
     frames, expected = [], []

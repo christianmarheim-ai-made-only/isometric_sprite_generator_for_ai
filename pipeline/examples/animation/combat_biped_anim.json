@@ -36,6 +36,58 @@
         "arm.L":   { "rotation_euler": [[1, [0, 0, 0]], [6, [0.6, 0, 0]]] },
         "arm.R":   { "rotation_euler": [[1, [0, 0, 0]], [6, [0.6, 0, 0]]] }
       }
+    },
+    "crouch_idle": {
+      "playback": "loop", "frames": 1, "fps": 1, "duration_frames": 1,
+      "bones": {
+        "thigh.L": { "rotation_euler": [[1, [0.8, 0, 0]]] },
+        "thigh.R": { "rotation_euler": [[1, [0.8, 0, 0]]] },
+        "shin.L":  { "rotation_euler": [[1, [-1.2, 0, 0]]] },
+        "shin.R":  { "rotation_euler": [[1, [-1.2, 0, 0]]] },
+        "spine":   { "rotation_euler": [[1, [0.35, 0, 0]]] }
+      }
+    },
+    "crouch_walk": {
+      "playback": "loop", "frames": 4, "fps": 8, "duration_frames": 8,
+      "bones": {
+        "thigh.L": { "rotation_euler": [[1, [1.1, 0, 0]], [5, [0.5, 0, 0]], [9, [1.1, 0, 0]]] },
+        "thigh.R": { "rotation_euler": [[1, [0.5, 0, 0]], [5, [1.1, 0, 0]], [9, [0.5, 0, 0]]] },
+        "shin.L":  { "rotation_euler": [[1, [-1.1, 0, 0]]] },
+        "shin.R":  { "rotation_euler": [[1, [-1.1, 0, 0]]] },
+        "spine":   { "rotation_euler": [[1, [0.35, 0, 0]]] },
+        "arm.L":   { "rotation_euler": [[1, [-0.3, 0, 0]], [5, [0.3, 0, 0]], [9, [-0.3, 0, 0]]] },
+        "arm.R":   { "rotation_euler": [[1, [0.3, 0, 0]], [5, [-0.3, 0, 0]], [9, [0.3, 0, 0]]] }
+      }
+    },
+    "jump": {
+      "playback": "loop", "frames": 2, "fps": 6, "duration_frames": 4,
+      "bones": {
+        "arm.L":   { "rotation_euler": [[1, [-2.4, 0, 0]], [3, [-2.7, 0, 0]], [5, [-2.4, 0, 0]]] },
+        "arm.R":   { "rotation_euler": [[1, [-2.4, 0, 0]], [3, [-2.7, 0, 0]], [5, [-2.4, 0, 0]]] },
+        "thigh.L": { "rotation_euler": [[1, [0.7, 0, 0]]] },
+        "thigh.R": { "rotation_euler": [[1, [0.7, 0, 0]]] },
+        "shin.L":  { "rotation_euler": [[1, [-0.7, 0, 0]]] },
+        "shin.R":  { "rotation_euler": [[1, [-0.7, 0, 0]]] }
+      }
+    },
+    "fall": {
+      "playback": "loop", "frames": 2, "fps": 6, "duration_frames": 4,
+      "bones": {
+        "arm.L":   { "rotation_euler": [[1, [-1.2, 0, 0]], [3, [-1.5, 0, 0]], [5, [-1.2, 0, 0]]] },
+        "arm.R":   { "rotation_euler": [[1, [-1.2, 0, 0]], [3, [-1.5, 0, 0]], [5, [-1.2, 0, 0]]] },
+        "thigh.L": { "rotation_euler": [[1, [0.3, 0, 0.25]]] },
+        "thigh.R": { "rotation_euler": [[1, [0.3, 0, -0.25]]] }
+      }
+    },
+    "hit": {
+      "playback": "once", "frames": 3, "fps": 14, "duration_frames": 3,
+      "bones": {
+        "spine":   { "rotation_euler": [[1, [0, 0, 0]], [2, [-0.55, 0, 0]], [3, [-0.2, 0, 0]]] },
+        "chest":   { "rotation_euler": [[1, [0, 0, 0]], [2, [-0.4, 0, 0]], [3, [-0.15, 0, 0]]] },
+        "head":    { "rotation_euler": [[1, [0, 0, 0]], [2, [-0.5, 0, 0]], [3, [-0.2, 0, 0]]] },
+        "arm.L":   { "rotation_euler": [[1, [0, 0, 0]], [2, [-0.7, 0, 0]], [3, [-0.3, 0, 0]]] },
+        "arm.R":   { "rotation_euler": [[1, [0, 0, 0]], [2, [-0.7, 0, 0]], [3, [-0.3, 0, 0]]] }
+      }
     }
   }
 }

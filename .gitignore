@@ -23,3 +23,6 @@ dist/model_authoring_contract_v1/
 # production logs are per-run/volatile (timing + commit hash) -> regenerable, not committed
 pipeline/output/verify_set/*/build_log.json
 pipeline/output/verify_set/build_index.json
+
+# arrow-pilot per-frame renderer intermediates (regenerable via generate_arrow_pilot.py)
+pipeline/output/arrow_pilot/frames/

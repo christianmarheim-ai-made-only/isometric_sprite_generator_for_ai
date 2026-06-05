@@ -49,8 +49,8 @@ def _multistate_errors(dc: int, frames: list, animations: dict, default_state) -
             errs.append(f"animations.{state}.directions ({spec.get('directions')}) must equal direction_count ({dc})")
         if not (isinstance(spec.get("frames"), int) and spec["frames"] > 0):
             errs.append(f"animations.{state}.frames must be a positive integer")
-        if spec.get("playback") not in ("loop", "once", "hold"):
-            errs.append(f"animations.{state}.playback must be loop|once|hold (got {spec.get('playback')!r})")
+        if spec.get("playback") not in ("loop", "once"):
+            errs.append(f"animations.{state}.playback must be loop|once (got {spec.get('playback')!r})")
     for f in frames:
         if f.get("state") not in animations:
             errs.append(f"frame references unknown state {f.get('state')!r}")

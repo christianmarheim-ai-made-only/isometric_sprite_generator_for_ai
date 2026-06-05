@@ -21,3 +21,5 @@ Real `game_iso_v1` packages baked across every input route. Each folder has `col
 - **Hit regions** cover the silhouette and match the body part under them.
 
 Regenerate: `python pipeline/tools/produce_verify_set.py`
+
+**Build logs:** per-bake `<variant>/build_log.json` (inputs+hashes, env, gate, warnings) + batch `build_index.json`. Diff two runs to verify a fix.

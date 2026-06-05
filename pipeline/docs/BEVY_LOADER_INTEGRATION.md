@@ -53,7 +53,7 @@ The manifest may declare a top-level `animations` map and per-frame `state` + `f
 - No `animations` block ⇒ a single implicit `idle` state (today's behavior). Fully backward-compatible.
 
 Playback clock (per proxy, client-side; state stays derived at the client edge — no sim/Entity
-changes): advance `frame_index` at `fps`; `loop` wraps, `once`/`hold` clamp to the terminal frame.
+changes): advance `frame_index` at `fps`; `loop` wraps, `once` clamps to the terminal frame.
 Map sim signals to a state (motion→walk, action→attack, else `default_state`). The reference
 `bevy_reference/src/loader.rs` parses all states, validates coverage, builds the full
 `(state,direction,frame_index)` atlas, and exposes the default state's frame 0 (the MIN);

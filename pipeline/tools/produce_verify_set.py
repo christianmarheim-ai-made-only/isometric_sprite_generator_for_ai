@@ -120,7 +120,7 @@ def main() -> int:
         "batch `build_index.json`. Diff two runs to verify a fix.",
     ]
     (VERIFY / "INDEX.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    idx = write_build_index(VERIFY, logs)
+    idx = write_build_index(VERIFY, logs, batch_id="verify_set")
 
     failed = [r["variant"] for r in rows if r["gate"] != "PASS"]
     total_warn = sum(r["warnings"] for r in idx)

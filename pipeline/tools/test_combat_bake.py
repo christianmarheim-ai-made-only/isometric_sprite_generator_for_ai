@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Gate the rigged biped COMBAT bake (the canonical idle/move/punch/death template). The
+"""Gate the rigged biped COMBAT bake (the canonical 9-clip idle/walk/crouch/jump/fall/hit/punch/death
+template). The
 `bake_anim_from_json` -> `bake_animated` path (JSON clip embedding onto biped_v1) had ZERO
 end-to-end coverage -- only the bird was gated, so a regression in biped combat baking was silent.
 Blender-skip (like the other Blender gates).
@@ -39,10 +40,17 @@ def main() -> int:
         out = Path(td) / "grunt"
         m = bake_asset(PIPELINE_ROOT / "examples" / "grunt.asset.json", out)
         anims = m["animations"]
-        ok &= check("states are idle/walk/punch/death (engine ADR-044 vocabulary)",
-                    set(anims) == {"idle", "walk", "punch", "death"})
+        expected_states = {"idle", "walk", "crouch_idle", "crouch_walk",
+                           "jump", "fall", "hit", "punch", "death"}
+        ok &= check("states are the full 9-clip engine ADR-044 vocabulary",
+                    set(anims) == expected_states)
         ok &= check("death playback=once (engine holds the final frame as the corpse)",
                     anims["death"]["playback"] == "once")
+        ok &= check("hit playback=once (engine plays the flinch then returns to state)",
+                    anims["hit"]["playback"] == "once")
+        ok &= check("crouch_idle/jump/fall playback=loop",
+                    all(anims[s]["playback"] == "loop"
+                        for s in ("crouch_idle", "jump", "fall")))
 
         atlas = Image.open(out / "color_atlas.png").convert("RGBA")
 

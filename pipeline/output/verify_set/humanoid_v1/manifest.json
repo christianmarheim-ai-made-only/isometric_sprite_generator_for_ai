@@ -723,6 +723,29 @@
     }
   ],
   "manifest_version": "sprite_manifest_bake_v1",
+  "provenance": {
+    "asset": {
+      "bytes": 550,
+      "path": "C:\\Code\\isometric_sprite_generator_for_ai\\pipeline\\examples\\humanoid_v1.asset.json",
+      "sha256": "dfb979355862d55a324be8fddc457024958657f10727e6ba50a7b9c38149e1cf"
+    },
+    "batch_id": null,
+    "build_log": "build_log.json",
+    "clips": null,
+    "contract_hash": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
+    "lockfile_hashes": {
+      "sprite_contract.lock.json": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
+      "sprite_states.lock.json": "sha256:6d8e1981e9b86d334c3527e9918104270ed04531d7d8b6babec194a8ae6e2c88",
+      "sprite_variants.lock.json": "sha256:eb9a206bbab46887b2203cf91819f293a0fc340adfeb52da18c8338587268bd1"
+    },
+    "mesh": {
+      "bytes": 7696,
+      "path": "C:\\Code\\isometric_sprite_generator_for_ai\\pipeline\\test_meshes\\humanoid.glb",
+      "sha256": "76ca79831c3c766ae26f667bd329b9709b95e7e4a5546e9cdcfde453e4027204"
+    },
+    "rig": null,
+    "schema": "sprite_provenance_v1"
+  },
   "state_contract_version": "sprite_states_multistate_v1",
   "variant_class": "character",
   "variant_id": "humanoid_v1",

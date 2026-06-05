@@ -26,11 +26,11 @@ TOOLS = argv[1]
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, TOOLS)
 import meshes  # noqa: E402  (Blender's bundled numpy)
+from constants import CANVAS, DIRS, GROUND_BAND, REGION_RGB  # noqa: E402
 
-CANVAS, DIRS = 256, 16
 COS30, SIN30, INV2 = math.cos(math.radians(30.0)), 0.5, 1.0 / math.sqrt(2.0)
 # region id -> body color (the "art"); the region pass uses the same hue, flat-lit.
-REGION_COLOR = {1: (0.86, 0.22, 0.22), 2: (0.22, 0.70, 0.36), 3: (0.27, 0.47, 0.95), 4: (0.93, 0.79, 0.20)}
+REGION_COLOR = REGION_RGB
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
@@ -166,7 +166,7 @@ for i in range(DIRS):
 # Measured world metrics from the FINAL mesh (local coords; foot at z~0 after normalization).
 _z = [v.co.z for v in mesh.vertices]
 _zmin, _zmax = min(_z), max(_z)
-_ground = [max(abs(v.co.x), abs(v.co.y)) for v in mesh.vertices if v.co.z <= _zmin + 0.15 * (_zmax - _zmin)]
+_ground = [max(abs(v.co.x), abs(v.co.y)) for v in mesh.vertices if v.co.z <= _zmin + GROUND_BAND * (_zmax - _zmin)]
 meta = {
     "canvas": CANVAS, "dirs": DIRS, "ortho_scale": cam_data.ortho_scale,
     "region_color": {str(k): list(v) for k, v in REGION_COLOR.items()},

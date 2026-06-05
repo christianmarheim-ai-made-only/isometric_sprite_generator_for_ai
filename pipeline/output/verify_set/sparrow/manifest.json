@@ -3722,6 +3722,29 @@
     256
   ],
   "manifest_version": "sprite_manifest_multistate_v1",
+  "provenance": {
+    "asset": {
+      "bytes": 619,
+      "path": "C:\\Code\\isometric_sprite_generator_for_ai\\pipeline\\examples\\sparrow.asset.json",
+      "sha256": "6b585091f0717fc5c90422246c16376e1c45199b29c12a719b78e20c63ecd372"
+    },
+    "batch_id": null,
+    "build_log": "build_log.json",
+    "clips": null,
+    "contract_hash": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
+    "lockfile_hashes": {
+      "sprite_contract.lock.json": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
+      "sprite_states.lock.json": "sha256:6d8e1981e9b86d334c3527e9918104270ed04531d7d8b6babec194a8ae6e2c88",
+      "sprite_variants.lock.json": "sha256:eb9a206bbab46887b2203cf91819f293a0fc340adfeb52da18c8338587268bd1"
+    },
+    "mesh": {
+      "bytes": 28372,
+      "path": "C:\\Code\\isometric_sprite_generator_for_ai\\pipeline\\test_meshes\\sparrow.glb",
+      "sha256": "5d3225c037a6a87a532b48487b9bf776a810af7490e30b4fdd8281e108697d3a"
+    },
+    "rig": "bird_v1",
+    "schema": "sprite_provenance_v1"
+  },
   "state_contract_version": "sprite_states_multistate_v1",
   "variant_class": "character",
   "variant_id": "sparrow",

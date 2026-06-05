@@ -24,8 +24,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from bake import shelf_place, place_into  # noqa: E402
-
-MAX_PAGE_PX = 4096  # per-page width cap (height grows to fit a state; see atlas_paging_contract.md §5)
+from constants import MAX_PAGE_PX  # noqa: E402  (per-page cap; see atlas_paging_contract.md §5)
 
 
 def _box(rect):
@@ -39,6 +38,12 @@ def _single_path(atlas: dict, key: str) -> str:
     return atlas["path"]
 
 
+class OversizePageError(RuntimeError):
+    """A sharded page exceeds MAX_PAGE_PX. Hard failure (not a warning): an oversize page is a
+    package the engine cannot load. See build_log.oversize_atlas_page (severity=error) for the
+    production-gate side and atlas_paging_contract.md §7 for the FUTURE within-state split."""
+
+
 def shard(pkg: Path, out: Path, policy: str = "per_state") -> dict:
     pkg, out = Path(pkg), Path(out)
     out.mkdir(parents=True, exist_ok=True)
@@ -48,7 +53,7 @@ def shard(pkg: Path, out: Path, policy: str = "per_state") -> dict:
     frames = m["frames"]
     states = sorted({f.get("state", "idle") for f in frames})  # per_state: one page per state
 
-    color_pages, hit_pages, new_frames = [], [], []
+    color_pages, hit_pages, new_frames, oversize = [], [], [], []
     for page_index, state in enumerate(states):
         sfr = [f for f in frames if f.get("state", "idle") == state]
         cims = [color.crop(_box(f["rect"])) for f in sfr]
@@ -57,8 +62,7 @@ def shard(pkg: Path, out: Path, policy: str = "per_state") -> dict:
         cpage, rects = place_into(cims, placements, atlas_size, "RGBA")
         mpage, _ = place_into(mims, placements, atlas_size, "L")
         if cpage.width > MAX_PAGE_PX or cpage.height > MAX_PAGE_PX:
-            print(f"WARN: page '{state}' is {cpage.size} (> {MAX_PAGE_PX} px). A single state exceeding "
-                  f"one max page needs the greedy-within-state split (FUTURE; see atlas_paging_contract.md §7).")
+            oversize.append((state, list(cpage.size)))
         cpage.save(out / f"color.{state}.png")
         mpage.save(out / f"mask.{state}.png")
         color_pages.append({"path": f"color.{state}.png", "size": list(cpage.size)})
@@ -77,6 +81,11 @@ def shard(pkg: Path, out: Path, policy: str = "per_state") -> dict:
     out_m["frames"] = new_frames
     out_m["atlas_page_policy"] = policy
     (out / "manifest.json").write_text(json.dumps(out_m, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if oversize:
+        detail = ", ".join(f"{s} {sz}" for s, sz in oversize)
+        raise OversizePageError(
+            f"{len(oversize)} page(s) exceed {MAX_PAGE_PX}px: {detail}. A single state larger than one "
+            f"max page needs the greedy-within-state split (FUTURE; atlas_paging_contract.md §7).")
     return out_m
 
 
@@ -85,7 +94,11 @@ def main() -> int:
     ap.add_argument("package", type=Path, help="baked single-page package dir (manifest.json + atlases)")
     ap.add_argument("--out", type=Path, required=True)
     args = ap.parse_args()
-    m = shard(args.package, args.out)
+    try:
+        m = shard(args.package, args.out)
+    except OversizePageError as e:
+        print(f"SHARD FAILED: {e}")
+        return 1
     pages = len(m["atlases"]["color"]["pages"])
     print(f"SHARDED [per_state]: {m['variant_id']} -> {args.out}  ({pages} pages, {len(m['frames'])} frames)")
     return 0

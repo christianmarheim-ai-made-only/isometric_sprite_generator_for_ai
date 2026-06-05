@@ -41,8 +41,9 @@ def main() -> int:
                     set(meta["material_region"].values()) == {1, 2, 3, 4})
         ok &= check(f"no region fallback (clean material names), got {meta['region_fallback_materials']}",
                     not meta["region_fallback_materials"])
-        ok &= check("per-clip poses rendered for idle/walk/punch/death",
-                    {cp.split("/")[0] for cp in meta["clip_poses"]} == {"idle", "walk", "punch", "death"})
+        ok &= check("per-clip poses rendered for the full 9-clip vocabulary",
+                    {cp.split("/")[0] for cp in meta["clip_poses"]} ==
+                    {"idle", "walk", "crouch_idle", "crouch_walk", "jump", "fall", "hit", "punch", "death"})
         for f in ("mesh_front.png", "tex_front.png", "region_front.png", "bind_front.png", "pose_walk_last.png"):
             ok &= check(f"stage image {f} present", (out / f).exists())
     print("ALL PASS" if ok else "SOME FAILED")

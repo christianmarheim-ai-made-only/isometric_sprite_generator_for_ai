@@ -83,7 +83,8 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
     if errs:
         raise SystemExit("baked package failed Gate-1:\n  " + "\n  ".join(errs))
 
-    from build_log import write_build_log
+    from build_log import write_build_log, stamp_provenance
+    from contract_hash import compute_individual_hashes
     meta = {}
     for mf in ("anim_meta.json", "blender_meta.json"):
         mp = out / mf
@@ -91,9 +92,15 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
             meta = json.loads(mp.read_text(encoding="utf-8"))
             break
     clips_path = (base / clips_rel).resolve() if clips_rel else None
+    rig = asset.get("rig")
     log = write_build_log(out, manifest, route, asset_path=manifest_path, mesh=mesh_path,
-                          clips=clips_path, gate_reasons=[], meta=meta,
+                          clips=clips_path, rig=rig, gate_reasons=[], meta=meta,
                           stages=[{"name": "bake", "ms": bake_ms}])
+    # Self-describing provenance in the shipped manifest: which model+clips+rig+lockfiles made it.
+    block = stamp_provenance(out / "manifest.json", asset_path=manifest_path, mesh=mesh_path,
+                             clips=clips_path, rig=rig,
+                             lockfile_hashes=compute_individual_hashes(PIPELINE_ROOT / "lockfiles"))
+    manifest["provenance"] = block
     nwarn = len(log["warnings"])
     tail = f"  [{nwarn} warning(s): {', '.join(sorted({w['code'] for w in log['warnings']}))}]" if nwarn else ""
     print(f"BAKE_ASSET OK [{route}]: {variant_id} -> {out}  ({len(manifest['frames'])} frames){tail}")

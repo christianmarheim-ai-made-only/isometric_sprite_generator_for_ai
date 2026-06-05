@@ -17,10 +17,14 @@ import hashlib
 import json
 import platform
 import subprocess
+import sys
 from pathlib import Path
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from constants import MAX_PAGE_PX  # noqa: E402  (canonical per-page cap)
+
 SCHEMA = "sprite_build_log_v1"
-MAX_PAGE_PX = 4096  # keep in sync with shard_atlas.MAX_PAGE_PX (see housekeeping H6: shared constants)
 _GIT_COMMIT_CACHE: list = []
 
 
@@ -68,8 +72,19 @@ def _atlases(manifest: dict) -> dict:
     return out
 
 
+def _artifacts(out_dir: Path) -> dict:
+    """sha256 the produced output files so a reviewer can answer 'which hitmask came from which
+    model' end-to-end: inputs.mesh.sha256 -> outputs.artifacts.hitmask_atlas.sha256."""
+    arts = {}
+    for key, fname in (("color_atlas", "color_atlas.png"), ("hitmask_atlas", "hitmask_atlas.png")):
+        h = file_sha256(out_dir / fname)
+        if h:
+            arts[key] = h
+    return arts
+
+
 def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=None, clips=None,
-                    gate_reasons=None, meta: dict | None = None, stages=None) -> dict:
+                    rig=None, gate_reasons=None, meta: dict | None = None, stages=None) -> dict:
     """Assemble + write out_dir/build_log.json and return the log dict."""
     out_dir = Path(out_dir)
     meta = meta or {}
@@ -98,7 +113,7 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
             "asset_path": str(asset_path) if asset_path else None,
             "mesh": file_sha256(mesh) if mesh else None,
             "clips": file_sha256(clips) if clips else None,
-            "rig": manifest.get("build", {}).get("rig") or None,
+            "rig": rig or manifest.get("build", {}).get("rig") or None,
         },
         "params": {
             "frame_canvas": manifest.get("frame_canvas"),
@@ -118,6 +133,7 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
         "outputs": {
             "frame_count": len(manifest.get("frames", [])),
             "atlases": _atlases(manifest),
+            "artifacts": _artifacts(out_dir),
             "packing_efficiency": eff,
         },
         "gates": {"gate_1_engine_accept": {"pass": gate1_ok, "reasons": gate_reasons}},
@@ -128,11 +144,56 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
     return log
 
 
-def write_build_index(batch_dir, logs: list) -> list:
-    rows = [{"variant": l["variant_id"], "route": l["route"], "ok": l["ok"],
-             "frames": l["outputs"]["frame_count"], "packing_efficiency": l["outputs"]["packing_efficiency"],
-             "warnings": len(l["warnings"]), "commit": l["environment"]["git"].get("commit")} for l in logs]
-    (Path(batch_dir) / "build_index.json").write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8")
+def stamp_provenance(manifest_path, *, asset_path=None, mesh=None, clips=None, rig=None,
+                     lockfile_hashes=None, batch_id=None) -> dict:
+    """Stamp a self-describing `provenance` block into a baked manifest.json (additive -- the engine
+    schema is additionalProperties:true). Lets the SHIPPED package answer 'which model + clips + rig
+    + lockfiles produced this' from manifest.json alone, and points at the build_log sidecar. Only
+    production bakers stamp this; the committed numpy references bake through core bake.py and stay
+    byte-reproducible."""
+    manifest_path = Path(manifest_path)
+    m = json.loads(manifest_path.read_text(encoding="utf-8"))
+    block = {
+        "schema": "sprite_provenance_v1",
+        "batch_id": batch_id,
+        "asset": file_sha256(asset_path) if asset_path else None,
+        "mesh": file_sha256(mesh) if mesh else None,
+        "clips": file_sha256(clips) if clips else None,
+        "rig": rig,
+        "contract_hash": m.get("contract_hash"),
+        "lockfile_hashes": lockfile_hashes,
+        "build_log": "build_log.json",
+    }
+    m["provenance"] = block
+    manifest_path.write_text(json.dumps(m, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return block
+
+
+def write_build_index(batch_dir, logs: list, batch_id=None) -> list:
+    rows = []
+    for l in logs:
+        inp = l.get("inputs", {})
+        arts = l.get("outputs", {}).get("artifacts", {})
+        rows.append({
+            "variant": l["variant_id"], "route": l["route"], "ok": l["ok"],
+            "frames": l["outputs"]["frame_count"],
+            "packing_efficiency": l["outputs"]["packing_efficiency"],
+            "warnings": len(l["warnings"]),
+            "commit": l["environment"]["git"].get("commit"),
+            "build_log": f"{l['variant_id']}/build_log.json",
+            "mesh_sha256": (inp.get("mesh") or {}).get("sha256"),
+            "rig": inp.get("rig"),
+            "hitmask_sha256": (arts.get("hitmask_atlas") or {}).get("sha256"),
+        })
+    index = {
+        "schema": "sprite_build_index_v1",
+        "batch_id": batch_id,
+        "contract_hash": logs[0]["environment"].get("contract_hash") if logs else None,
+        "commit": logs[0]["environment"]["git"].get("commit") if logs else None,
+        "variant_count": len(rows),
+        "variants": rows,
+    }
+    (Path(batch_dir) / "build_index.json").write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
     return rows
 
 

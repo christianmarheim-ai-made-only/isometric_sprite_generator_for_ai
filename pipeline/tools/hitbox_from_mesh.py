@@ -30,9 +30,7 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from mesh_io import load_obj, REGION_NAMES  # noqa: E402
 from measure_metrics import compute_world_metrics  # noqa: E402
-
-GROUND_BAND = 0.15  # ground-contact verts: z <= zmin + GROUND_BAND * height (matches bake.py)
-EYE_FRACTION = 0.9  # eye height = EYE_FRACTION * height (matches bake.py)
+from constants import GROUND_BAND, EYE_FRACTION  # noqa: E402  (canonical: must match bake.py)
 
 
 def hitbox_from_mesh(mesh_path: str, up: str = "z") -> dict:
