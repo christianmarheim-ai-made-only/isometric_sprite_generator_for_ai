@@ -18,7 +18,7 @@ All ADRs are **Proposed** unless ratified by the engine/gameplay review group. T
 | ADR-0015 | M1/M2 arrow pilot direction-only scope | M1/M2 |
 | ADR-0016 | AI generation behind proven seam + cleanup/source validator | M4 |
 | ADR-0017 | Atlas/compression/streaming deferred until measured | M4/M5 |
-| ADR-0018 | Vertical projection pinned by height pixel scale (30°/26.565° trap) | M3 |
+| ADR-0018 | Camera elevation 30° (confirmed); height pinned by an explicit pixel scale | M3 |
 | ADR-0019 | Height-calibration probe + gate before height bakes | M2A/M3 |
 
 ## Review order

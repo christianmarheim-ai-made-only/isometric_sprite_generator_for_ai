@@ -79,33 +79,23 @@ extrusion; atlas `path` relative to manifest; R8 hitmask + palette
   look right on screen, checked via the oracle).
 - `eye_height_world` absent → engine uses **`0.85 · height_world`**.
 
-## RESOLVED: camera elevation = 30° (confirmed); height↔×24 mapping is the live item
+## Camera elevation = 30° (engine-confirmed); the live item is the height ↔ ×24 mapping
 
-> **Update (post-write): the engine confirmed `30°`.** The v1 reference package's
-> `26.565°` claim was the error; a corrected package is incoming. **ADR-0018 (which
-> leaned 30°) stands — no rewrite.** The only remaining live item is the **30° ↔
-> `height·24` reconciliation** (how real heights foreshorten) — the flat arrow can't
-> reveal it, so settle it with a height-bearing reference / the ADR-0019 probe.
-> Original three-position analysis kept below for context.
+The camera elevation is **30°** (confirmed by the engine). The ground projection
+(`×32/×16`, `tile_px [64,32]`) is verified and the flat arrow is elevation-immune,
+so nothing shipped is affected.
 
-Three positions that were on the table — **a wrong elevation is the one
-irreversible mistake (forces a full re-bake):**
+The one remaining item — and the only place a wrong call forces a re-bake — is how
+**real heights foreshorten**: the engine maps world height with
+`HEIGHT_SCREEN_SCALE = 24` (`screen_y = −(x+y)·16 + height·24`), while a naive 30°
+ortho camera would render height at ≈39 px/unit instead. So the bake must **set the
+height scale explicitly to 24** (ADR-0018), and a flat arrow cannot reveal whether
+it's right.
 
-- **Engine reference (this package):** `26.565° = arctan(0.5)` is correct; **`30°` is
-  "wrong"** (stated in README, the format spec, the QA doc, and the schema). Suggests
-  the check: a 2 m vertical pole → `2·24 = 48 px` of screen-Y rise.
-- **What you were told:** `30°` is right, `26` is the mistake — you will confirm.
-- **ADR-0018 (just written, leans 30°):** `30°` is the camera *elevation* for a strict
-  orthographic 2:1 **ground** tile (`sin30°=½`); `26.565°` is the screen 2:1 *slope*.
-  Caveat I found: under a single **uniform** ortho camera, *neither* angle reproduces
-  ground `×32/×16` **and** height `×24` together — so the engine almost certainly uses
-  an explicit/anamorphic height scale (24) and "elevation" is partly nominal. **The
-  arbiter is `render.rs`, not prose.**
-
-**Action (user-owned):** confirm against `crates/client_bevy/src/render.rs`. If the
-engine truly realizes `arctan(0.5)`, **revise ADR-0018 to adopt 26.565° and bake there.**
-Harmless for the flat probe; **critical before any 3D height bake.** Gate it on the
-height-calibration probe (ADR-0019 = the reference's 2 m → 48 px check).
+**Settle it with a height-bearing reference** — a 1 m / 2 m vertical pole that must
+measure **24 px / 48 px** of screen-Y rise from the foot (the ADR-0019 calibration
+gate) — or confirm against `crates/client_bevy/src/render.rs`. **Do not bake any 3D
+height art until the height scale is pinned and that check passes.**
 
 ## Instruction when work resumes
 

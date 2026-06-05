@@ -7,7 +7,7 @@
 
 ## Context
 
-ADR-0018 pins vertical projection by an explicit height pixel scale rather than the camera elevation. That number must be **verified against the running engine before** real character variants are baked — otherwise a wrong height scale is found only after the catalogue exists, forcing the full re-bake the "30 vs 26.57" flag warns about. M1 set the pattern: a tiny deterministic probe proves one engine-facing assumption in pixels (the arrow proved direction + ground projection). Height needs the same.
+ADR-0018 pins vertical projection by an explicit height pixel scale rather than the camera elevation. That number must be **verified against the running engine before** real character variants are baked — otherwise a wrong height scale is found only after the catalogue exists, forcing the full re-bake an undetected height-scale error would otherwise cause. M1 set the pattern: a tiny deterministic probe proves one engine-facing assumption in pixels (the arrow proved direction + ground projection). Height needs the same.
 
 ## Decision
 
