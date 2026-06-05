@@ -1,105 +1,64 @@
-# ADR-0018: Vertical Projection Is Pinned by a Height Pixel Scale, Not Camera Elevation
+# ADR-0018: Camera Elevation Is 30°; the Engine Applies `height_world × 24` Sizing (Not the Bake)
 
-- Status: Proposed
+- Status: Proposed (height handling **engine-confirmed** against `crates/client_bevy/src/render.rs`)
 - Date: 2026-06-05
-- Blocks: M3 height-bearing variants (anything taller than the ground plane); production contract camera block
-- Related: ADR-0014 (validator/runtime contract), ADR-0015 (arrow pilot scope), ADR-0007 (world metrics), ADR-0019 (height-calibration probe)
+- Supersedes: an earlier draft of this ADR that proposed pinning an explicit *in-bake* height pixel scale (anamorphic ×24). That approach was **wrong** and has been removed — see the Decision.
+- Blocks: M3 height-bearing variants; the production-contract camera block
+- Related: ADR-0014 (validator/runtime), ADR-0015 (arrow pilot), ADR-0007 (world metrics), ADR-0019 (foreshortening calibration)
 
 ## Context
 
-The `game_iso_v1` camera elevation is **30°** (engine-confirmed). The ground
-projection — `screen_x = (wx−wy)·32`, `screen_y = (wx+wy)·16`, `tile_px [64,32]` —
-was verified in pixels by the M1/M2 arrow pilot (dir02 down, dir10 up, clockwise
-winding) and corresponds to a 2:1 ground tile. None of that is in question.
+`game_iso_v1` is a 2:1 dimetric isometric projection. Its **ground** projection
+(`screen_x=(x−y)·32`, `screen_y=(x+y)·16`; tile 64×32) was verified in pixels by the
+M1/M2 arrow pilot and matches the engine. This ADR settles the **vertical** axis: the
+camera elevation, and **who applies** the world-height → screen-pixels scaling.
 
-The unresolved axis is **height**. For an orthographic iso camera (uniform scale
-`s`, azimuth 45°, elevation θ) the per-axis screen scales are:
-
-```
-horizontal (wx−wy):  s/sqrt(2)            -> 32 px/unit   => s ≈ 45.25
-depth      (wx+wy):  s/sqrt(2) · sin θ    -> 16 px/unit   => θ = 30°
-height     (wz):     s · cos θ             -> ≈ 39 px/unit at 30°
-```
-
-But the engine places height with its own constant, `HEIGHT_SCREEN_SCALE = 24`
-(`screen_y = −(wx+wy)·16 + height·24`, Bevy y-up). A single uniformly-scaled camera
-at 30° therefore does **not** reproduce the engine's height: it yields ≈39 px per
-world height-unit while the engine expects 24. Baking real 3D meshes with a naive
-30° camera makes tall bodies ≈1.6× too tall, with error growing with height (eyes,
-muzzles, health bars, projectile spawns, depth sorting / LOS silhouettes all drift).
-Flat assets (`z ≈ 0`) are immune — which is why the arrow pilot is correct, nothing
-shipped is wrong, and a flat probe cannot reveal this.
-
-(The M1/M2 debug-subset contract encodes only the ground projection + `tile_px`; it
-specifies no height factor. Vertical projection is currently unspecified in the
-validated contract and must be pinned for production before any height-bearing bake.)
+The "30° vs 26.565°" trap: a 2:1 *ground* tile requires `sin(elevation)=0.5 ⇒
+elevation = 30°`. `arctan(0.5) ≈ 26.565°` is the on-screen tile-edge **slope** (a screen
+result), **not** the camera elevation — a camera literally at 26.565° would render a
+`≈2.236:1` ground, which is wrong.
 
 ## Decision
 
-> **⚠️ SUPERSEDED — see the Resolution section at the end of this ADR.** Decision
-> point 1 below ("set the height scale explicitly in the bake" / anamorphic ×24) is
-> **wrong**: the engine applies `×24` itself (`render.rs::sprite_size`). The bake must
-> **not** apply a ×24/anamorphic squash — it bakes at **30°** (correct foreshortening)
-> and emits `height_world`. (Current code is already correct; this note prevents a wrong
-> re-implementation during R2–R6.)
-
-1. The authoritative vertical spec is the **height pixel scale**
-   `height_px_per_world_unit` = the engine's `HEIGHT_SCREEN_SCALE` (currently `24`).
-   It is **set explicitly in the bake**, not left to fall out of the 30° camera
-   (which gives ≈39). Mechanism: an anamorphic Z scale, a post-render vertical scale,
-   or an engine-matched camera — whatever makes a world height `h` render to exactly
-   `h · 24` px.
-2. The camera elevation stays **30°** (engine-confirmed, ground verified). The
-   manifest records `camera_elevation_degrees: 30`, the ground scales, and
-   `height_px_per_world_unit`; the validator and runtime assert
-   `height_px_per_world_unit` equals the engine constant (fail closed), so any drift
-   is a field-by-field failure, not a visual surprise.
-3. If the engine constant and the ground scales are ever found mutually inconsistent,
-   it is resolved once, on the contract/engine side, by agreeing a single coherent
-   (ground, height) system — never by silently re-scaling per asset.
+1. **Camera elevation is 30°** (azimuth 45°). 26.565° is the tile-edge screen angle, not
+   the camera elevation; the camera is never set to 26.565°.
+2. **The bake applies NO in-bake height scale / anamorphic ×24.** It renders the model
+   through the 30° camera — which produces the correct height **foreshortening** (and
+   therefore the frame's **aspect ratio** + internal vertical proportions) — and emits a
+   correct `world_metrics.height_world`. The absolute pixel size of the baked frame is
+   irrelevant to the engine.
+3. **The engine applies the absolute on-screen size** (`render.rs::sprite_size`): drawn
+   **height = `height_world × HEIGHT_SCREEN_SCALE (24)`**; drawn **width = height ×
+   frame_aspect** (`rect.w / rect.h`). The engine resizes the baked frame to
+   `height_world×24` px tall, preserving the frame's aspect.
+4. **Consequence — cropping (see ADR-0019 / R5):** because the engine derives width from
+   `rect.w/rect.h`, the **aspect of engine-consumed frames is load-bearing**. You may
+   **not** tight-crop engine-consumed frames to varying aspects without an engine
+   `logical_frame_canvas` sizing change — or animation scale (crouch/hurt/death) silently
+   stretches.
+5. The manifest records `camera_elevation_degrees: 30` + the ground scales; the validator
+   and runtime assert `camera_elevation_degrees == 30` (and **reject 26.565**). There is
+   **no** "height pixel scale" field the bake must hit.
 
 ## Consequences
 
 ### Positive
-
-- Pins the quantity that actually drives 3D height correctness (height px/unit).
-- Keeps the verified ground projection + confirmed 30° elevation intact — no re-bake of flat assets.
-- Makes height mis-scaling a hard validator failure instead of silent visual drift.
+- The simplest correct rule: bake = 30° + `height_world`; the engine owns absolute size.
+- Keeps the verified ground; no re-bake of flat assets; no anamorphic bake step.
 
 ### Negative
-
-- The bake needs an explicit vertical-scale step, not just "set the camera angle."
-- Requires the engine's `HEIGHT_SCREEN_SCALE` to be carried as a contract value.
+- The engine's rect-aspect sizing **constrains cropping** (point 4) — a real limitation R5 must respect.
+- Requires the engine to carry `HEIGHT_SCREEN_SCALE` (24) as a known contract constant.
 
 ## Validation requirements
-
-- `height_px_per_world_unit` present in the production manifest and equal to the engine constant (validator + runtime assert).
-- Ground scales unchanged (`×32 / ×16`, `tile_px [64,32]`); M1/M2 ground diagnostics still pass.
-- A height-calibration probe (ADR-0019) passes before any height-bearing variant is baked.
+- `camera_elevation_degrees == 30` in the manifest (validator + runtime).
+- Ground scales unchanged (`×32/×16`; tile 64×32); M1/M2 ground diagnostics still pass.
+- Foreshortening/aspect calibration passes (ADR-0019) before any 3D height bake.
 
 ## M1/M2 assumption
-
-The arrow pilot is flat (no height) and uses only the ground projection, so it is unaffected and remains valid. No M1/M2 re-bake is required.
+The arrow pilot is flat (no height) and uses only the ground projection — unaffected.
 
 ## M3 review questions
-
-- Carry the engine `HEIGHT_SCREEN_SCALE` as a manifest/contract field.
-- Choose the height-scale mechanism (anamorphic camera vs post-scale).
-- Does the height factor interact with per-variant scale (large/small creatures)?
-
-## Resolution (2026-06-05, from engine `render.rs`)
-
-Confirmed against the authority (`crates/client_bevy/src/render.rs::sprite_size`):
-the engine sets on-screen **height = `height_world × HEIGHT_SCREEN_SCALE` (24)** and
-**width = height × frame_aspect** (`rect.w/rect.h`). So `×24` is applied **engine-side**,
-not in the bake. This **supersedes Decision point 1's "set the height scale explicitly to
-24 in the bake."** The corrected decision:
-
-- The bake renders at azimuth 45° + **elevation 30°** (ground + correct height
-  *foreshortening*, which fixes the frame's aspect and internal vertical proportions) and
-  emits a correct `world_metrics.height_world`. It does **not** apply an in-bake `×24` /
-  anamorphic squash.
-- The engine owns absolute on-screen size (`height_world×24` tall, width = height ×
-  frame-aspect). Elevation `30°` is still the one irreversible thing to get right (it bakes
-  the foreshortening / aspect); `26.565°` remains the screen tile-edge angle, not the camera.
-- Validator/runtime still assert `camera_elevation_degrees == 30` and valid `world_metrics`.
+- The rect-aspect-vs-tight-crop tension (point 4): does the engine gain a
+  `logical_frame_canvas` sizing field, or do engine-consumed frames stay full-canvas?
+- Does `height_world×24` interact with per-variant scale (large/small creatures)?

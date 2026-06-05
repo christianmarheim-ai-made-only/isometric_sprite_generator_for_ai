@@ -1,65 +1,51 @@
-# ADR-0019: Height-Calibration Probe and Gate Before Height-Bearing Bakes
+# ADR-0019: Foreshortening/Aspect Calibration Probe Before Height-Bearing Bakes
 
 - Status: Proposed
 - Date: 2026-06-05
+- Supersedes: an earlier draft that framed the gate as a *pixel-height* (`height_world×24`) equality check. That absolute sizing is an **engine** concern (`render.rs::sprite_size`), **not** a bake gate — see the Decision.
 - Blocks: M2A combat surfaces; M3 height-bearing variants
-- Related: ADR-0018 (height pixel scale), ADR-0015 (arrow direction probe), ADR-0013 (M2A harness), ADR-0014 (validator/runtime)
+- Related: ADR-0018 (elevation/sizing), ADR-0015 (arrow direction probe), ADR-0013, ADR-0014
 
 ## Context
 
-ADR-0018 pins vertical projection by an explicit height pixel scale rather than the camera elevation. That number must be **verified against the running engine before** real character variants are baked — otherwise a wrong height scale is found only after the catalogue exists, forcing the full re-bake an undetected height-scale error would otherwise cause. M1 set the pattern: a tiny deterministic probe proves one engine-facing assumption in pixels (the arrow proved direction + ground projection). Height needs the same.
+The flat arrow probe proved the ground/direction convention but is elevation-immune
+(no height), so it **cannot** reveal whether the bake's 30° height **foreshortening** is
+correct. Per ADR-0018 the engine applies the absolute `height_world×24` sizing; the bake
+owns the 30° foreshortening (which sets the frame **aspect** + internal proportions). A
+wrong elevation shows up as a wrong foreshortening/aspect, and is the one irreversible
+mistake (it forces a re-bake), so it must be gated before any real 3D bake.
 
 ## Decision
 
-> **⚠️ SUPERSEDED — see the Resolution section at the end of this ADR.** The bake-side
-> gate is a **foreshortening / aspect** check at 30°, **not** a pixel-height equality
-> check — the `height_world × 24` pixel height is an **engine** test
-> (`render.rs::sprite_size`), not a bake gate. Do not build the redundant pixel-height
-> gate in R3.
+Add a **foreshortening/aspect calibration probe** — a known-proportion 3D object (e.g. a
+`1×1×H` box / pole, plus a cube) rendered through the production 30° bake path.
 
-Add a **height-calibration probe** — the vertical analogue of the arrow direction probe — and gate height-bearing bakes on it.
-
-- The probe is a known-height vertical reference (e.g., posts of exactly 1.00 m and 2.00 m at the origin), rendered through the production bake path.
-- **Machine gate:** each reference's rendered pixel height equals `height_world · height_px_per_world_unit` within a tight tolerance (e.g., ±1 px), and the base sits on the anchor (origin == anchor, ground contact).
-- **Human gate:** the probe overlaid at its engine-computed screen position lines up at top and bottom (a debug sheet, like the arrow sheet).
-- **No height-bearing variant (M2A or M3) is baked until this probe passes** against the engine's pinned factor. Flat/probe assets are exempt.
-- The probe's measured factor is written to its manifest and is the value ADR-0018's validator/runtime checks assert against.
+- **Bake-side gate (this IS a bake gate):** the rendered object's **aspect / internal
+  proportions** match the 30° orthographic projection prediction within tolerance. This is
+  what catches a wrong elevation.
+- This is **NOT** a "rendered pixel height == `height_world×24`" check — that absolute
+  sizing is applied by the **engine** (`render.rs::sprite_size`) and is verified by an
+  **engine** test, not a bake gate.
+- No height-bearing variant (M2A/M3) is baked until this passes. Flat/probe assets exempt.
 
 ## Consequences
 
 ### Positive
-
-- Catches a wrong height scale on one 5-minute asset instead of the whole roster.
-- Turns ADR-0018's "·24" from an assumption into a measured, regression-tested fact.
-- Reuses the proven probe → atlas → manifest → validator path.
+- Catches a wrong elevation on one tiny object, not the whole roster.
+- Reuses the R1 renderer + the probe → atlas → manifest → validator path.
+- No confusion with engine-side absolute sizing.
 
 ### Negative
-
-- One more gate before real art.
-- Needs the engine to expose (or confirm) where it expects the top of a known-height unit on screen.
+- One more gate before real art; needs a known-proportion reference object.
 
 ## Validation requirements
-
-- Probe manifest validates; `height_px_per_world_unit` recorded.
-- Rendered reference heights match `height_world · factor` within tolerance.
-- Anchor/base alignment holds (origin == anchor, ground contact).
-- Gate wired into the M2A/M3 pre-bake checks (CI).
+- The calibration object's rendered **aspect** matches the 30° projection within tolerance.
+- `camera_elevation_degrees == 30` (ADR-0018); 26.565 rejected.
+- Anchor / ground-contact correct.
 
 ## M1/M2 assumption
-
-Not part of M1/M2 (flat arrow). The probe is added at M2A, before the first height-bearing asset.
+Not part of M1/M2 (flat arrow). Added at M2A / R3, before the first height-bearing asset.
 
 ## M3 review questions
-
-- Reference heights and tolerance (±1 px? sub-pixel?).
-- Should the probe also calibrate eye height (ADR-0007) for muzzle/projectile alignment?
-- Merge the height probe with the arrow direction probe into one calibration asset?
-
-## Resolution (2026-06-05, from engine `render.rs`)
-
-The engine sizes sprites by `height_world × 24` (`render.rs::sprite_size`), so the
-calibration is **bake-side foreshortening**, not "24 px/unit in the bake." The probe
-verifies that a known-proportion 3D object, rendered through the **30°** camera, has the
-**rendered aspect / internal proportions** the 30° projection predicts (a wrong elevation
-shows up here as a wrong aspect). The engine-side `2 m → 48 px` (`height_world×24`) is a
-separate **engine** test, not a bake gate. Gate this before any 3D height bake.
+- Reference object(s) + tolerance (aspect-implied extents to ±1 px?).
+- Should this merge with the direction probe into one calibration asset?
