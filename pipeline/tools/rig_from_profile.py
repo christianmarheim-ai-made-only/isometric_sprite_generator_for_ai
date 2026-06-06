@@ -1,0 +1,128 @@
+"""In-Blender: assemble an UNRIGGED part-mesh glb + a rig profile into a RIGGED glb.
+
+Some producers deliver a model as separate body-part meshes (e.g. torso_body, head_head,
+arms_front_leg_0) plus a rig PROFILE (bone head/tail/parent positions) plus anim clips that target
+the profile's bone names -- but NOT an actual armature in the glb. bake_anim_from_json then fails
+"no armature found". This tool builds the armature from the profile and rigidly skins each part-mesh
+to its NEAREST bone (vertex group weight 1 + armature modifier), so the part follows that bone (and,
+via the bone hierarchy, its parent's keyed motion). Rigid part-skinning is the natural choice for a
+part-based mesh -- no weight painting, deterministic.
+
+  blender --background --python rig_from_profile.py -- IN_UNRIGGED.glb RIG_PROFILE.json UP OUT_RIGGED.glb
+
+UP = the asset's geometry.up ("z" or "y"): a Z-up-authored glb is stood upright before rigging so it
+aligns with the profile's +Z-up bone frame; the exported glb is standard glTF (Y-up), so the asset's
+geometry.up for the RIGGED glb is "y".
+"""
+import bpy, sys, json, math
+from mathutils import Matrix, Vector
+
+argv = sys.argv[sys.argv.index("--") + 1:]
+GLB, PROFILE, UP, OUT = argv[0], argv[1], argv[2], argv[3]
+MATERIALS = argv[4] if len(argv) > 4 else None   # optional sidecar materials.json (region + base_color)
+
+for o in list(bpy.data.objects):           # clean default scene (cube/camera/light) so it doesn't export
+    bpy.data.objects.remove(o, do_unlink=True)
+
+prof = json.loads(open(PROFILE, encoding="utf-8").read())
+
+before = set(bpy.data.objects)
+bpy.ops.import_scene.gltf(filepath=GLB)
+meshes = [o for o in bpy.data.objects if o not in before and o.type == 'MESH']
+if not meshes:
+    raise SystemExit("rig_from_profile: no meshes imported")
+
+# Stand a Z-up-authored glb upright (Blender's glTF import lays it on -Y) so it aligns with the
+# profile's +Z-up bone positions before we measure centroids + skin.
+if UP == "z":
+    rot = Matrix.Rotation(math.radians(-90.0), 4, 'X')
+    for m in meshes:
+        m.matrix_world = rot @ m.matrix_world
+    bpy.context.view_layer.update()
+
+# Build the armature from the profile (bones are in the +Z-up rig frame == the corrected mesh frame).
+arm_data = bpy.data.armatures.new("rig")
+arm = bpy.data.objects.new(prof["rig_profile"], arm_data)
+bpy.context.collection.objects.link(arm)
+bpy.context.view_layer.objects.active = arm
+bpy.ops.object.mode_set(mode='EDIT')
+ebones = {}
+for b in prof["bones"]:
+    eb = arm_data.edit_bones.new(b["name"])
+    eb.head = Vector(b["head"])
+    eb.tail = Vector(b["tail"])
+    if (eb.tail - eb.head).length < 1e-4:   # zero-length bones are deleted by Blender
+        eb.tail = eb.head + Vector((0.0, 0.0, 0.02))
+    ebones[b["name"]] = eb
+for b in prof["bones"]:
+    if b.get("parent") and b["parent"] in ebones:
+        ebones[b["name"]].parent = ebones[b["parent"]]
+bpy.ops.object.mode_set(mode='OBJECT')
+
+# Nearest-bone proximity (exclude the static root). Each part-mesh binds 100% to one bone.
+bone_mid = {b["name"]: (Vector(b["head"]) + Vector(b["tail"])) / 2
+            for b in prof["bones"] if b["name"] != "root"}
+
+
+def nearest_bone(c):
+    return min(bone_mid, key=lambda bn: (bone_mid[bn] - c).length)
+
+
+for m in meshes:
+    cen = sum((m.matrix_world @ v.co for v in m.data.vertices), Vector()) / max(1, len(m.data.vertices))
+    bone = nearest_bone(cen)
+    vg = m.vertex_groups.new(name=bone)
+    vg.add([v.index for v in m.data.vertices], 1.0, 'REPLACE')
+    mod = m.modifiers.new(name="Armature", type='ARMATURE')
+    mod.object = arm
+    m.parent = arm
+    m.matrix_parent_inverse = arm.matrix_world.inverted()   # keep the mesh in place under the new parent
+    print(f"RIG: {m.name} -> {bone}")
+
+# Material fix-up: the delivered glb carries generic DefaultMaterial names with no base colour, but
+# the region + colour intent lives in the part-mesh OBJECT names (torso_body, head_head, ...) and the
+# sidecar materials.json. Name each mesh's material after the mesh (so region_source=material_name
+# resolves head/torso/arms/legs) and paint its base colour from the sidecar -- so the bake renders the
+# right per-region colour instead of flat grey, and the R8 hitmask gets all four regions.
+_KW = [("head", 1), ("torso", 2), ("body", 2), ("arm", 3), ("leg", 4)]
+
+
+def _region(name):
+    n = name.lower()
+    for kw, r in _KW:
+        if kw in n:
+            return r
+    return 2
+
+
+_region_color = {}
+if MATERIALS:
+    for mm in json.loads(open(MATERIALS, encoding="utf-8").read()).get("materials", []):
+        _region_color.setdefault(_region(mm.get("name", "") + " " + (mm.get("region") or "")), mm.get("base_color"))
+
+# The delivered glb's imported materials carry a tangled node graph (broken texture nodes, vertex-colour
+# attribute links into Base Color) that the glTF exporter resolves to flat 0.8 grey no matter what we set
+# on the Principled default_value. Rather than untangle it, REPLACE each part-mesh's material with a clean,
+# fresh single-Principled material named after the mesh -- the region keyword lives in the name (so
+# region_source=material_name resolves head/torso/arms/legs) and the base colour comes from the sidecar.
+# A clean material round-trips through glTF export reliably (verified), so the bake renders true per-region
+# colour instead of grey.
+for m in meshes:
+    col = _region_color.get(_region(m.name)) or (0.8, 0.8, 0.8)
+    newmat = bpy.data.materials.new(name=m.name)
+    newmat.use_nodes = True
+    bsdf = next(n for n in newmat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    bsdf.inputs['Base Color'].default_value = (col[0], col[1], col[2], 1.0)
+    newmat.diffuse_color = (col[0], col[1], col[2], 1.0)
+    m.data.materials.clear()
+    m.data.materials.append(newmat)
+    # Strip vertex-colour attributes: if present, the glTF exporter writes a COLOR_0 stream and the
+    # re-importer wires Color-Attribute -> Mix -> Principled Base Color, which parks the real baseColor
+    # off the Principled default (left at flat 0.8 grey). MATERIAL-mode bake reads that default -> grey.
+    # We want flat per-region colour, so drop the vertex colours entirely.
+    while m.data.color_attributes:
+        m.data.color_attributes.remove(m.data.color_attributes[0])
+    print(f"MAT: {m.name} -> region {_region(m.name)}  base {[round(c, 2) for c in (col[0], col[1], col[2])]}")
+
+bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', use_selection=False)
+print(f"RIGGED -> {OUT}  ({len(meshes)} parts, {len(prof['bones'])} bones)")

@@ -1,0 +1,80 @@
+{
+  "model_source_version": "procedural_prop_model_source_v1",
+  "asset_id": "red_ball_arrow_v1",
+  "asset_name": "Red Ball With Dual Forward Arrows",
+  "variant_class": "effect",
+  "source_format": "gltf",
+  "source_file": "red_ball_arrow_v1.glb",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "ground_footprint_center",
+  "art_direction": {
+    "style": "clean readable gameplay prop",
+    "silhouette": "simple sphere with two painted black arrows on opposite sides, both pointing in the same forward/rolling direction",
+    "concept_art": "red_ball_arrow_v1_concept_art.png",
+    "important_marker_rule": "When viewed from the front or the top, the visible arrow points downward. The opposite-side arrow also points downward relative to that local view, so as the ball rolls one arrow rotates out while the opposite arrow rotates in."
+  },
+  "visual_objects": [
+    "torso_ball_body"
+  ],
+  "hit_proxy_objects": [
+    {
+      "name": "torso_ball_body",
+      "region": "torso"
+    }
+  ],
+  "metric_proxy_objects": [
+    "torso_ball_body"
+  ],
+  "sockets": [
+    "center_socket",
+    "eye_socket",
+    "pelvis_ring_center",
+    "shoulder_ring_center",
+    "forward_marker_socket"
+  ],
+  "clips_states": [
+    {
+      "state": "idle",
+      "frames": 1,
+      "playback": "loop",
+      "clip": "idle",
+      "directional": true
+    },
+    {
+      "state": "roll",
+      "frames": 6,
+      "playback": "loop",
+      "clip": "roll",
+      "directional": true
+    },
+    {
+      "state": "pop",
+      "frames": 5,
+      "playback": "once",
+      "clip": "pop",
+      "directional": true
+    },
+    {
+      "state": "explode",
+      "frames": 8,
+      "playback": "once",
+      "clip": "explode",
+      "directional": true
+    }
+  ],
+  "world_metrics": {
+    "height_world": 0.8,
+    "visual_height_world": 0.8,
+    "footprint_radius_world": 0.4,
+    "eye_height_world": 0.4,
+    "eye_position_world": [
+      0.0,
+      0.0,
+      0.4
+    ],
+    "body_center_height_world": 0.4
+  },
+  "notes": "Ball package uses body-center analogs for pelvis/shoulder orbit metadata because the prop has no anatomical pelvis or shoulders."
+}

@@ -1,0 +1,63 @@
+{
+  "asset_contract_version": "external_asset_v1",
+  "variant_id": "cow_brown_farm_v1",
+  "archetype": "quadruped",
+  "files": {
+    "mesh": "cow_brown_farm_v1_rigged.glb",
+    "animation_clips": "cow_brown_farm_v1_anim.json"
+  },
+  "geometry": {
+    "up": "y",
+    "forward": "+x",
+    "unit": "meter"
+  },
+  "rig": "quadruped_v1",
+  "region_source": "material_name",
+  "default_state": "idle",
+  "textures": {
+    "base_color": "cow_brown_farm_v1_texture_atlas.png"
+  },
+  "animations": {
+    "idle": {
+      "clip": "idle",
+      "frames": 4,
+      "fps": 6,
+      "playback": "loop"
+    },
+    "walk": {
+      "clip": "walk",
+      "frames": 8,
+      "fps": 10,
+      "playback": "loop"
+    },
+    "run": {
+      "clip": "run",
+      "frames": 8,
+      "fps": 14,
+      "playback": "loop"
+    },
+    "graze": {
+      "clip": "graze",
+      "frames": 8,
+      "fps": 8,
+      "playback": "loop"
+    },
+    "hit": {
+      "clip": "hit",
+      "frames": 5,
+      "fps": 12,
+      "playback": "once"
+    },
+    "death": {
+      "clip": "death",
+      "frames": 8,
+      "fps": 10,
+      "playback": "once"
+    }
+  },
+  "world_metrics": {
+    "height_world": 1.62,
+    "footprint_radius_world": 0.42,
+    "eye_height_world": 1.43
+  }
+}

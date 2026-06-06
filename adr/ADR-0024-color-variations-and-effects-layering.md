@@ -100,6 +100,25 @@ The unifying principle this ADR adopts: **STATIC, per-unit visual identity is re
    **front-arc + back-arc pair** (two entities depth-offset around the anchor) to wrap correctly, or
    accept a whole-ring-at-one-depth for cheap. This is the one place effect multiplicity meets the
    height-ignores-depth caveat (B.5).
+7. **The orbit RADIUS is per-creature too — body-width-aware, not just height-aware (the fat-body
+   rule).** B.5 made the core anchor's *height* per-creature so the orb floats at the right z. An
+   *enveloping* orbit's RADIUS must be per-creature for the same reason: a radius authored for a THIN
+   body, reused on a FAT one, sweeps a circle that ends up **inside** the fat silhouette — the orb
+   clips through the chest/rump instead of circling clear of it. So a ring's radius is the body's
+   horizontal half-extent **at that ring's height**, plus a clearance — a fat cow needs a wider orbit
+   than a thin figure at the same core height:
+   `radius_world >= body_half_extent(plane, height) + clearance`. A machine-checkable lower bound falls
+   out of data we already ship — the **torso-region AABB in the hitbox** (ADR-0006): the max radial
+   distance from the ring centre to the torso-AABB corners in the ring plane under-estimates
+   `body_half_extent`, so `radius_world >= torso_half_extent + clearance` is auditable without opening
+   the mesh. Confirmed by the first two real deliveries: the round ball's enveloping equator ring sets
+   `radius 0.52` over a `0.40` torso half-extent (a clean `0.12` clearance); the cow's long barrel
+   torso reaches `~0.81` half-extent at its pelvis ring, so the same `~0.34` circle that hugs a thin
+   body would **spear the cow** — a deliberately *hugging* contact ring (the cow's delivered
+   `pelvis_ring`) is therefore a conscious opt-out that MUST say so in its `note`. This lives in the
+   **`spell_orbits` companion file** (per named ring: `center_world`, `height_world`, `radius_world`,
+   `plane`, optional `clearance_*`) — a runtime/engine sidecar like sockets, **additive and never
+   consumed by the bake** — the same anchor machinery a held weapon uses (ADR-0021).
 
 ## Consequences
 
@@ -134,7 +153,9 @@ The unifying principle this ADR adopts: **STATIC, per-unit visual identity is re
 - Greyscale-authoring convention: do we add a pipeline check/warning that a creature declared
   `recolorable` is actually low-saturation (so tints read), mirroring the build-log detector pattern?
 - **Which sockets are effect-bindable**, and do they carry per-anchor orbit defaults (radius, plane,
-  instance spacing) as emitted data or purely game-side? (additive either way; B.6.)
+  instance spacing) as emitted data or purely game-side? (Emitted today as the `spell_orbits`
+  companion file, B.7; **per-ring radius is per-creature + body-width-aware** — bounded below by the
+  torso-AABB half-extent plus a clearance, so a thin-body orbit is never silently reused on a fat one.)
 - **Continuous-loop effects** (rings/auras that wrap the body) need a front-arc/back-arc split
   convention engine-side (B.6) — define it when the first wrapping effect ships; discrete-orb sets
   (fireballs) need nothing.

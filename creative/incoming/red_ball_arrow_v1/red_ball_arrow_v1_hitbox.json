@@ -1,0 +1,33 @@
+{
+  "hitbox_spec_version": "hitbox_v1",
+  "from_mesh": "red_ball_arrow_v1.glb",
+  "unit": "meter",
+  "up": "z",
+  "world_metrics": {
+    "height_world": 0.8,
+    "footprint_radius_world": 0.4,
+    "eye_height_world": 0.4,
+    "unit": "meter"
+  },
+  "collision_capsule": {
+    "radius_world": 0.4,
+    "height_world": 0.8,
+    "note": "Sphere approximated as capsule with equal height and diameter."
+  },
+  "regions": {
+    "torso": {
+      "id": 2,
+      "aabb_min": [
+        -0.4,
+        -0.4,
+        0.0
+      ],
+      "aabb_max": [
+        0.4,
+        0.4,
+        0.8
+      ]
+    }
+  },
+  "hitmask_note": "Single-region torso hitmask for the full sphere."
+}

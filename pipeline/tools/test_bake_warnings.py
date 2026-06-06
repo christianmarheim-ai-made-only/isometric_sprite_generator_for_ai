@@ -7,6 +7,8 @@ failure into build_log warnings (surfaced per-variant in build_index, so a BATCH
   - world_metrics_mismatch : authored vs measured height diverge (wrong scale / lying down)
   - non_upright_biped      : a biped silhouette that is landscape, not portrait
   - degenerate_uv          : a textured material whose UVs collapse -> renders flat
+  - base_color_linked      : a material's Base Color is node-driven (vertex-colour Mix from a glTF
+                             re-import), not the Principled default -> risk of silent flat-grey render
 Pure Python, fast (no Blender).
 
 Run: python pipeline/tools/test_bake_warnings.py
@@ -57,6 +59,13 @@ def main() -> int:
                               "test", meta={"degenerate_uv_materials": ["coat", "sash"]})
         ok &= check("degenerate_uv: 2 collapsed materials -> 2 warnings",
                     [w["code"] for w in deg["warnings"]].count("degenerate_uv") == 2)
+
+        # base_color_linked: a glTF re-import wiring vertex-colour Mix into Base Color renders SILENT grey
+        bcl = write_build_log(Path(td), {"variant_id": "c", "animations": {}, "frames": [],
+                                         "atlases": {"color": {"size": [10, 10]}}},
+                              "test", meta={"base_color_linked_materials": ["torso_body", "head_head"]})
+        ok &= check("base_color_linked: 2 node-driven base colours -> 2 warnings",
+                    [w["code"] for w in bcl["warnings"]].count("base_color_linked") == 2)
 
         bad = {"variant_id": "b", "world_metrics": {"height_world": 1.03}, "animations": {},
                "frames": [{"rect": [0, 0, 134, 76]}] * 16, "atlases": {"color": {"size": [10, 10]}}}

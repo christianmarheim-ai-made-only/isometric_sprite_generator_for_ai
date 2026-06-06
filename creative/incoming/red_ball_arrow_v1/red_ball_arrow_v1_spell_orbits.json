@@ -1,0 +1,31 @@
+{
+  "spell_orbit_spec_version": "spell_orbit_points_v1",
+  "asset_id": "red_ball_arrow_v1",
+  "unit": "meter",
+  "pelvis_ring": {
+    "semantic_role": "body_center_analog",
+    "center_world": [
+      0.0,
+      0.0,
+      0.4
+    ],
+    "height_world": 0.4,
+    "radius_world": 0.52,
+    "plane": "xy",
+    "note": "Ball has no anatomical pelvis; use equator ring around body center as the pelvis-ring analog."
+  },
+  "shoulder_ring": {
+    "semantic_role": "upper_body_analog",
+    "center_world": [
+      0.0,
+      0.0,
+      0.56
+    ],
+    "height_world": 0.56,
+    "radius_world": 0.34,
+    "plane": "xy",
+    "clearance_above_head_world": 0.24,
+    "clearance_below_belly_world": 0.22,
+    "note": "Upper-hemisphere ring keeps rotating spell VFX off the floor and below the topmost silhouette."
+  }
+}

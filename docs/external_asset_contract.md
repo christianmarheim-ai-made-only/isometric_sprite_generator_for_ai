@@ -115,6 +115,40 @@ Every face needs a body **HIT region** so the pipeline can emit the R8 hit-mask.
 names match no keyword and fall back to `torso` like any unmatched name. 5–7 are reserved in the
 palette for a future gear iteration — do not attempt to author them.
 
+## 4b. spell_orbits (companion data — not consumed by the bake)
+
+Optional sidecar `<variant>_spell_orbits.json` (`spell_orbit_spec_version: spell_orbit_points_v1`)
+describing where **orbiting / enveloping effects** (an orb circling the body, a status ring, a shield
+bubble) pivot and how wide they sweep. Like `_sockets.json` and `_hitbox.json`, it is **engine/runtime
+data the bake never reads** — additive and reviewable, never a baked pixel. It is the data side of
+ADR-0024's per-creature effect `core` anchor.
+
+Each entry is a **named ring** (e.g. `pelvis_ring`, `shoulder_ring`) carrying, in **metres, world
+space** (same frame as the mesh/hitbox, origin = ground footprint centre, up per `geometry.up`):
+`center_world [x,y,z]` (the orbit pivot; SHOULD equal the matching `<ring>_center` socket — its `z` is
+the **per-creature core height**), `height_world` (= `center_world[2]`), `radius_world` (the in-plane
+sweep radius — **per-creature and body-width-aware**, see below), `plane` (`"xy"`/`"xz"`/`"yz"`), and
+optional `clearance_above_head_world` / `clearance_below_belly_world` / `clearance_radial_world`,
+`left_anchor_world` / `right_anchor_world` (discrete attach points), `semantic_role` (for
+non-anatomical bodies, e.g. a ball's equator as a `body_center_analog` ring), and `note`.
+
+**The fat-body invariant (normative).** For any ring meant to **encircle** the body, `radius_world`
+MUST clear the body silhouette at the ring's height:
+
+```
+radius_world  >=  body_half_extent(plane, height_world)  +  clearance_radial_world
+```
+
+An orbit sized for a THIN creature, reused on a FAT one, otherwise sweeps a circle **inside** the fat
+body — the effect clips through the chest/rump instead of circling it. A conservative, mesh-free lower
+bound for `body_half_extent` of an `xy` ring is the **torso-region AABB** in `_hitbox.json`: the max
+radial distance from `center_world` to the torso-AABB corners in the ring plane. So
+`radius_world >= torso_half_extent + clearance_radial_world` is checkable from data you already ship.
+(Worked from the first deliveries: the round ball's equator ring `radius 0.52` over a `0.40` torso
+half-extent; the cow's long barrel torso reaches `~0.81`, so a thin-body radius would spear it.) A ring
+that **deliberately hugs** the body on its long axis (a contact/trim effect, like the cow's delivered
+`pelvis_ring`) is a conscious opt-out and MUST say so in its `note`.
+
 ## 5. Rig / skeleton (only if you ship animation)
 
 - An **armature/skeleton** with bones named **exactly** per a **rig profile** (the shared bone

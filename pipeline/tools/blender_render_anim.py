@@ -32,8 +32,22 @@ scene.view_settings.view_transform = 'Standard'
 before = set(bpy.data.objects)
 bpy.ops.import_scene.gltf(filepath=MESH_FILE)
 imported = [o for o in bpy.data.objects if o not in before]
-obj = next(o for o in imported if o.type == 'MESH')
 arm = next((o for o in imported if o.type == 'ARMATURE'), None)
+meshes = [o for o in imported if o.type == 'MESH']
+# Multi-PART delivery (e.g. a quadruped built as separate body-part meshes): JOIN the
+# material-bearing meshes into one so height/footprint, region assignment, and texture/UV checks
+# cover the WHOLE model. Measuring only the first mesh gives a torso-only hitmask + a too-short
+# height. 0-material marker meshes (the generators' stray Icosphere) are excluded, so single-mesh
+# deliveries -- and grunt/sparrow's Icosphere -- are unchanged.
+real = [m for m in meshes if len(m.data.materials) > 0] or meshes
+if len(real) > 1:
+    for o in bpy.data.objects:
+        o.select_set(False)
+    for mo in real:
+        mo.select_set(True)
+    bpy.context.view_layer.objects.active = real[0]
+    bpy.ops.object.join()
+obj = real[0]
 root_obj = arm if arm else obj
 
 # Honor the asset's declared up-axis. Blender's glTF importer ALWAYS assumes the file is glTF
@@ -76,11 +90,45 @@ if has_tex and obj.data.uv_layers:
             _v = [_uv[li].uv[1] for li in _loops]
             if max(max(_u) - min(_u), max(_v) - min(_v)) < 1e-4:
                 degenerate_uv.append(_mat.name)
-for _m in obj.data.materials:  # show the real PBR base color in MATERIAL mode (Workbench reads diffuse_color)
+# Resolve each material's flat MATERIAL-mode colour (Workbench reads diffuse_color). A clean factor-only
+# material carries the colour on the Principled Base Color socket default. But a glTF re-import of a mesh
+# that shipped vertex colours wires Color-Attribute -> Mix -> Base Color: the socket default is left at
+# flat 0.8 grey while the real colour sits on an upstream constant input. Reading the default then renders
+# SILENTLY grey. Detect that case (base_color_linked_materials warning) and best-effort recover the
+# upstream constant colour by walking the feeder nodes for the first unlinked colour input.
+base_color_linked = []
+
+
+def _flat_base_color(bsdf):
+    bc = bsdf.inputs['Base Color']
+    if not bc.is_linked:
+        return bc.default_value
+    stack = [lk.from_node for lk in bc.links]
+    seen = set()
+    while stack:
+        n = stack.pop()
+        if n in seen:
+            continue
+        seen.add(n)
+        for inp in n.inputs:
+            if inp.is_linked:
+                stack.extend(lk.from_node for lk in inp.links)
+            elif hasattr(inp, 'default_value'):
+                try:
+                    if len(inp.default_value) >= 3:   # first unlinked colour constant == baseColorFactor
+                        return inp.default_value
+                except TypeError:
+                    pass
+    return bc.default_value
+
+
+for _m in obj.data.materials:
     if _m and _m.use_nodes:
         _b = next((n for n in _m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
         if _b is not None:
-            _c = _b.inputs['Base Color'].default_value
+            if _b.inputs['Base Color'].is_linked:
+                base_color_linked.append(_m.name)
+            _c = _flat_base_color(_b)
             _m.diffuse_color = (_c[0], _c[1], _c[2], 1.0)
 
 right = Vector((1.0, -1.0, 0.0)).normalized()
@@ -176,6 +224,7 @@ meta = {
     "region_fallback_materials": region_fallback,
     "missing_clips": missing_clips,
     "degenerate_uv_materials": degenerate_uv,
+    "base_color_linked_materials": base_color_linked,
     "blender_version": bpy.app.version_string,
 }
 json.dump(meta, open(os.path.join(OUT, "anim_meta.json"), "w"), indent=2)

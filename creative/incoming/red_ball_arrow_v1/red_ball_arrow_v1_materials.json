@@ -1,0 +1,23 @@
+{
+  "materials_spec_version": "materials_v1",
+  "asset_id": "red_ball_arrow_v1",
+  "materials": [
+    {
+      "name": "torso_ball_body",
+      "region": "torso",
+      "base_color": [
+        0.9,
+        0.14,
+        0.12,
+        1.0
+      ],
+      "surface": "matte painted rubber",
+      "texture": "red_ball_arrow_v1_texture_atlas.png"
+    }
+  ],
+  "marker_paint": {
+    "count": 2,
+    "placement": "opposite sides of sphere",
+    "forward_marker_orientation_rule": "front and top views show the arrow pointing down"
+  }
+}

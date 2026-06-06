@@ -1,0 +1,18 @@
+{
+  "package_manifest_version": "generated_asset_package_v1",
+  "asset_id": "cow_brown_farm_v1",
+  "package_role": "quadruped character",
+  "entry_files": {
+    "glb_mesh": "cow_brown_farm_v1.glb",
+    "source_asset": "cow_brown_farm_v1.source_asset.json",
+    "model_source": "cow_brown_farm_v1.model_source.json",
+    "animation_data": "cow_brown_farm_v1_anim.json",
+    "hitbox": "cow_brown_farm_v1_hitbox.json",
+    "physical_metrics": "cow_brown_farm_v1_physical_metrics.json",
+    "spell_orbits": "cow_brown_farm_v1_spell_orbits.json",
+    "sockets": "cow_brown_farm_v1_sockets.json",
+    "materials": "cow_brown_farm_v1_materials.json",
+    "texture_atlas": "cow_brown_farm_v1_texture_atlas.png"
+  },
+  "notes": "This package is designed to be machine-readable and editable. A schema-valid external_asset_v1 manifest is not included when the current contract lacks the needed archetype/rig."
+}

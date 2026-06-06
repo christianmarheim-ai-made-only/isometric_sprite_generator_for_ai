@@ -1,0 +1,60 @@
+{
+  "asset_id": "red_ball_arrow_v1",
+  "variant_class": "effect",
+  "source_format": "gltf",
+  "source_file": "red_ball_arrow_v1.glb",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "ground_footprint_center",
+  "visual_objects": [
+    "torso_ball_body"
+  ],
+  "hit_proxy_objects": [
+    {
+      "name": "torso_ball_body",
+      "region": "torso"
+    }
+  ],
+  "metric_proxy_objects": [
+    "torso_ball_body"
+  ],
+  "sockets": [
+    "center_socket",
+    "eye_socket",
+    "pelvis_ring_center",
+    "shoulder_ring_center",
+    "forward_marker_socket"
+  ],
+  "clips_states": [
+    {
+      "state": "idle",
+      "frames": 1,
+      "playback": "loop",
+      "clip": "idle",
+      "directional": true
+    },
+    {
+      "state": "roll",
+      "frames": 6,
+      "playback": "loop",
+      "clip": "roll",
+      "directional": true
+    },
+    {
+      "state": "pop",
+      "frames": 5,
+      "playback": "once",
+      "clip": "pop",
+      "directional": true
+    },
+    {
+      "state": "explode",
+      "frames": 8,
+      "playback": "once",
+      "clip": "explode",
+      "directional": true
+    }
+  ],
+  "notes": "The two painted arrows live on opposite sides of the sphere and both indicate the same forward rolling direction. Front/top views show the arrow pointing downward."
+}

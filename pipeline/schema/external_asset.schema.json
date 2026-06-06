@@ -9,7 +9,7 @@
   "properties": {
     "asset_contract_version": { "const": "external_asset_v1" },
     "variant_id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "unique per variant; becomes the output dir name, so two assets must not share it" },
-    "archetype": { "enum": ["biped", "bird"], "description": "logical family; selects the shared rig + animation library. Add a value here when a new archetype is introduced." },
+    "archetype": { "enum": ["biped", "bird", "quadruped", "ball"], "description": "logical family; selects the shared rig + animation library. Add a value here when a new archetype is introduced. (quadruped: 4-legged creatures, forelegs->arms / hindlegs->legs region reuse; ball: rolling-ball prop.)" },
     "files": {
       "type": "object",
       "additionalProperties": false,

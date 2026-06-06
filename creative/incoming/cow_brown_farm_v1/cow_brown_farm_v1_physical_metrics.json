@@ -1,0 +1,39 @@
+{
+  "physical_metrics_version": "physical_metrics_v1",
+  "asset_id": "cow_brown_farm_v1",
+  "unit": "meter_kg_second",
+  "metrics_source": "authored_from_metric_proxy_volume",
+  "density_profile": "bovine_v1",
+  "density_kg_per_m3": 985.0,
+  "body_volume_m3": 0.457,
+  "mass_kg": 450.0,
+  "weight_newtons_earth": 4412.993,
+  "gravity_m_per_s2": 9.80665,
+  "volume_policy": "Closed bovine metric proxy excluding horn tips and tail tuft.",
+  "metric_proxy_volume_breakdown_m3": [
+    {
+      "name": "torso_body_proxy",
+      "volume_m3": 0.275
+    },
+    {
+      "name": "head_neck_proxy",
+      "volume_m3": 0.052
+    },
+    {
+      "name": "front_legs_pair_proxy",
+      "volume_m3": 0.048
+    },
+    {
+      "name": "hind_legs_pair_proxy",
+      "volume_m3": 0.05
+    },
+    {
+      "name": "pelvis_proxy",
+      "volume_m3": 0.02
+    },
+    {
+      "name": "udder_proxy",
+      "volume_m3": 0.012
+    }
+  ]
+}

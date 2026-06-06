@@ -1,0 +1,13 @@
+{
+  "physical_metrics_version": "physical_metrics_v1",
+  "asset_id": "red_ball_arrow_v1",
+  "unit": "meter_kg_second",
+  "metrics_source": "authored_from_metric_proxy_volume",
+  "density_profile": "rubber_v1",
+  "density_kg_per_m3": 1100.0,
+  "body_volume_m3": 0.268083,
+  "mass_kg": 294.891,
+  "weight_newtons_earth": 2891.891,
+  "gravity_m_per_s2": 9.80665,
+  "volume_policy": "Solid spherical gameplay prop volume."
+}

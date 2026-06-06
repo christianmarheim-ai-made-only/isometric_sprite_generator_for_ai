@@ -1,0 +1,66 @@
+{
+  "materials_spec_version": "materials_v1",
+  "asset_id": "cow_brown_farm_v1",
+  "materials": [
+    {
+      "name": "head_head",
+      "region": "head",
+      "base_color": [
+        0.59,
+        0.35,
+        0.19,
+        1.0
+      ],
+      "surface": "short fur",
+      "texture": "cow_brown_farm_v1_texture_atlas.png"
+    },
+    {
+      "name": "head_muzzle",
+      "region": "head",
+      "base_color": [
+        0.74,
+        0.58,
+        0.43,
+        1.0
+      ],
+      "surface": "soft skin/fur mix",
+      "texture": "cow_brown_farm_v1_texture_atlas.png"
+    },
+    {
+      "name": "torso_body",
+      "region": "torso",
+      "base_color": [
+        0.57,
+        0.34,
+        0.18,
+        1.0
+      ],
+      "surface": "short fur",
+      "texture": "cow_brown_farm_v1_texture_atlas.png"
+    },
+    {
+      "name": "arms_front_leg_0",
+      "region": "arms",
+      "base_color": [
+        0.43,
+        0.26,
+        0.14,
+        1.0
+      ],
+      "surface": "leg fur",
+      "texture": "cow_brown_farm_v1_texture_atlas.png"
+    },
+    {
+      "name": "legs_hind_leg_2",
+      "region": "legs",
+      "base_color": [
+        0.43,
+        0.26,
+        0.14,
+        1.0
+      ],
+      "surface": "leg fur",
+      "texture": "cow_brown_farm_v1_texture_atlas.png"
+    }
+  ]
+}

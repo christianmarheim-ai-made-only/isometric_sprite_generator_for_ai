@@ -140,6 +140,11 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
     for nm in meta.get("degenerate_uv_materials", []):
         warnings.append({"code": "degenerate_uv", "severity": "warn",
                          "detail": f"material '{nm}' has collapsed UVs -> textured but renders FLAT per-material (no detail)"})
+    for nm in meta.get("base_color_linked_materials", []):
+        warnings.append({"code": "base_color_linked", "severity": "warn",
+                         "detail": f"material '{nm}' Base Color is driven by a node graph (e.g. vertex-colour Mix from a "
+                                   "glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from "
+                                   "the upstream constant; verify the rendered colour (risk of silent flat grey)"})
     eff, over = _packing(manifest)
     if over:
         warnings.append({"code": "oversize_atlas_page", "severity": "error",

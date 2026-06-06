@@ -1,0 +1,53 @@
+{
+  "asset_id": "red_ball_arrow_v1",
+  "checks": [
+    {
+      "file": "red_ball_arrow_v1.source_asset.json",
+      "schema": "source_asset",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "file": "red_ball_arrow_v1_anim.json",
+      "schema": "animation_clips",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "file": "red_ball_arrow_v1_hitbox.json",
+      "schema": "hitbox",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "file": "red_ball_arrow_v1.glb",
+      "exists": true
+    },
+    {
+      "file": "red_ball_arrow_v1_texture_atlas.png",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "exists": true
+    },
+    {
+      "file": "red_ball_arrow_v1.asset.json",
+      "schema": "external_asset_v1",
+      "valid": true,
+      "errors": []
+    }
+  ],
+  "notes": "external_asset_v1 front door synthesized and auto-rigged (rig_from_profile.py): the contract now supports the 'ball' archetype and the ball_v1 rig. The .asset.json validates against external_asset.schema.json and bakes into a game_iso_v1 package (320 frames, RED, 0 warnings).",
+  "bake_result": {
+    "baked": true,
+    "frames": 320,
+    "regions": [
+      0,
+      2
+    ],
+    "color": "red",
+    "ok": true,
+    "warning_codes": []
+  }
+}

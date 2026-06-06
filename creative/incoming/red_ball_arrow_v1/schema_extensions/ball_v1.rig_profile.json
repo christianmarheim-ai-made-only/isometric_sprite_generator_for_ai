@@ -1,0 +1,79 @@
+{
+  "rig_profile": "ball_v1",
+  "description": "Simple rolling-ball prop rig. Root stays in place while the body rotates for in-place sprite baking.",
+  "bind_pose_units": "metre, +Z up, +X forward",
+  "bones": [
+    {
+      "name": "root",
+      "parent": null,
+      "head": [
+        0,
+        0,
+        0
+      ],
+      "tail": [
+        0,
+        0,
+        0.05
+      ]
+    },
+    {
+      "name": "body",
+      "parent": "root",
+      "head": [
+        0,
+        0,
+        0.4
+      ],
+      "tail": [
+        0.1,
+        0,
+        0.4
+      ]
+    },
+    {
+      "name": "marker",
+      "parent": "body",
+      "head": [
+        0,
+        0,
+        0.68
+      ],
+      "tail": [
+        0,
+        0,
+        0.8
+      ]
+    }
+  ],
+  "region_by_bone": {
+    "body": "torso",
+    "marker": "torso"
+  },
+  "states": {
+    "idle": {
+      "required": true,
+      "frames": 1,
+      "fps": 1,
+      "playback": "loop"
+    },
+    "roll": {
+      "required": false,
+      "frames": 6,
+      "fps": 12,
+      "playback": "loop"
+    },
+    "pop": {
+      "required": false,
+      "frames": 5,
+      "fps": 14,
+      "playback": "once"
+    },
+    "explode": {
+      "required": false,
+      "frames": 8,
+      "fps": 16,
+      "playback": "once"
+    }
+  }
+}

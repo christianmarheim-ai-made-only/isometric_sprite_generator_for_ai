@@ -1,0 +1,52 @@
+{
+  "socket_spec_version": "socket_points_v1",
+  "asset_id": "cow_brown_farm_v1",
+  "unit": "meter",
+  "sockets": {
+    "head_socket": [
+      0.72,
+      0.0,
+      1.28
+    ],
+    "mouth_socket": [
+      0.82,
+      0.0,
+      1.17
+    ],
+    "eye.L": [
+      0.68,
+      0.08,
+      1.43
+    ],
+    "eye.R": [
+      0.68,
+      -0.08,
+      1.43
+    ],
+    "shoulder.L": [
+      0.26,
+      0.18,
+      1.2
+    ],
+    "shoulder.R": [
+      0.26,
+      -0.18,
+      1.2
+    ],
+    "back_socket": [
+      -0.02,
+      0.0,
+      1.28
+    ],
+    "pelvis_ring_center": [
+      -0.18,
+      0.0,
+      0.96
+    ],
+    "shoulder_ring_center": [
+      0.26,
+      0.0,
+      1.2
+    ]
+  }
+}

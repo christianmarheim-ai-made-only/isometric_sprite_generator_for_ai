@@ -1,0 +1,331 @@
+{
+  "rig_profile": "quadruped_v1",
+  "description": "Quadruped farm-animal rig for a medium brown cow. Front legs are the forelimbs, hind legs are rear limbs.",
+  "bind_pose_units": "metre, +Z up, +X forward",
+  "bones": [
+    {
+      "name": "root",
+      "parent": null,
+      "head": [
+        0,
+        0,
+        0
+      ],
+      "tail": [
+        0,
+        0,
+        0.08
+      ]
+    },
+    {
+      "name": "pelvis",
+      "parent": "root",
+      "head": [
+        -0.28,
+        0,
+        0.92
+      ],
+      "tail": [
+        -0.08,
+        0,
+        0.96
+      ]
+    },
+    {
+      "name": "spine",
+      "parent": "pelvis",
+      "head": [
+        -0.08,
+        0,
+        0.96
+      ],
+      "tail": [
+        0.22,
+        0,
+        1.02
+      ]
+    },
+    {
+      "name": "chest",
+      "parent": "spine",
+      "head": [
+        0.22,
+        0,
+        1.02
+      ],
+      "tail": [
+        0.42,
+        0,
+        1.08
+      ]
+    },
+    {
+      "name": "neck",
+      "parent": "chest",
+      "head": [
+        0.42,
+        0,
+        1.08
+      ],
+      "tail": [
+        0.58,
+        0,
+        1.2
+      ]
+    },
+    {
+      "name": "head",
+      "parent": "neck",
+      "head": [
+        0.58,
+        0,
+        1.2
+      ],
+      "tail": [
+        0.82,
+        0,
+        1.28
+      ]
+    },
+    {
+      "name": "tail",
+      "parent": "pelvis",
+      "head": [
+        -0.5,
+        0,
+        1.03
+      ],
+      "tail": [
+        -0.72,
+        0,
+        1.08
+      ]
+    },
+    {
+      "name": "foreleg.L",
+      "parent": "chest",
+      "head": [
+        0.22,
+        0.16,
+        0.98
+      ],
+      "tail": [
+        0.22,
+        0.16,
+        0.52
+      ]
+    },
+    {
+      "name": "foreshin.L",
+      "parent": "foreleg.L",
+      "head": [
+        0.22,
+        0.16,
+        0.52
+      ],
+      "tail": [
+        0.22,
+        0.16,
+        0.08
+      ]
+    },
+    {
+      "name": "forehoof.L",
+      "parent": "foreshin.L",
+      "head": [
+        0.22,
+        0.16,
+        0.08
+      ],
+      "tail": [
+        0.3,
+        0.16,
+        0.0
+      ]
+    },
+    {
+      "name": "foreleg.R",
+      "parent": "chest",
+      "head": [
+        0.22,
+        -0.16,
+        0.98
+      ],
+      "tail": [
+        0.22,
+        -0.16,
+        0.52
+      ]
+    },
+    {
+      "name": "foreshin.R",
+      "parent": "foreleg.R",
+      "head": [
+        0.22,
+        -0.16,
+        0.52
+      ],
+      "tail": [
+        0.22,
+        -0.16,
+        0.08
+      ]
+    },
+    {
+      "name": "forehoof.R",
+      "parent": "foreshin.R",
+      "head": [
+        0.22,
+        -0.16,
+        0.08
+      ],
+      "tail": [
+        0.3,
+        -0.16,
+        0.0
+      ]
+    },
+    {
+      "name": "hindleg.L",
+      "parent": "pelvis",
+      "head": [
+        -0.22,
+        0.16,
+        0.96
+      ],
+      "tail": [
+        -0.22,
+        0.16,
+        0.52
+      ]
+    },
+    {
+      "name": "hindshin.L",
+      "parent": "hindleg.L",
+      "head": [
+        -0.22,
+        0.16,
+        0.52
+      ],
+      "tail": [
+        -0.22,
+        0.16,
+        0.08
+      ]
+    },
+    {
+      "name": "hindhoof.L",
+      "parent": "hindshin.L",
+      "head": [
+        -0.22,
+        0.16,
+        0.08
+      ],
+      "tail": [
+        -0.12,
+        0.16,
+        0.0
+      ]
+    },
+    {
+      "name": "hindleg.R",
+      "parent": "pelvis",
+      "head": [
+        -0.22,
+        -0.16,
+        0.96
+      ],
+      "tail": [
+        -0.22,
+        -0.16,
+        0.52
+      ]
+    },
+    {
+      "name": "hindshin.R",
+      "parent": "hindleg.R",
+      "head": [
+        -0.22,
+        -0.16,
+        0.52
+      ],
+      "tail": [
+        -0.22,
+        -0.16,
+        0.08
+      ]
+    },
+    {
+      "name": "hindhoof.R",
+      "parent": "hindshin.R",
+      "head": [
+        -0.12,
+        -0.16,
+        0.0
+      ],
+      "tail": [
+        -0.12,
+        -0.16,
+        0.0
+      ]
+    }
+  ],
+  "region_by_bone": {
+    "head": "head",
+    "neck": "head",
+    "pelvis": "torso",
+    "spine": "torso",
+    "chest": "torso",
+    "tail": "torso",
+    "foreleg.L": "arms",
+    "foreshin.L": "arms",
+    "forehoof.L": "arms",
+    "foreleg.R": "arms",
+    "foreshin.R": "arms",
+    "forehoof.R": "arms",
+    "hindleg.L": "legs",
+    "hindshin.L": "legs",
+    "hindhoof.L": "legs",
+    "hindleg.R": "legs",
+    "hindshin.R": "legs",
+    "hindhoof.R": "legs"
+  },
+  "states": {
+    "idle": {
+      "required": true,
+      "frames": 1,
+      "fps": 1,
+      "playback": "loop"
+    },
+    "walk": {
+      "required": false,
+      "frames": 8,
+      "fps": 10,
+      "playback": "loop"
+    },
+    "run": {
+      "required": false,
+      "frames": 8,
+      "fps": 14,
+      "playback": "loop"
+    },
+    "graze": {
+      "required": false,
+      "frames": 8,
+      "fps": 8,
+      "playback": "loop"
+    },
+    "hit": {
+      "required": false,
+      "frames": 5,
+      "fps": 12,
+      "playback": "once"
+    },
+    "death": {
+      "required": false,
+      "frames": 8,
+      "fps": 10,
+      "playback": "once"
+    }
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "model_source_version": "procedural_character_model_source_v1",
+  "asset_id": "cow_brown_farm_v1",
+  "asset_name": "Brown Farm Cow",
+  "variant_class": "character",
+  "source_format": "gltf",
+  "source_file": "cow_brown_farm_v1.glb",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "ground_footprint_center",
+  "art_direction": {
+    "style": "stylized-realistic farm animal for readable isometric sprites",
+    "silhouette": "sturdy brown cow with calm head, small horns, udder, and readable leg spacing",
+    "palette": [
+      "warm medium brown",
+      "dark brown",
+      "beige muzzle",
+      "dark hoof",
+      "light horn"
+    ],
+    "concept_art": "cow_brown_farm_v1_concept_art.png"
+  },
+  "visual_objects": [
+    "torso_body",
+    "torso_chest",
+    "torso_hips",
+    "head_neck",
+    "head_head",
+    "head_muzzle",
+    "torso_udder",
+    "torso_tail",
+    "arms_front_leg_0",
+    "arms_front_leg_1",
+    "legs_hind_leg_2",
+    "legs_hind_leg_3"
+  ],
+  "hit_proxy_objects": [
+    {
+      "name": "head_head",
+      "region": "head"
+    },
+    {
+      "name": "head_muzzle",
+      "region": "head"
+    },
+    {
+      "name": "head_neck",
+      "region": "head"
+    },
+    {
+      "name": "torso_body",
+      "region": "torso"
+    },
+    {
+      "name": "torso_chest",
+      "region": "torso"
+    },
+    {
+      "name": "torso_hips",
+      "region": "torso"
+    },
+    {
+      "name": "torso_tail",
+      "region": "torso"
+    },
+    {
+      "name": "torso_udder",
+      "region": "torso"
+    },
+    {
+      "name": "arms_front_leg_0",
+      "region": "arms"
+    },
+    {
+      "name": "arms_front_leg_1",
+      "region": "arms"
+    },
+    {
+      "name": "legs_hind_leg_2",
+      "region": "legs"
+    },
+    {
+      "name": "legs_hind_leg_3",
+      "region": "legs"
+    }
+  ],
+  "metric_proxy_objects": [
+    "torso_body",
+    "torso_chest",
+    "torso_hips",
+    "head_head",
+    "head_neck",
+    "arms_front_leg_0",
+    "arms_front_leg_1",
+    "legs_hind_leg_2",
+    "legs_hind_leg_3"
+  ],
+  "sockets": [
+    "head_socket",
+    "mouth_socket",
+    "pelvis_ring_center",
+    "shoulder_ring_center",
+    "shoulder.L",
+    "shoulder.R",
+    "eye.L",
+    "eye.R",
+    "back_socket"
+  ],
+  "clips_states": [
+    {
+      "state": "idle",
+      "frames": 4,
+      "playback": "loop",
+      "clip": "idle",
+      "directional": true
+    },
+    {
+      "state": "walk",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "walk",
+      "directional": true
+    },
+    {
+      "state": "run",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "run",
+      "directional": true
+    },
+    {
+      "state": "graze",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "graze",
+      "directional": true
+    },
+    {
+      "state": "hit",
+      "frames": 5,
+      "playback": "once",
+      "clip": "hit",
+      "directional": true
+    },
+    {
+      "state": "death",
+      "frames": 8,
+      "playback": "once",
+      "clip": "death",
+      "directional": true
+    }
+  ],
+  "world_metrics": {
+    "height_world": 1.62,
+    "visual_height_world": 1.62,
+    "footprint_radius_world": 0.42,
+    "eye_height_world": 1.43,
+    "eye_position_world": [
+      0.66,
+      0.08,
+      1.43
+    ],
+    "shoulder_height_world": 1.23,
+    "pelvis_height_world": 0.96
+  },
+  "notes": "Current external_asset_v1 supports only biped/bird archetypes; this package includes a custom quadruped rig profile and a source-asset descriptor instead of a schema-valid external_asset_v1 manifest."
+}

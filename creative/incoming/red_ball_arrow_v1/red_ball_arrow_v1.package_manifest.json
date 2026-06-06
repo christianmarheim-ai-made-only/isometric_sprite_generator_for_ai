@@ -1,0 +1,18 @@
+{
+  "package_manifest_version": "generated_asset_package_v1",
+  "asset_id": "red_ball_arrow_v1",
+  "package_role": "prop/effect",
+  "entry_files": {
+    "glb_mesh": "red_ball_arrow_v1.glb",
+    "source_asset": "red_ball_arrow_v1.source_asset.json",
+    "model_source": "red_ball_arrow_v1.model_source.json",
+    "animation_data": "red_ball_arrow_v1_anim.json",
+    "hitbox": "red_ball_arrow_v1_hitbox.json",
+    "physical_metrics": "red_ball_arrow_v1_physical_metrics.json",
+    "spell_orbits": "red_ball_arrow_v1_spell_orbits.json",
+    "sockets": "red_ball_arrow_v1_sockets.json",
+    "materials": "red_ball_arrow_v1_materials.json",
+    "texture_atlas": "red_ball_arrow_v1_texture_atlas.png"
+  },
+  "notes": "This package is designed to be machine-readable and editable. A schema-valid external_asset_v1 manifest is not included when the current contract lacks the needed archetype/rig."
+}

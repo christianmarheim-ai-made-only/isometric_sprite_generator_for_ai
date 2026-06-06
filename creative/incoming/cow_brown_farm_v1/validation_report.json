@@ -1,0 +1,58 @@
+{
+  "asset_id": "cow_brown_farm_v1",
+  "checks": [
+    {
+      "file": "cow_brown_farm_v1.source_asset.json",
+      "schema": "source_asset",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "file": "cow_brown_farm_v1_anim.json",
+      "schema": "animation_clips",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "file": "cow_brown_farm_v1_hitbox.json",
+      "schema": "hitbox",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "file": "cow_brown_farm_v1.glb",
+      "exists": true
+    },
+    {
+      "file": "cow_brown_farm_v1_texture_atlas.png",
+      "exists": true
+    },
+    {
+      "file": "README.md",
+      "exists": true
+    },
+    {
+      "file": "cow_brown_farm_v1.asset.json",
+      "schema": "external_asset_v1",
+      "valid": true,
+      "errors": []
+    }
+  ],
+  "notes": "external_asset_v1 front door synthesized and auto-rigged (rig_from_profile.py): the contract now supports the 'quadruped' archetype and the quadruped_v1 rig. The .asset.json validates against external_asset.schema.json and bakes into a game_iso_v1 package (656 frames, 4 regions, BROWN, standing). Open flag: oversize_atlas_page (multi-clip combat-size atlas > 4096; engine consumes single-page up to the ~8192 GPU cap, paging deferred = TASK-018).",
+  "bake_result": {
+    "baked": true,
+    "frames": 656,
+    "regions": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "color": "brown",
+    "ok": false,
+    "warning_codes": [
+      "oversize_atlas_page"
+    ]
+  }
+}

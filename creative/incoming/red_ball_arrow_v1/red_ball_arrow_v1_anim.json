@@ -1,0 +1,234 @@
+{
+  "anim_spec_version": "anim_clips_v1",
+  "rig": "ball_v1",
+  "notes": "Angles in radians. Roll rotates the body around local +Y/-Y so the downward-facing marker cycles in and out. No horizontal translation is keyed.",
+  "clips": {
+    "idle": {
+      "playback": "loop",
+      "frames": 1,
+      "fps": 1,
+      "duration_frames": 1,
+      "bones": {}
+    },
+    "roll": {
+      "playback": "loop",
+      "frames": 6,
+      "fps": 12,
+      "duration_frames": 6,
+      "bones": {
+        "body": {
+          "rotation_euler": [
+            [
+              1,
+              [
+                0,
+                0,
+                0
+              ]
+            ],
+            [
+              2,
+              [
+                0,
+                -1.0472,
+                0
+              ]
+            ],
+            [
+              3,
+              [
+                0,
+                -2.0944,
+                0
+              ]
+            ],
+            [
+              4,
+              [
+                0,
+                -3.1416,
+                0
+              ]
+            ],
+            [
+              5,
+              [
+                0,
+                -4.1888,
+                0
+              ]
+            ],
+            [
+              6,
+              [
+                0,
+                -5.236,
+                0
+              ]
+            ],
+            [
+              7,
+              [
+                0,
+                -6.2832,
+                0
+              ]
+            ]
+          ]
+        }
+      }
+    },
+    "pop": {
+      "playback": "once",
+      "frames": 5,
+      "fps": 14,
+      "duration_frames": 7,
+      "bones": {
+        "body": {
+          "rotation_euler": [
+            [
+              1,
+              [
+                0,
+                0,
+                0
+              ]
+            ],
+            [
+              3,
+              [
+                0,
+                -0.35,
+                0
+              ]
+            ],
+            [
+              5,
+              [
+                0,
+                0.35,
+                0
+              ]
+            ],
+            [
+              7,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        },
+        "marker": {
+          "location": [
+            [
+              1,
+              [
+                0,
+                0,
+                0
+              ]
+            ],
+            [
+              3,
+              [
+                0,
+                0,
+                0.1
+              ]
+            ],
+            [
+              5,
+              [
+                0,
+                0,
+                0.16
+              ]
+            ],
+            [
+              7,
+              [
+                0,
+                0,
+                0.0
+              ]
+            ]
+          ]
+        }
+      }
+    },
+    "explode": {
+      "playback": "once",
+      "frames": 8,
+      "fps": 16,
+      "duration_frames": 8,
+      "bones": {
+        "body": {
+          "rotation_euler": [
+            [
+              1,
+              [
+                0,
+                0,
+                0
+              ]
+            ],
+            [
+              3,
+              [
+                0,
+                -0.8,
+                0.2
+              ]
+            ],
+            [
+              5,
+              [
+                0,
+                0.8,
+                -0.2
+              ]
+            ],
+            [
+              8,
+              [
+                0,
+                1.3,
+                0.4
+              ]
+            ]
+          ]
+        },
+        "marker": {
+          "location": [
+            [
+              1,
+              [
+                0,
+                0,
+                0
+              ]
+            ],
+            [
+              4,
+              [
+                0,
+                0,
+                0.18
+              ]
+            ],
+            [
+              8,
+              [
+                0,
+                0,
+                0.32
+              ]
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

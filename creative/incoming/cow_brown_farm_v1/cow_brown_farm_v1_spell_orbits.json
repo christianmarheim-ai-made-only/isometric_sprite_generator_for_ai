@@ -1,0 +1,39 @@
+{
+  "spell_orbit_spec_version": "spell_orbit_points_v1",
+  "asset_id": "cow_brown_farm_v1",
+  "unit": "meter",
+  "pelvis_ring": {
+    "center_world": [
+      -0.18,
+      0.0,
+      0.96
+    ],
+    "height_world": 0.96,
+    "radius_world": 0.34,
+    "plane": "xy",
+    "note": "Centered just forward of the hind-leg attachment, hugging the main body without clipping legs."
+  },
+  "shoulder_ring": {
+    "center_world": [
+      0.26,
+      0.0,
+      1.2
+    ],
+    "height_world": 1.2,
+    "radius_world": 0.24,
+    "plane": "xy",
+    "left_anchor_world": [
+      0.26,
+      0.18,
+      1.2
+    ],
+    "right_anchor_world": [
+      0.26,
+      -0.18,
+      1.2
+    ],
+    "clearance_above_head_world": 0.18,
+    "clearance_below_belly_world": 0.44,
+    "note": "Fireballs rotating around the shoulder line should stay below the horn/head apex and above the torso midline."
+  }
+}

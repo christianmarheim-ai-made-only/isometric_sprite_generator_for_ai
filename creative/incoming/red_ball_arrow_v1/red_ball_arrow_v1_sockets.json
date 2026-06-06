@@ -1,0 +1,32 @@
+{
+  "socket_spec_version": "socket_points_v1",
+  "asset_id": "red_ball_arrow_v1",
+  "unit": "meter",
+  "sockets": {
+    "center_socket": [
+      0.0,
+      0.0,
+      0.4
+    ],
+    "eye_socket": [
+      0.0,
+      0.0,
+      0.4
+    ],
+    "forward_marker_socket": [
+      0.0,
+      0.0,
+      0.72
+    ],
+    "pelvis_ring_center": [
+      0.0,
+      0.0,
+      0.4
+    ],
+    "shoulder_ring_center": [
+      0.0,
+      0.0,
+      0.56
+    ]
+  }
+}
