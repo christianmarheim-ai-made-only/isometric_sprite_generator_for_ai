@@ -24,7 +24,7 @@
       "fps": 12,
       "playback": "loop"
     },
-    "move": {
+    "walk": {
       "clip": "move",
       "frames": 8,
       "fps": 12,
@@ -36,7 +36,7 @@
       "fps": 16,
       "playback": "loop"
     },
-    "shoot": {
+    "attack": {
       "clip": "shoot",
       "frames": 6,
       "fps": 12,
@@ -48,7 +48,7 @@
       "fps": 12,
       "playback": "once"
     },
-    "hurt": {
+    "hit": {
       "clip": "hurt",
       "frames": 5,
       "fps": 12,
