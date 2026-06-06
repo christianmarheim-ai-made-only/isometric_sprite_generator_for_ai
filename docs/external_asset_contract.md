@@ -50,14 +50,16 @@ declared state. To add a bird, you deliver only a new skinned mesh + texture.
   Declare it to match how your glb is actually authored. *Confirmed end-to-end by the
   `chr_pirate_duelist_v1` PoC — a `up:"z"` glb that baked lying down until the Blender path was taught
   to honor the field.*
-- **Forward = +X — required (every archetype).** The model MUST face +X (direction 0) — +X is the
-  head/travel direction for *any* body plan: biped chest/face, bird beak, **quadruped head/nose**
-  (spine head `+X` → tail `−X`), fish/serpent mouth. The bake spins the model about Z from exactly how
-  it was authored; `forward` is declared-only (schema pins it to `"+x"`) and is **read by no baker** —
-  a model facing another way renders 90/180° wrong **and passes every gate silently**. A
-  radially-symmetric prop (ball/orb) has no forward and bakes near-identical in all 16 directions —
-  that is correct, not a bug; align any directional marker to +X. (Pipeline-applied `forward` rotation
-  is a planned follow-up.)
+- **Forward = the heading you declare (default +X).** +X (direction 0) is the head/travel direction
+  for *any* body plan: biped chest/face, bird beak, **quadruped head/nose** (spine head `+X` → tail
+  `−X`), fish/serpent mouth. Best practice is still to author facing **+X**. But if you author facing
+  another planar axis, **declare it** — `geometry.forward ∈ {"+x","-x","+y","-y"}` — and the **baker
+  rotates it onto +X** (a `+y`-authored model bakes identically to a `+x`-authored one). It is a LIVE
+  correction now, not just a label, so a mis-faced delivery is a one-line metadata fix, not a re-author.
+  A radially-symmetric prop (ball/orb) has no forward and bakes near-identical in all 16 directions —
+  that is correct, not a bug; align any directional marker to +X. *(Caveat: the correction trusts the
+  DECLARED value — if `forward` disagrees with the actual geometry it still bakes wrong. A facing oracle
+  that auto-detects the true forward is a separate follow-up.)*
 - **Origin = ground footprint centre.** The root/feet sit at the origin on the ground plane
   (the lowest point at height 0, the footprint centred on x=y=0). The pipeline re-normalizes,
   but author close to this so the rig/anim root is sane.

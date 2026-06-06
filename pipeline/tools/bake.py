@@ -239,11 +239,16 @@ def bake_character(out: Path, canvas_px: int = 256, variant_id: str = "humanoid_
 
 
 def bake_mesh(mesh_path, out: Path, canvas_px: int = 256, variant_id: str | None = None,
-              up: str = "z") -> dict:
+              up: str = "z", forward: str = "+x") -> dict:
     """Bake a REAL external mesh (OBJ; HIT regions by material/group name) -> CHARACTER package (R8).
-    The mesh is normalized to the contract (foot at origin, +Z up; up='y' rotates a Y-up file)."""
+    The mesh is normalized to the contract (foot at origin, +Z up; up='y' rotates a Y-up file). The
+    declared `forward` axis is rotated onto +X (direction 0); forward='+x' is the no-op default."""
     from mesh_io import load_obj
     verts, faces, face_region = load_obj(mesh_path, up=up)
+    if (forward or "+x") != "+x":                       # rotate the declared forward heading onto +X
+        from constants import forward_yaw
+        from render3d import rotate_z
+        verts = rotate_z(verts, forward_yaw(forward))
     variant_id = variant_id or Path(mesh_path).stem
     return _bake_mesh_character(verts, faces, face_region, out, canvas_px, variant_id, Path(mesh_path).name)
 
@@ -349,6 +354,8 @@ def main() -> int:
     ap.add_argument("--mesh", choices=list(MESHES) + ["humanoid", "humanoid_anim"], default="cube")
     ap.add_argument("--mesh-file", default=None, help="bake a real OBJ mesh (HIT regions by material name)")
     ap.add_argument("--up", default="z", choices=["z", "y"], help="up axis of --mesh-file (y rotates to +Z)")
+    ap.add_argument("--forward", default="+x", choices=["+x", "-x", "+y", "-y"],
+                    help="forward axis of --mesh-file (rotated onto +X = direction 0)")
     ap.add_argument("--variant-id", default=None)
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--canvas", type=int, default=256)
@@ -356,7 +363,7 @@ def main() -> int:
     if args.mesh_file:
         variant_id = args.variant_id or Path(args.mesh_file).stem
         out = (args.out or (PIPELINE_ROOT / "output" / variant_id)).resolve()
-        manifest = bake_mesh(args.mesh_file, out, args.canvas, variant_id, args.up)
+        manifest = bake_mesh(args.mesh_file, out, args.canvas, variant_id, args.up, args.forward)
     elif args.mesh == "humanoid":
         variant_id = args.variant_id or "humanoid_ref"
         out = (args.out or (PIPELINE_ROOT / "output" / variant_id)).resolve()

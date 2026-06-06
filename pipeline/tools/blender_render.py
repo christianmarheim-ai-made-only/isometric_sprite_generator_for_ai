@@ -26,7 +26,7 @@ TOOLS = argv[1]
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, TOOLS)
 import meshes  # noqa: E402  (Blender's bundled numpy)
-from constants import CANVAS, DIRS, GROUND_BAND, REGION_RGB  # noqa: E402
+from constants import CANVAS, DIRS, GROUND_BAND, REGION_RGB, forward_yaw  # noqa: E402
 
 COS30, SIN30, INV2 = math.cos(math.radians(30.0)), 0.5, 1.0 / math.sqrt(2.0)
 # region id -> body color (the "art"); the region pass uses the same hue, flat-lit.
@@ -38,6 +38,10 @@ scene.view_settings.view_transform = 'Standard'  # predictable sRGB (not AgX) fo
 
 # --- mesh: a real glTF/glb file (--mesh-file; HIT regions by material name), or the procedural humanoid ---
 MESH_FILE = argv[2] if len(argv) > 2 and argv[2] else None
+# Declared forward axis -> a base yaw that rotates it onto +X (direction 0). "+x" = no-op (BASE_YAW 0.0,
+# so the orbit below is byte-identical to before). Same CCW-about-+Z convention as the per-direction spin.
+FORWARD = argv[3] if len(argv) > 3 and argv[3] else "+x"
+BASE_YAW = 0.0 if FORWARD == "+x" else forward_yaw(FORWARD)
 if MESH_FILE:
     from mesh_io import region_for_name, REGION_KEYWORDS  # noqa: E402
     before = set(bpy.data.objects)
@@ -144,7 +148,7 @@ shading.color_type = 'TEXTURE' if has_tex else 'MATERIAL'
 shading.light = 'STUDIO'
 scene.display.render_aa = '8'
 for i in range(DIRS):
-    obj.rotation_euler = (0.0, 0.0, i * (2 * math.pi / DIRS))
+    obj.rotation_euler = (0.0, 0.0, BASE_YAW + i * (2 * math.pi / DIRS))
     r.filepath = os.path.join(OUT, f"color_dir{i:02d}.png")
     bpy.ops.render.render(write_still=True)
 
@@ -159,7 +163,7 @@ shading.color_type = 'MATERIAL'
 shading.light = 'FLAT'
 scene.display.render_aa = 'OFF'
 for i in range(DIRS):
-    obj.rotation_euler = (0.0, 0.0, i * (2 * math.pi / DIRS))
+    obj.rotation_euler = (0.0, 0.0, BASE_YAW + i * (2 * math.pi / DIRS))
     r.filepath = os.path.join(OUT, f"region_dir{i:02d}.png")
     bpy.ops.render.render(write_still=True)
 

@@ -32,13 +32,14 @@ If any of these is wrong the body will look wrong in-engine no matter how good t
    sized from real height; wrong scale ⇒ wrong on-screen size next to everything else.
 2. **Up axis.** Build Z-up, or Y-up and declare `up: "y"` in the manifest later. (glTF is Y-up by
    default; the pipeline converts.)
-3. **Forward = +X — required (every archetype).** The model **faces +X** (direction 0) — +X is the way
-   it *travels / looks*, whatever the body plan: a biped's chest/face, a bird's beak, a **quadruped's
-   head/nose** (the spine runs head `+X` → tail `−X`, belly down, front legs toward `+X`), a
-   fish/serpent's mouth. The bake spins the model about vertical Z in 16 equal steps from **exactly how
-   you built it** — it never rotates to a heading, and `forward` is declared-only (schema pins it to
-   `+x`) **read by no baker**. So a model built facing another way renders 90/180° wrong **and still
-   passes every gate** (silent — there is no facing oracle). Build it facing +X. *(Radially-symmetric
+3. **Forward = the heading you declare (default +X).** +X (direction 0) is the way it *travels /
+   looks*, whatever the body plan: a biped's chest/face, a bird's beak, a **quadruped's head/nose** (the
+   spine runs head `+X` → tail `−X`, belly down, front legs toward `+X`), a fish/serpent's mouth. Author
+   facing **+X** when you can. If you author facing another planar axis, **declare it** —
+   `geometry.forward ∈ {+x,-x,+y,-y}` — and the **baker rotates it onto +X** (a `+y`-authored model
+   bakes identically to a `+x` one). It is a live correction, so a mis-faced model is a one-line metadata
+   fix, not a re-author. *(The correction trusts the DECLARED value: if `forward` disagrees with the
+   actual geometry it still bakes wrong — a facing oracle is a separate follow-up.)* *(Radially-symmetric
    props — a ball, an orb — have no forward; see rule 5.)*
 4. **Origin = ground footprint centre.** The lowest point sits at **z = 0**, and the standing
    footprint is centred on **x = y = 0**. Feet on the floor, body over the origin.

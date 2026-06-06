@@ -40,7 +40,8 @@
       "type": "integer", "minimum": 1,
       "description": "Fallback playback fps for any clip that does not declare its own fps."
     },
-    "forward_axis": {"type": "string", "enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]},
+    "forward_axis": {"type": "string", "enum": ["+X", "-X", "+Y", "-Y"],
+                     "description": "Forward / travel heading; the baker rotates it onto +X. Planar only (+Z/-Z invalid -- forward is a ground-plane heading)."},
     "up_axis": {"type": "string", "enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]},
     "units": {"type": "string", "enum": ["meter", "centimeter", "millimeter", "inch", "foot"]},
     "origin_policy": {

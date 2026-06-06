@@ -24,7 +24,7 @@
       "additionalProperties": false,
       "properties": {
         "up": { "enum": ["y", "z"], "default": "z", "description": "source up axis. HONORED for .obj (a Y-up obj without up:\"y\" bakes sideways). For .glb/.gltf the importer reads the file's own axis and this field is currently inert -- set it correctly anyway for portability." },
-        "forward": { "const": "+x", "description": "The model MUST face +X (= direction 0). This field is optional -- omit it and +x is assumed; if present it must be `+x`. It is declared-only and NOT applied by any baker yet, so a model built facing another way renders wrong. (Future: pipeline-applied rotation.)" },
+        "forward": { "enum": ["+x", "-x", "+y", "-y"], "default": "+x", "description": "The model's forward / travel heading (the way it faces). Optional -- omit it and `+x` (= direction 0) is assumed. The baker ROTATES the declared forward onto +X (a +y-authored model bakes identically to a +x-authored one), so this is a LIVE correction, not just a label. Planar only: forward is a ground-plane heading (+z/-z are not valid)." },
         "unit": { "const": "meter" }
       }
     },

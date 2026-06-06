@@ -16,10 +16,11 @@ from mathutils import Matrix, Vector
 argv = sys.argv[sys.argv.index("--") + 1:]
 OUT, TOOLS, MESH_FILE, STATES_JSON = argv[0], argv[1], argv[2], argv[3]
 UP = argv[4] if len(argv) > 4 else "y"  # asset geometry.up; "z" needs a Z-up correction (see below)
+FORWARD = argv[5] if len(argv) > 5 else "+x"  # asset geometry.forward; rotated onto +X (direction 0)
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, TOOLS)
 from mesh_io import region_for_name, REGION_KEYWORDS  # noqa: E402
-from constants import CANVAS, DIRS, GROUND_BAND, REGION_RGB  # noqa: E402
+from constants import CANVAS, DIRS, GROUND_BAND, REGION_RGB, forward_yaw  # noqa: E402
 
 states = json.loads(open(STATES_JSON, encoding="utf-8").read())
 COS30, SIN30, INV2 = math.cos(math.radians(30.0)), 0.5, 1.0 / math.sqrt(2.0)
@@ -64,6 +65,13 @@ xs = [c.x for c in cos]; ys = [c.y for c in cos]; zs = [c.z for c in cos]
 shift = Vector(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, min(zs)))  # foot -> origin
 root_obj.location = root_obj.location - shift
 bpy.context.view_layer.update()
+# Honor the asset's declared forward: rotate the model about world +Z (the foot sits at the origin, so
+# this is anchor-stable) so the declared forward lands on +X = direction 0. forward == "+x" is the no-op
+# default -- this block is skipped, so a +x bake is byte-identical to before. Same yaw + CCW convention
+# as the per-direction orbit below, so it composes cleanly.
+if FORWARD != "+x":
+    root_obj.matrix_world = Matrix.Rotation(forward_yaw(FORWARD), 4, 'Z') @ root_obj.matrix_world
+    bpy.context.view_layer.update()
 base_mat = root_obj.matrix_world.copy()
 cos = [obj.matrix_world @ v.co for v in obj.data.vertices]
 zs = [c.z for c in cos]

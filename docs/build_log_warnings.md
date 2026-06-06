@@ -47,8 +47,11 @@ Detector logic is gated by `test_bake_warnings.py` (pure Python, in `build.py --
 
 ## Known gaps (not yet auto-detected)
 
-- **Forward-axis** is declared-only and not applied by any baker; a model facing the wrong way bakes
-  rotated and passes distinctness. No oracle to auto-detect yet (see `external_asset_contract.md`).
+- **Forward-axis** is now a LIVE correction: the baker rotates the declared `geometry.forward` onto +X
+  (gated by `test_forward_axis.py`), so a mis-faced delivery is a one-line metadata fix. The remaining
+  gap is the *oracle*: the correction trusts the DECLARED value, so a model whose declared `forward`
+  disagrees with its actual geometry still bakes rotated and passes distinctness. Auto-detecting the
+  TRUE forward (a facing oracle) is not yet built (see `external_asset_contract.md`).
 - **Stray geometry:** the example generators leave a 0-material `Icosphere` in each glb (universal,
   benign — ignored for measurement, doesn't visibly pollute). A genuinely material-bearing second
   mesh would render into the sprite; not currently flagged (it would false-positive on the Icosphere).

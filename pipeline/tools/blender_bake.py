@@ -57,12 +57,12 @@ def find_blender(explicit: str | None = None) -> str | None:
     return None
 
 
-def _run_blender(blender: str, out: Path, mesh_file=None) -> dict:
+def _run_blender(blender: str, out: Path, mesh_file=None, forward: str = "+x") -> dict:
     out.mkdir(parents=True, exist_ok=True)
+    # argv[2]=mesh-or-empty, argv[3]=forward (always passed so positions are stable; forward "+x" is a
+    # no-op inside blender_render.py, so a +x bake is byte-identical to before).
     cmd = [blender, "--background", "--python", str(SCRIPT_DIR / "blender_render.py"),
-           "--", str(out), str(SCRIPT_DIR)]
-    if mesh_file:
-        cmd.append(str(mesh_file))
+           "--", str(out), str(SCRIPT_DIR), str(mesh_file) if mesh_file else "", forward]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     meta = out / "blender_meta.json"
     if proc.returncode != 0 or not meta.exists():
@@ -104,8 +104,9 @@ def camera_parity_error(meta: dict) -> float:
     return worst
 
 
-def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = "humanoid_blender") -> tuple[dict, dict]:
-    meta = _run_blender(blender_exe, out, mesh_file)
+def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = "humanoid_blender",
+                 forward: str = "+x") -> tuple[dict, dict]:
+    meta = _run_blender(blender_exe, out, mesh_file, forward=forward)
     targets = {int(k): [round(_srgb(c) * 255) for c in v] for k, v in meta["region_color"].items()}
     color_imgs = [Image.open(out / f"color_dir{i:02d}.png").convert("RGBA") for i in range(DIRS)]
     region_arrs = [_region_ids(out / f"region_dir{i:02d}.png", targets) for i in range(DIRS)]
@@ -164,7 +165,8 @@ def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = 
 
 
 def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations: dict,
-                  variant_id: str, default_state: str | None = None, up: str = "y") -> tuple[dict, dict]:
+                  variant_id: str, default_state: str | None = None, up: str = "y",
+                  forward: str = "+x") -> tuple[dict, dict]:
     """R8: bake a RIGGED + ANIMATED glb into a MULTI-STATE, tight-cropped package by SAMPLING the
     glb's clips (blender_render_anim). `asset_animations` = {state: {clip, frames, fps, playback}}
     from the asset manifest. Same package shape as the procedural bake_character_anim (R5)."""
@@ -175,7 +177,7 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
     states_json.write_text(json.dumps(states_spec), encoding="utf-8")
     proc = subprocess.run(
         [blender_exe, "--background", "--python", str(SCRIPT_DIR / "blender_render_anim.py"),
-         "--", str(out), str(SCRIPT_DIR), str(mesh_file), str(states_json), str(up)],
+         "--", str(out), str(SCRIPT_DIR), str(mesh_file), str(states_json), str(up), str(forward)],
         capture_output=True, text=True)
     meta_p = out / "anim_meta.json"
     if proc.returncode != 0 or not meta_p.exists():

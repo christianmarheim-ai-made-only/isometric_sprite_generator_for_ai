@@ -15,6 +15,8 @@ is safe to import from both host CPython and Blender's bundled interpreter (the 
 """
 from __future__ import annotations
 
+import math
+
 # --- Frame / atlas geometry ------------------------------------------------------------------
 CANVAS = 256          # logical frame canvas (px), the engine-facing render size
 DIRS = 16             # direction_count (game_iso_v1 16-way)
@@ -76,6 +78,26 @@ def material_region_name(part_name: str, region_id: int, index: int = 0) -> str:
     if region_for_name(cand) == region_id:
         return cand
     return f"{kw}__{index}"
+
+
+# --- Forward-axis correction ----------------------------------------------------------------
+#     game_iso_v1 fixes forward = +X = direction 0. A delivery declares geometry.forward; the bake
+#     rotates the model about world +Z so the DECLARED forward lands on +X (so a +Y-authored model
+#     bakes identically to a +X-authored one). forward_yaw is the SINGLE source the four render paths
+#     (blender_render_anim, blender_render, render3d/bake numpy) share, so they cannot disagree.
+#     Planar only (forward is a ground-plane heading; +Z/-Z are not valid forwards).
+FORWARD_AXES = ("+x", "-x", "+y", "-y")
+_FORWARD_VEC = {"+x": (1.0, 0.0), "-x": (-1.0, 0.0), "+y": (0.0, 1.0), "-y": (0.0, -1.0)}
+
+
+def forward_yaw(forward: str) -> float:
+    """Yaw (radians, CCW about +Z) that rotates the declared `forward` axis onto +X (direction 0).
+
+    +x -> 0 (the no-op default); +y -> -pi/2; -y -> +pi/2; -x -> -pi (== +pi). Sign is the value that
+    makes R_z(yaw) @ forward == +X; it is pinned empirically by test_forward_axis (a +Y-authored mesh
+    baked with forward:"+y" must equal the +X-authored mesh baked with forward:"+x")."""
+    fx, fy = _FORWARD_VEC.get((forward or "+x").lower(), (1.0, 0.0))
+    return -math.atan2(fy, fx)
 
 
 # --- Atlas paging ---------------------------------------------------------------------------

@@ -71,6 +71,7 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
         raise SystemExit("asset has no files.mesh to bake")
     mesh_path = (base / mesh).resolve()
     up = (asset.get("geometry") or {}).get("up", "z")
+    forward = (asset.get("geometry") or {}).get("forward", "+x")  # rotated onto +X by the baker
     anims = asset.get("animations")
     clips_rel = (asset.get("files") or {}).get("animation_clips")
     ext = mesh_path.suffix.lower()
@@ -80,7 +81,7 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
     t0 = time.perf_counter()
     if ext == ".obj":
         from bake import bake_mesh
-        manifest = bake_mesh(str(mesh_path), out, variant_id=variant_id, up=up)
+        manifest = bake_mesh(str(mesh_path), out, variant_id=variant_id, up=up, forward=forward)
         route = "numpy / OBJ static"
     elif ext in (".glb", ".gltf"):
         import subprocess
@@ -132,9 +133,9 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
                 mesh_for_bake = str(animated)
                 route = "Blender / rigged + animated (clips embedded from animation_clips JSON)"
             manifest, _ = bake_animated(out, blender, mesh_for_bake, anims, variant_id,
-                                        default_state=asset.get("default_state"), up=up)
+                                        default_state=asset.get("default_state"), up=up, forward=forward)
         else:
-            manifest, _ = bake_blender(out, blender, str(mesh_path), variant_id)
+            manifest, _ = bake_blender(out, blender, str(mesh_path), variant_id, forward=forward)
             route = "Blender / static"
     else:
         raise SystemExit(f"unsupported mesh format: {ext}")

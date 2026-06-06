@@ -57,6 +57,7 @@ STEPS = [
     ("test_bake_warnings", [str(SCRIPT_DIR / "test_bake_warnings.py")]),
     ("test_intake", [str(SCRIPT_DIR / "test_intake.py")]),
     ("test_auto_rig", [str(SCRIPT_DIR / "test_auto_rig.py")]),
+    ("test_forward_axis", [str(SCRIPT_DIR / "test_forward_axis.py")]),
 ]
 
 
