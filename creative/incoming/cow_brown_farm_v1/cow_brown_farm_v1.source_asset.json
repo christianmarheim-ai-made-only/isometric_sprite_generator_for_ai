@@ -7,6 +7,10 @@
   "up_axis": "+Z",
   "units": "meter",
   "origin_policy": "ground_footprint_center",
+  "archetype": "quadruped",
+  "rig": "quadruped_v1",
+  "default_state": "idle",
+  "default_fps": 10,
   "visual_objects": [
     "torso_body",
     "torso_chest",
@@ -95,6 +99,7 @@
     {
       "state": "idle",
       "frames": 4,
+      "fps": 6,
       "playback": "loop",
       "clip": "idle",
       "directional": true
@@ -102,6 +107,7 @@
     {
       "state": "walk",
       "frames": 8,
+      "fps": 10,
       "playback": "loop",
       "clip": "walk",
       "directional": true
@@ -109,6 +115,7 @@
     {
       "state": "run",
       "frames": 8,
+      "fps": 14,
       "playback": "loop",
       "clip": "run",
       "directional": true
@@ -116,6 +123,7 @@
     {
       "state": "graze",
       "frames": 8,
+      "fps": 8,
       "playback": "loop",
       "clip": "graze",
       "directional": true
@@ -123,6 +131,7 @@
     {
       "state": "hit",
       "frames": 5,
+      "fps": 12,
       "playback": "once",
       "clip": "hit",
       "directional": true
@@ -130,6 +139,7 @@
     {
       "state": "death",
       "frames": 8,
+      "fps": 10,
       "playback": "once",
       "clip": "death",
       "directional": true

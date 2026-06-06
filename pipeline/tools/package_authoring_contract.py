@@ -21,7 +21,7 @@ DOCS = REPO / "docs"
 DOC_FILES = [
     "authoring_overview.md", "modeling_the_body.md", "texturing_the_body.md",
     "generating_animation_data.md", "generating_hitbox_data.md", "external_asset_contract.md",
-    "multistate_sprite_contract.md", "atlas_paging_contract.md",
+    "generated_package_intake.md", "multistate_sprite_contract.md", "atlas_paging_contract.md",
 ]
 SCHEMA_FILES = [
     "external_asset.schema.json", "animation_clips.schema.json", "hitbox_spec.schema.json",

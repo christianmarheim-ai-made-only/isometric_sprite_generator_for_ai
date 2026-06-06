@@ -14,12 +14,16 @@ UP = the asset's geometry.up ("z" or "y"): a Z-up-authored glb is stood upright 
 aligns with the profile's +Z-up bone frame; the exported glb is standard glTF (Y-up), so the asset's
 geometry.up for the RIGGED glb is "y".
 """
-import bpy, sys, json, math
+import bpy, sys, json, math, os
 from mathutils import Matrix, Vector
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from constants import region_for_name, material_region_name, REGION_NAMES, REGION_NAME_TO_ID  # shared region table (no drift)
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 GLB, PROFILE, UP, OUT = argv[0], argv[1], argv[2], argv[3]
-MATERIALS = argv[4] if len(argv) > 4 else None   # optional sidecar materials.json (region + base_color)
+MATERIALS = argv[4] if len(argv) > 4 else None      # optional sidecar materials.json (region + base_color)
+SOURCE_ASSET = argv[5] if len(argv) > 5 else None   # optional source_asset.json (DECLARED hit_proxy regions)
 
 for o in list(bpy.data.objects):           # clean default scene (cube/camera/light) so it doesn't export
     bpy.data.objects.remove(o, do_unlink=True)
@@ -84,32 +88,43 @@ for m in meshes:
 # sidecar materials.json. Name each mesh's material after the mesh (so region_source=material_name
 # resolves head/torso/arms/legs) and paint its base colour from the sidecar -- so the bake renders the
 # right per-region colour instead of flat grey, and the R8 hitmask gets all four regions.
-_KW = [("head", 1), ("torso", 2), ("body", 2), ("arm", 3), ("leg", 4)]
+# Region assignment. The AUTHORITATIVE source is the producer's DECLARED hit_proxy_objects (region per
+# part name) in the source_asset; fall back to the shared keyword table (constants.region_for_name) only
+# when a part is not declared. This is what makes non-keyword creature parts survive -- a squid's
+# `tentacle_3` declared `legs`, a dragon's `wing_L` declared `arms` -- instead of silently collapsing to
+# torso. The keyword table is shared with the bake (mesh_io re-exports it), so the two never drift.
+_declared = {}   # part name -> region id, from the source_asset's hit_proxy_objects
+if SOURCE_ASSET:
+    for hp in json.loads(open(SOURCE_ASSET, encoding="utf-8").read()).get("hit_proxy_objects", []):
+        rid = REGION_NAME_TO_ID.get(hp.get("region"))
+        if rid:
+            _declared[hp["name"]] = rid
 
 
-def _region(name):
-    n = name.lower()
-    for kw, r in _KW:
-        if kw in n:
-            return r
-    return 2
+def _region_of(part_name):
+    return _declared.get(part_name) or region_for_name(part_name)
 
 
+# Per-region representative base colour from the sidecar (materials.json carries an explicit `region` +
+# base_color per material). region id -> colour; the first material seen for a region wins.
 _region_color = {}
 if MATERIALS:
     for mm in json.loads(open(MATERIALS, encoding="utf-8").read()).get("materials", []):
-        _region_color.setdefault(_region(mm.get("name", "") + " " + (mm.get("region") or "")), mm.get("base_color"))
+        rid = REGION_NAME_TO_ID.get(mm.get("region")) or region_for_name(mm.get("name", ""))
+        _region_color.setdefault(rid, mm.get("base_color"))
 
-# The delivered glb's imported materials carry a tangled node graph (broken texture nodes, vertex-colour
-# attribute links into Base Color) that the glTF exporter resolves to flat 0.8 grey no matter what we set
-# on the Principled default_value. Rather than untangle it, REPLACE each part-mesh's material with a clean,
-# fresh single-Principled material named after the mesh -- the region keyword lives in the name (so
-# region_source=material_name resolves head/torso/arms/legs) and the base colour comes from the sidecar.
-# A clean material round-trips through glTF export reliably (verified), so the bake renders true per-region
-# colour instead of grey.
-for m in meshes:
-    col = _region_color.get(_region(m.name)) or (0.8, 0.8, 0.8)
-    newmat = bpy.data.materials.new(name=m.name)
+# REPLACE each part-mesh's material with a clean, fresh single-Principled material: the delivered glb's
+# imported node graph resolves to flat 0.8 grey through the glTF exporter (see the vertex-colour note
+# below), so a clean material is the only thing that round-trips. The material NAME must make the
+# downstream bake resolve the part to the SAME region we assigned here -- keep the part name when its own
+# keyword already resolves correctly, else append the canonical region keyword (e.g. a `tentacle_3`
+# declared `legs` becomes `tentacle_3__legs`) so region_for_name agrees. The base colour comes from the
+# sidecar, so the bake renders true per-region colour instead of grey.
+for _idx, m in enumerate(meshes):
+    region_id = _region_of(m.name)
+    col = _region_color.get(region_id) or (0.8, 0.8, 0.8)
+    mat_name = material_region_name(m.name, region_id, _idx)
+    newmat = bpy.data.materials.new(name=mat_name)
     newmat.use_nodes = True
     bsdf = next(n for n in newmat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
     bsdf.inputs['Base Color'].default_value = (col[0], col[1], col[2], 1.0)
@@ -122,7 +137,8 @@ for m in meshes:
     # We want flat per-region colour, so drop the vertex colours entirely.
     while m.data.color_attributes:
         m.data.color_attributes.remove(m.data.color_attributes[0])
-    print(f"MAT: {m.name} -> region {_region(m.name)}  base {[round(c, 2) for c in (col[0], col[1], col[2])]}")
+    src = "declared" if m.name in _declared else "keyword"
+    print(f"MAT: {m.name} -> region {region_id} ({src}) mat='{mat_name}'  base {[round(c, 2) for c in (col[0], col[1], col[2])]}")
 
 bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', use_selection=False)
 print(f"RIGGED -> {OUT}  ({len(meshes)} parts, {len(prof['bones'])} bones)")

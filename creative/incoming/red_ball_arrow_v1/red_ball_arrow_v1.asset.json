@@ -21,7 +21,7 @@
     "idle": {
       "clip": "idle",
       "frames": 1,
-      "fps": 1,
+      "fps": 6,
       "playback": "loop"
     },
     "roll": {
@@ -39,7 +39,7 @@
     "explode": {
       "clip": "explode",
       "frames": 8,
-      "fps": 16,
+      "fps": 12,
       "playback": "once"
     }
   },

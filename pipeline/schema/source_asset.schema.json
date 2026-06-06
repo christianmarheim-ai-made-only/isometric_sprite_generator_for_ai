@@ -24,6 +24,22 @@
     "variant_class": {"type": "string", "enum": ["probe", "character", "effect"]},
     "source_format": {"type": "string", "enum": ["blend", "fbx", "gltf"]},
     "source_file": {"type": "string", "minLength": 1},
+    "archetype": {
+      "type": "string", "minLength": 1,
+      "description": "Engine archetype the bake targets (biped/bird/quadruped/ball/...). Optional in the schema for back-compat with internal descriptors; REQUIRED for a delivered generated package (the intake gate enforces it + checks it against the external_asset archetype enum, the authoritative list)."
+    },
+    "rig": {
+      "type": "string", "minLength": 1,
+      "description": "Rig profile name the animation clips target (e.g. quadruped_v1). Optional here for back-compat; REQUIRED for a delivered package and the intake gate verifies a matching rig_profiles/<rig>.json (or schema_extensions/<rig>.rig_profile.json) exists."
+    },
+    "default_state": {
+      "type": "string", "minLength": 1,
+      "description": "Animation state shown at rest. Optional; synthesis defaults to 'idle' if present else the first clip."
+    },
+    "default_fps": {
+      "type": "integer", "minimum": 1,
+      "description": "Fallback playback fps for any clip that does not declare its own fps."
+    },
     "forward_axis": {"type": "string", "enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]},
     "up_axis": {"type": "string", "enum": ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]},
     "units": {"type": "string", "enum": ["meter", "centimeter", "millimeter", "inch", "foot"]},
@@ -67,6 +83,8 @@
         "properties": {
           "state": {"type": "string", "minLength": 1},
           "frames": {"type": "integer", "minimum": 1},
+          "fps": {"type": "integer", "minimum": 1,
+                  "description": "Playback fps for this clip. Falls back to default_fps, then the pipeline default."},
           "playback": {"type": "string", "enum": ["loop", "once"]},
           "clip": {"type": ["string", "null"]},
           "directional": {"type": "boolean"}

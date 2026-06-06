@@ -25,23 +25,12 @@ if str(SCRIPT_DIR) not in sys.path:
 
 import meshes  # noqa: E402
 
-REGION_NAMES = {1: "head", 2: "torso", 3: "arms", 4: "legs"}
-# keyword (lowercased substring of the material/group name) -> region id. Order: specific first.
-REGION_KEYWORDS = [
-    ("head", 1), ("skull", 1), ("face", 1), ("neck", 1), ("beak", 1),
-    ("torso", 2), ("chest", 2), ("body", 2), ("spine", 2), ("hip", 2), ("pelvis", 2), ("waist", 2), ("tail", 2),
-    ("arm", 3), ("hand", 3), ("shoulder", 3), ("elbow", 3), ("wrist", 3), ("wing", 3),
-    ("leg", 4), ("foot", 4), ("feet", 4), ("thigh", 4), ("shin", 4), ("knee", 4), ("ankle", 4),
-]
-
-
-def region_for_name(name: str) -> int:
-    """Body HIT region for a material/group name; unmatched body faces default to torso (2)."""
-    n = (name or "").lower()
-    for kw, rid in REGION_KEYWORDS:
-        if kw in n:
-            return rid
-    return 2
+# Region id<->name + the name->region keyword table live in constants.py (the single source, so the
+# auto-rigger's rigged-glb material naming and this bake-time region assignment resolve through the
+# SAME table and can never drift). Re-exported here for importers that pull them from mesh_io.
+from constants import (  # noqa: E402, F401
+    REGION_NAMES, REGION_NAME_TO_ID, REGION_KEYWORDS, region_for_name,
+)
 
 
 def load_obj(path, up: str = "z", normalize: bool = True):

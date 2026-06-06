@@ -7,6 +7,10 @@
   "up_axis": "+Z",
   "units": "meter",
   "origin_policy": "ground_footprint_center",
+  "archetype": "ball",
+  "rig": "ball_v1",
+  "default_state": "idle",
+  "default_fps": 12,
   "visual_objects": [
     "torso_ball_body"
   ],
@@ -30,6 +34,7 @@
     {
       "state": "idle",
       "frames": 1,
+      "fps": 6,
       "playback": "loop",
       "clip": "idle",
       "directional": true
@@ -37,6 +42,7 @@
     {
       "state": "roll",
       "frames": 6,
+      "fps": 12,
       "playback": "loop",
       "clip": "roll",
       "directional": true
@@ -44,6 +50,7 @@
     {
       "state": "pop",
       "frames": 5,
+      "fps": 14,
       "playback": "once",
       "clip": "pop",
       "directional": true
@@ -51,6 +58,7 @@
     {
       "state": "explode",
       "frames": 8,
+      "fps": 12,
       "playback": "once",
       "clip": "explode",
       "directional": true

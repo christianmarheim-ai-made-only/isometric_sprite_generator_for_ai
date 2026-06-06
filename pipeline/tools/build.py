@@ -55,6 +55,7 @@ STEPS = [
     ("test_loop_seam", [str(SCRIPT_DIR / "test_loop_seam.py")]),
     ("test_blender_goldens", [str(SCRIPT_DIR / "test_blender_goldens.py")]),
     ("test_bake_warnings", [str(SCRIPT_DIR / "test_bake_warnings.py")]),
+    ("test_intake", [str(SCRIPT_DIR / "test_intake.py")]),
 ]
 
 

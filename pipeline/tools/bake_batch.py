@@ -31,6 +31,53 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from bake_asset import bake_asset  # noqa: E402
 from build_log import write_build_index, index_summary  # noqa: E402
+from intake_package import lint_package, write_asset, find_package  # noqa: E402
+
+
+def prepare(paths, write: bool = True) -> tuple[list[dict], set, list[str]]:
+    """Intake pre-pass: find every delivered generated package (a *.package_manifest.json), GATE it,
+    and synthesize its <id>.asset.json when missing -- so a delivery that ships only its source files
+    still bakes, and an incomplete/inconsistent one is caught HERE (skipped, recorded) instead of
+    erroring at random mid-bake. Returns (intake_failures, skip_dirs, synthesized_variant_ids);
+    skip_dirs hold packages whose gate failed (their asset.json, if any, is excluded from the bake).
+    With write=False (dry run) it gates but writes nothing."""
+    failures: list[dict] = []
+    skip_dirs: set = set()
+    synthesized: list[str] = []
+    seen: set = set()
+    for p in paths:
+        p = Path(p)
+        manifests = sorted(p.rglob("*.package_manifest.json")) if p.is_dir() else []
+        for mani in manifests:
+            pkg = mani.parent.resolve()
+            if pkg in seen:
+                continue
+            seen.add(pkg)
+            rep = lint_package(pkg)
+            for w in rep.warnings:
+                print(f"  intake warn [{pkg.name}]: {w}")
+            if not rep.ok:
+                print(f"  INTAKE FAIL [{pkg.name}]: {len(rep.errors)} error(s) -> not baked")
+                for e in rep.errors:
+                    print(f"     - {e}")
+                failures.append({"package": pkg.name, "errors": rep.errors})
+                skip_dirs.add(pkg)
+                continue
+            try:
+                sa = find_package(pkg)["source_asset"]
+                vid = json.loads(sa.read_text(encoding="utf-8"))["asset_id"]
+                if not (pkg / f"{vid}.asset.json").exists():
+                    synthesized.append(vid)
+                    if write:
+                        out = write_asset(pkg)
+                        print(f"  intake: synthesized {out.name} for [{pkg.name}]")
+                    else:
+                        print(f"  intake: would synthesize {vid}.asset.json for [{pkg.name}]")
+            except Exception as e:                       # synthesis blew up despite a clean gate -> record
+                print(f"  INTAKE FAIL [{pkg.name}]: synth error {e!r} -> not baked")
+                failures.append({"package": pkg.name, "errors": [repr(e)]})
+                skip_dirs.add(pkg)
+    return failures, skip_dirs, synthesized
 
 
 def discover(paths) -> list[Path]:
@@ -62,15 +109,26 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true", help="list the packages that would bake, then stop")
     args = ap.parse_args()
 
-    assets = discover(args.paths)
-    if not assets:
-        print("no *.asset.json found under: " + ", ".join(str(p) for p in args.paths))
-        return 1
+    # Intake pre-pass: gate delivered packages + synthesize any missing asset.json front door.
+    intake_failures, skip_dirs, would_synth = prepare(args.paths, write=not args.dry_run)
+
+    assets = [a for a in discover(args.paths) if a.resolve().parent not in skip_dirs]
     if args.dry_run:
-        print(f"DRY RUN: {len(assets)} package(s) would bake:")
+        print(f"DRY RUN: {len(assets) + len(would_synth)} package(s) would bake "
+              f"({len(would_synth)} via synthesis); {len(intake_failures)} would be skipped (intake FAIL):")
         for a in assets:
             print(f"  {a}")
-        return 0
+        for v in would_synth:
+            print(f"  (synthesize) {v}.asset.json")
+        for f in intake_failures:
+            print(f"  SKIP {f['package']}: {len(f['errors'])} intake error(s)")
+        return 0 if not intake_failures else 1
+    if not assets:
+        if intake_failures:
+            print(f"\nINTAKE: all {len(intake_failures)} package(s) failed the gate; nothing to bake.")
+            return 1
+        print("no *.asset.json found under: " + ", ".join(str(p) for p in args.paths))
+        return 1
     args.out.mkdir(parents=True, exist_ok=True)
     print(f"BATCH [{args.batch_id}]: {len(assets)} package(s) -> {args.out}")
 
@@ -116,14 +174,19 @@ def main() -> int:
         for r in flagged:
             mark = "FAIL" if not r.get("ok", True) else "warn"
             print(f"  [{mark}] {r['variant']}: {', '.join(r['warning_codes'])}")
+    if intake_failures:
+        print(f"INTAKE FAILURES ({len(intake_failures)}) -- gated out, NOT baked:")
+        for f in intake_failures:
+            first = f["errors"][0][:160] if f["errors"] else ""
+            print(f"  {f['package']}: {len(f['errors'])} error(s) (first: {first})")
     if failures:
         print(f"BAKE FAILURES ({len(failures)}):")
         for f in failures:
             print(f"  {f['asset']} ({f['variant']}): {f['error'][:200]}")
     clean = sum(1 for r in idx if r.get("ok") and not r.get("warning_codes"))
-    print(f"\nBATCH DONE: {clean} clean / {len(idx)} baked / {len(failures)} failed  "
-          f"({len(assets)} package(s))  ->  {args.out / 'build_index.json'}")
-    return 0 if (not failures and all(r.get("ok") for r in idx)) else 1
+    print(f"\nBATCH DONE: {clean} clean / {len(idx)} baked / {len(failures)} bake-fail / "
+          f"{len(intake_failures)} intake-fail  ->  {args.out / 'build_index.json'}")
+    return 0 if (not failures and not intake_failures and all(r.get("ok") for r in idx)) else 1
 
 
 if __name__ == "__main__":

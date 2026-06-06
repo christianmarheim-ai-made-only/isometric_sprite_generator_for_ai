@@ -9,9 +9,9 @@ between `bake.py` and `hitbox_from_mesh.py`, the text hitbox a producer sanity-c
 matches the baked manifest; if `REGION_RGB` drifts between the render scripts, the R8 hit-mask
 decodes to the wrong gameplay region. Importing from here makes that drift impossible.
 
-PURE LITERALS ONLY -- no numpy/PIL/Blender imports -- so this module is safe to import from both
-host CPython and Blender's bundled interpreter (the Blender scripts `sys.path.insert(0, TOOLS)`
-before importing, exactly as they already do for `render3d`).
+PURE LITERALS + dependency-free pure helpers ONLY -- no numpy/PIL/Blender imports -- so this module
+is safe to import from both host CPython and Blender's bundled interpreter (the Blender scripts
+`sys.path.insert(0, TOOLS)` before importing, exactly as they already do for `render3d`).
 """
 from __future__ import annotations
 
@@ -33,6 +33,50 @@ REGION_RGB = {
     4: (0.93, 0.79, 0.20),   # legs
 }
 PREVIEW_BG_RGB = (0.10, 0.10, 0.10)   # region id 0 (none/background) tint, preview only
+
+# --- R8 HIT-region id <-> name + the name->region keyword table ------------------------------
+#     This is the SINGLE source for resolving a material/group name to a body region. Both the
+#     auto-rigger (rig_from_profile, which names the rigged-glb materials) and the bake
+#     (mesh_io.region_for_name, which assigns the HIT region per face) resolve through THIS table,
+#     so the material a part is given and the region the bake reads can never drift apart -- the
+#     drift that would (e.g.) colour a dragon's `wing` as torso while the mask calls it arms.
+REGION_NAMES = {1: "head", 2: "torso", 3: "arms", 4: "legs"}
+REGION_NAME_TO_ID = {v: k for k, v in REGION_NAMES.items()}
+REGION_KEYWORDS = [
+    ("head", 1), ("skull", 1), ("face", 1), ("neck", 1), ("beak", 1),
+    ("torso", 2), ("chest", 2), ("body", 2), ("spine", 2), ("hip", 2), ("pelvis", 2), ("waist", 2), ("tail", 2),
+    ("arm", 3), ("hand", 3), ("shoulder", 3), ("elbow", 3), ("wrist", 3), ("wing", 3),
+    ("leg", 4), ("foot", 4), ("feet", 4), ("thigh", 4), ("shin", 4), ("knee", 4), ("ankle", 4),
+]
+
+
+def region_for_name(name: str) -> int:
+    """Body HIT region id for a material/group name; unmatched body faces default to torso (2)."""
+    n = (name or "").lower()
+    for kw, rid in REGION_KEYWORDS:
+        if kw in n:
+            return rid
+    return 2
+
+
+def material_region_name(part_name: str, region_id: int, index: int = 0) -> str:
+    """Name a rigged part's material so the bake's region_for_name resolves it to `region_id`.
+
+    region_for_name returns the FIRST keyword (in REGION_KEYWORDS order: head<torso<arms<legs) found
+    anywhere in the name, so the encoding has three cases:
+      1. the part's OWN keyword already resolves correctly      -> keep the name (keyword deliveries untouched)
+      2. appending the canonical region keyword resolves it      -> `tentacle_3` declared legs -> `tentacle_3__legs`
+      3. the part name carries a HIGHER-priority conflicting kw  -> drop it: `wing_L` (wing=arms) declared legs
+         (e.g. wing -> arms outranks leg -> legs)                   can't keep "wing", so -> `legs__<index>`
+    `index` only matters for case 3 (a keyword-free ordinal that keeps the names distinct)."""
+    kw = REGION_NAMES[region_id]
+    if region_for_name(part_name) == region_id:
+        return part_name
+    cand = f"{part_name}__{kw}"
+    if region_for_name(cand) == region_id:
+        return cand
+    return f"{kw}__{index}"
+
 
 # --- Atlas paging ---------------------------------------------------------------------------
 MAX_PAGE_PX = 4096    # a single atlas page must fit within MAX_PAGE_PX in each dimension

@@ -10,6 +10,13 @@ What you get back: an engine-loadable sprite package (see `docs/multistate_sprit
 and, in the pipeline repo, `pipeline/docs/BEVY_LOADER_INTEGRATION.md`). You do **not** produce sprites — you produce
 the **3D source**, and a small `*.asset.json` manifest that tells the pipeline how to read it.
 
+> **Delivering a generated package?** If you ship a self-describing package (a
+> `*.package_manifest.json` inventory + a `*.source_asset.json` descriptor + hitbox/anim/materials
+> sidecars) you do **not** hand-author the `.asset.json` — the pipeline **synthesizes** it for you and
+> gates the delivery. Declare `archetype`, `rig`, and per-clip `fps` in your `source_asset.json` and see
+> **[`generated_package_intake.md`](generated_package_intake.md)** (the cow/ball quadruped/ball deliveries
+> work this way). The rest of this doc describes the `.asset.json` that intake produces.
+
 ---
 
 ## 0. The reuse split (read this first — it is how we scale)
