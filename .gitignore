@@ -27,11 +27,6 @@ pipeline/output/verify_set/build_index.json
 # arrow-pilot per-frame renderer intermediates (regenerable via generate_arrow_pilot.py)
 pipeline/output/arrow_pilot/frames/
 
-# PoC bake output (regenerable via bake_asset.py creative/pirate/chr_pirate_duelist_v1.asset.json)
-pipeline/output/pirate_poc/
-pipeline/output/pirate_poc_sharded/
-pipeline/output/pirate_demo/
-
 # batch bake output (regenerable via bake_batch.py)
 pipeline/output/incoming_batch/
 pipeline/output/new_creatures/
