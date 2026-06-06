@@ -1,0 +1,50 @@
+{
+  "atlases": {
+    "color": {
+      "path": "color_atlas.png",
+      "size": [
+        256,
+        128
+      ]
+    }
+  },
+  "build": {
+    "generator": "pipeline/tools/bake_terrain.py",
+    "renderer": "affine_2d_warp",
+    "source": "procedural_arid"
+  },
+  "camera": {
+    "azimuth_degrees": 45,
+    "camera_elevation_degrees": 30,
+    "elevation_degrees": 30,
+    "id": "game_iso_v1",
+    "projection": "orthographic_pixel_iso_dimetric_2_to_1",
+    "screen_y": "down",
+    "tile_px": [
+      64,
+      32
+    ]
+  },
+  "direction_count": 1,
+  "frame_canvas": [
+    256,
+    128
+  ],
+  "frames": [
+    {
+      "anchor": [
+        128.0,
+        64.0
+      ],
+      "direction": 0,
+      "rect": [
+        0,
+        0,
+        256,
+        128
+      ]
+    }
+  ],
+  "variant_class": "terrain",
+  "variant_id": "ground_arid_v1"
+}

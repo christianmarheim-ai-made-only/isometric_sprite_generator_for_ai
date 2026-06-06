@@ -37,8 +37,8 @@
     },
     "variant_id": { "type": "string", "description": "Human name of the variant (\"arrow_probe\", \"knight\", ...)." },
     "variant_class": {
-      "enum": ["probe", "character", "effect"],
-      "description": "probe = debug billboard (placeholder world_metrics OK, rendered at engine defaults). character/effect = real art (world_metrics REQUIRED + valid)."
+      "enum": ["probe", "character", "effect", "terrain"],
+      "description": "probe = debug billboard (placeholder world_metrics OK, rendered at engine defaults). character/effect = real art (world_metrics REQUIRED + valid). terrain = flat z=0 ground tile (engine ADR-053 / pipeline ADR-0006): direction_count 1, world_metrics OMITTED (not an occluder/viewer); the terrain tag IS the signal."
     },
     "direction_count": {
       "enum": [1, 2, 4, 8, 16],
