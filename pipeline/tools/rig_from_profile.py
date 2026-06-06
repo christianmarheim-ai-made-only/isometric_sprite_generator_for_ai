@@ -113,6 +113,25 @@ if MATERIALS:
         rid = REGION_NAME_TO_ID.get(mm.get("region")) or region_for_name(mm.get("name", ""))
         _region_color.setdefault(rid, mm.get("base_color"))
 
+# Uncovered-region fallback: a region present on the mesh but with NO base_color in materials.json (a
+# common producer gap -- e.g. limbs left unpainted, as in the green ogre's arms/legs and the red dragon's
+# hindlegs) would otherwise bake flat 0.8 GREY -- a grey-limbed "green ogre". Inherit the BODY (torso,
+# region 2) colour instead: it is the creature's skin/scale colour, a far better default than grey.
+# Fall back to any declared colour, then grey. Warn once per region so the producer gap stays visible.
+_warned_regions = set()
+
+
+def _color_for(rid):
+    col = _region_color.get(rid)
+    if col:
+        return col
+    fb = _region_color.get(2) or (next(iter(_region_color.values()), None) if _region_color else None)
+    if rid not in _warned_regions:
+        _warned_regions.add(rid)
+        print(f"WARN: region {rid} ({REGION_NAMES.get(rid, '?')}) has no base_color in materials.json -> "
+              f"inheriting the body/torso colour {fb if fb else 'grey'} (paint it in the sidecar to override)")
+    return fb or (0.8, 0.8, 0.8)
+
 # REPLACE each part-mesh's material with a clean, fresh single-Principled material: the delivered glb's
 # imported node graph resolves to flat 0.8 grey through the glTF exporter (see the vertex-colour note
 # below), so a clean material is the only thing that round-trips. The material NAME must make the
@@ -122,7 +141,7 @@ if MATERIALS:
 # sidecar, so the bake renders true per-region colour instead of grey.
 for _idx, m in enumerate(meshes):
     region_id = _region_of(m.name)
-    col = _region_color.get(region_id) or (0.8, 0.8, 0.8)
+    col = _color_for(region_id)
     mat_name = material_region_name(m.name, region_id, _idx)
     newmat = bpy.data.materials.new(name=mat_name)
     newmat.use_nodes = True

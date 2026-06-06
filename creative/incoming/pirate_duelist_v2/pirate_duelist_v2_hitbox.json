@@ -1,0 +1,72 @@
+{
+  "hitbox_spec_version": "hitbox_v1",
+  "from_mesh": "pirate_duelist_v2.glb",
+  "unit": "meter",
+  "up": "z",
+  "world_metrics": {
+    "unit": "meter",
+    "height_world": 1.82,
+    "footprint_radius_world": 0.38,
+    "eye_height_world": 1.64
+  },
+  "collision_capsule": {
+    "radius_world": 0.38,
+    "height_world": 1.82,
+    "note": "Gameplay capsule intentionally uses authored body height rather than visual hat height."
+  },
+  "regions": {
+    "head": {
+      "id": 1,
+      "aabb_min": [
+        -0.19874,
+        -0.3475,
+        1.39
+      ],
+      "aabb_max": [
+        0.2475,
+        0.3475,
+        2.02
+      ]
+    },
+    "torso": {
+      "id": 2,
+      "aabb_min": [
+        -0.20651,
+        -0.31035,
+        0.36
+      ],
+      "aabb_max": [
+        0.294,
+        0.31035,
+        1.55
+      ]
+    },
+    "arms": {
+      "id": 3,
+      "aabb_min": [
+        -0.065,
+        -0.5225,
+        0.77
+      ],
+      "aabb_max": [
+        0.48,
+        0.51166,
+        1.45082
+      ]
+    },
+    "legs": {
+      "id": 4,
+      "aabb_min": [
+        -0.075,
+        -0.175,
+        0.005
+      ],
+      "aabb_max": [
+        0.23,
+        0.175,
+        0.9
+      ]
+    }
+  },
+  "hitmask_note": "Regions come from material-name keyword matching. Hat maps to head; pistol maps to arms because weapon/gear regions are not active in external_asset_v1."
+}

@@ -1,0 +1,18 @@
+{
+  "package_manifest_version": "generated_asset_package_v1",
+  "asset_id": "green_ogre_v1",
+  "entry_files": {
+    "glb_mesh": "green_ogre_v1.glb",
+    "model_source": "green_ogre_v1.model_source.json",
+    "source_asset": "green_ogre_v1.source_asset.json",
+    "animation_data": "green_ogre_v1_anim.json",
+    "hitbox": "green_ogre_v1_hitbox.json",
+    "physical_metrics": "green_ogre_v1_physical_metrics.json",
+    "spell_orbits": "green_ogre_v1_spell_orbits.json",
+    "sockets": "green_ogre_v1_sockets.json",
+    "materials": "green_ogre_v1_materials.json",
+    "texture_atlas": "green_ogre_v1_texture_atlas.png",
+    "concept_art": "green_ogre_v1_concept_art.png",
+    "external_asset": "green_ogre_v1.asset.json"
+  }
+}

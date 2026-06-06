@@ -1,0 +1,334 @@
+{
+  "rig_profile": "dragon_v1",
+  "description": "Large winged quadruped dragon rig with head, forelegs, hindlegs, wings and tail.",
+  "bind_pose_units": "metre, +Z up, +X forward",
+  "bones": [
+    {
+      "name": "root",
+      "parent": null,
+      "head": [
+        0,
+        0,
+        0
+      ],
+      "tail": [
+        0,
+        0,
+        0.1
+      ]
+    },
+    {
+      "name": "pelvis",
+      "parent": "root",
+      "head": [
+        -0.9,
+        0,
+        2.6
+      ],
+      "tail": [
+        0.2,
+        0,
+        2.9
+      ]
+    },
+    {
+      "name": "spine",
+      "parent": "pelvis",
+      "head": [
+        0.2,
+        0,
+        2.9
+      ],
+      "tail": [
+        1.8,
+        0,
+        3.5
+      ]
+    },
+    {
+      "name": "chest",
+      "parent": "spine",
+      "head": [
+        1.8,
+        0,
+        3.5
+      ],
+      "tail": [
+        2.6,
+        0,
+        4.0
+      ]
+    },
+    {
+      "name": "neck",
+      "parent": "chest",
+      "head": [
+        2.6,
+        0,
+        4.0
+      ],
+      "tail": [
+        4.1,
+        0,
+        5.0
+      ]
+    },
+    {
+      "name": "head",
+      "parent": "neck",
+      "head": [
+        4.1,
+        0,
+        5.0
+      ],
+      "tail": [
+        5.3,
+        0,
+        5.3
+      ]
+    },
+    {
+      "name": "jaw",
+      "parent": "head",
+      "head": [
+        5.0,
+        0,
+        4.9
+      ],
+      "tail": [
+        5.5,
+        0,
+        4.8
+      ]
+    },
+    {
+      "name": "horn.L",
+      "parent": "head",
+      "head": [
+        4.2,
+        -0.22,
+        5.6
+      ],
+      "tail": [
+        3.7,
+        -0.3,
+        6.1
+      ]
+    },
+    {
+      "name": "horn.R",
+      "parent": "head",
+      "head": [
+        4.2,
+        0.22,
+        5.6
+      ],
+      "tail": [
+        3.7,
+        0.3,
+        6.1
+      ]
+    },
+    {
+      "name": "wing.L",
+      "parent": "chest",
+      "head": [
+        1.2,
+        -1.0,
+        4.1
+      ],
+      "tail": [
+        1.6,
+        -4.2,
+        5.0
+      ]
+    },
+    {
+      "name": "wing.R",
+      "parent": "chest",
+      "head": [
+        1.2,
+        1.0,
+        4.1
+      ],
+      "tail": [
+        1.6,
+        4.2,
+        5.0
+      ]
+    },
+    {
+      "name": "foreleg.L",
+      "parent": "chest",
+      "head": [
+        1.8,
+        -0.95,
+        2.8
+      ],
+      "tail": [
+        1.9,
+        -0.95,
+        1.4
+      ]
+    },
+    {
+      "name": "foreleg.R",
+      "parent": "chest",
+      "head": [
+        1.8,
+        0.95,
+        2.8
+      ],
+      "tail": [
+        1.9,
+        0.95,
+        1.4
+      ]
+    },
+    {
+      "name": "hindleg.L",
+      "parent": "pelvis",
+      "head": [
+        -1.2,
+        -0.95,
+        2.4
+      ],
+      "tail": [
+        -1.1,
+        -0.95,
+        1.2
+      ]
+    },
+    {
+      "name": "hindleg.R",
+      "parent": "pelvis",
+      "head": [
+        -1.2,
+        0.95,
+        2.4
+      ],
+      "tail": [
+        -1.1,
+        0.95,
+        1.2
+      ]
+    },
+    {
+      "name": "tail.1",
+      "parent": "pelvis",
+      "head": [
+        -2.4,
+        0,
+        2.6
+      ],
+      "tail": [
+        -3.5,
+        0,
+        2.4
+      ]
+    },
+    {
+      "name": "tail.2",
+      "parent": "tail.1",
+      "head": [
+        -3.5,
+        0,
+        2.4
+      ],
+      "tail": [
+        -4.7,
+        0,
+        2.2
+      ]
+    },
+    {
+      "name": "tail.3",
+      "parent": "tail.2",
+      "head": [
+        -4.7,
+        0,
+        2.2
+      ],
+      "tail": [
+        -6.0,
+        0,
+        2.0
+      ]
+    }
+  ],
+  "region_by_bone": {
+    "head": "head",
+    "jaw": "head",
+    "neck": "head",
+    "horn.L": "head",
+    "horn.R": "head",
+    "pelvis": "torso",
+    "spine": "torso",
+    "chest": "torso",
+    "tail.1": "torso",
+    "tail.2": "torso",
+    "tail.3": "torso",
+    "wing.L": "arms",
+    "wing.R": "arms",
+    "foreleg.L": "arms",
+    "foreleg.R": "arms",
+    "hindleg.L": "legs",
+    "hindleg.R": "legs"
+  },
+  "states": {
+    "idle": {
+      "required": true,
+      "frames": 4,
+      "fps": 6,
+      "playback": "loop"
+    },
+    "walk": {
+      "required": false,
+      "frames": 8,
+      "fps": 10,
+      "playback": "loop"
+    },
+    "run": {
+      "required": false,
+      "frames": 8,
+      "fps": 14,
+      "playback": "loop"
+    },
+    "bite": {
+      "required": false,
+      "frames": 6,
+      "fps": 12,
+      "playback": "once"
+    },
+    "breath": {
+      "required": false,
+      "frames": 8,
+      "fps": 12,
+      "playback": "once"
+    },
+    "takeoff": {
+      "required": false,
+      "frames": 8,
+      "fps": 12,
+      "playback": "once"
+    },
+    "fly": {
+      "required": false,
+      "frames": 8,
+      "fps": 12,
+      "playback": "loop"
+    },
+    "hurt": {
+      "required": false,
+      "frames": 5,
+      "fps": 12,
+      "playback": "once"
+    },
+    "death": {
+      "required": false,
+      "frames": 8,
+      "fps": 10,
+      "playback": "once"
+    }
+  }
+}

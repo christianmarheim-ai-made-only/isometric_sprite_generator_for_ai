@@ -1,0 +1,31 @@
+{
+  "physical_metrics_version": "physical_metrics_v1",
+  "asset_id": "green_ogre_v1",
+  "unit": "meter_kg_second",
+  "metrics_source": "authored_from_metric_proxy_volume",
+  "density_profile": "ogre_humanoid_v1",
+  "density_kg_per_m3": 990.0,
+  "body_volume_m3": 0.214,
+  "mass_kg": 211.9,
+  "weight_newtons_earth": 2078.23,
+  "gravity_m_per_s2": 9.80665,
+  "volume_policy": "Humanoid proxy volume includes torso, head, limbs and excludes loincloth.",
+  "metric_proxy_volume_breakdown_m3": [
+    {
+      "name": "torso_proxy",
+      "volume_m3": 0.118
+    },
+    {
+      "name": "head_proxy",
+      "volume_m3": 0.018
+    },
+    {
+      "name": "arms_proxy",
+      "volume_m3": 0.032
+    },
+    {
+      "name": "legs_proxy",
+      "volume_m3": 0.046
+    }
+  ]
+}

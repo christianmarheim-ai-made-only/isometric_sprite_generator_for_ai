@@ -1,0 +1,144 @@
+{
+  "asset_id": "green_ogre_v1",
+  "variant_class": "character",
+  "source_format": "gltf",
+  "source_file": "green_ogre_v1.glb",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "ground_footprint_center",
+  "archetype": "biped",
+  "rig": "biped_v1",
+  "visual_objects": [
+    "torso_pelvis",
+    "torso_belly",
+    "torso_chest",
+    "head_head",
+    "head_jaw",
+    "arms_upper_L",
+    "arms_upper_R",
+    "legs_thigh_L",
+    "legs_thigh_R"
+  ],
+  "hit_proxy_objects": [
+    {
+      "name": "head_head",
+      "region": "head"
+    },
+    {
+      "name": "head_jaw",
+      "region": "head"
+    },
+    {
+      "name": "torso_pelvis",
+      "region": "torso"
+    },
+    {
+      "name": "torso_belly",
+      "region": "torso"
+    },
+    {
+      "name": "torso_chest",
+      "region": "torso"
+    },
+    {
+      "name": "arms_upper_L",
+      "region": "arms"
+    },
+    {
+      "name": "arms_upper_R",
+      "region": "arms"
+    },
+    {
+      "name": "arms_fore_L",
+      "region": "arms"
+    },
+    {
+      "name": "arms_fore_R",
+      "region": "arms"
+    },
+    {
+      "name": "legs_thigh_L",
+      "region": "legs"
+    },
+    {
+      "name": "legs_thigh_R",
+      "region": "legs"
+    },
+    {
+      "name": "legs_shin_L",
+      "region": "legs"
+    },
+    {
+      "name": "legs_shin_R",
+      "region": "legs"
+    }
+  ],
+  "metric_proxy_objects": [
+    "torso_pelvis",
+    "torso_belly",
+    "torso_chest",
+    "head_head",
+    "arms_upper_L",
+    "arms_upper_R",
+    "legs_thigh_L",
+    "legs_thigh_R"
+  ],
+  "sockets": [
+    "head_socket",
+    "eye.L",
+    "eye.R",
+    "shoulder.L",
+    "shoulder.R",
+    "hand.L",
+    "hand.R",
+    "pelvis_ring_center",
+    "shoulder_ring_center",
+    "back_socket"
+  ],
+  "clips_states": [
+    {
+      "state": "idle",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "idle",
+      "directional": true
+    },
+    {
+      "state": "walk",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "move",
+      "directional": true
+    },
+    {
+      "state": "attack",
+      "frames": 6,
+      "playback": "once",
+      "clip": "attack",
+      "directional": true
+    },
+    {
+      "state": "roar",
+      "frames": 6,
+      "playback": "once",
+      "clip": "roar",
+      "directional": true
+    },
+    {
+      "state": "hit",
+      "frames": 5,
+      "playback": "once",
+      "clip": "hurt",
+      "directional": true
+    },
+    {
+      "state": "death",
+      "frames": 8,
+      "playback": "once",
+      "clip": "death",
+      "directional": true
+    }
+  ],
+  "notes": "Source-side descriptor for the ogre generator package."
+}

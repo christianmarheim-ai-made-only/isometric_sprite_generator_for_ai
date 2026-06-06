@@ -34,3 +34,9 @@ pipeline/output/pirate_demo/
 
 # batch bake output (regenerable via bake_batch.py)
 pipeline/output/incoming_batch/
+pipeline/output/new_creatures/
+
+# delivered human reference art (NOT pipeline inputs -- the bake uses glb + materials + texture_atlas).
+# Already-committed concept art (cow/ball) stays tracked; this keeps NEW deliveries' large refs out.
+creative/incoming/*/concept_art/
+creative/incoming/*/*_concept_art.png

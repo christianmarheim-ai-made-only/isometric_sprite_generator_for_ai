@@ -1,0 +1,72 @@
+{
+  "hitbox_spec_version": "hitbox_v1",
+  "from_mesh": "green_ogre_v1.glb",
+  "unit": "meter",
+  "up": "z",
+  "world_metrics": {
+    "height_world": 2.42,
+    "footprint_radius_world": 0.46,
+    "eye_height_world": 2.18,
+    "unit": "meter"
+  },
+  "collision_capsule": {
+    "radius_world": 0.46,
+    "height_world": 2.42,
+    "note": "Broad biped capsule with generous shoulder mass."
+  },
+  "regions": {
+    "head": {
+      "id": 1,
+      "aabb_min": [
+        -0.16,
+        -0.26,
+        2.05
+      ],
+      "aabb_max": [
+        0.34,
+        0.26,
+        2.62
+      ]
+    },
+    "torso": {
+      "id": 2,
+      "aabb_min": [
+        -0.45,
+        -0.42,
+        0.84
+      ],
+      "aabb_max": [
+        0.55,
+        0.42,
+        2.2
+      ]
+    },
+    "arms": {
+      "id": 3,
+      "aabb_min": [
+        -0.14,
+        -0.72,
+        0.7
+      ],
+      "aabb_max": [
+        0.28,
+        0.72,
+        1.95
+      ]
+    },
+    "legs": {
+      "id": 4,
+      "aabb_min": [
+        -0.28,
+        -0.34,
+        0.0
+      ],
+      "aabb_max": [
+        0.2,
+        0.34,
+        1.08
+      ]
+    }
+  },
+  "hitmask_note": "Head, torso, arms, and legs correspond to the ogre concept and biped rig."
+}

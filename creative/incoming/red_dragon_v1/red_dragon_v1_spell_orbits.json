@@ -1,0 +1,39 @@
+{
+  "spell_orbit_spec_version": "spell_orbit_points_v1",
+  "asset_id": "red_dragon_v1",
+  "unit": "meter",
+  "pelvis_ring": {
+    "center_world": [
+      -0.7,
+      0.0,
+      2.85
+    ],
+    "height_world": 2.85,
+    "radius_world": 0.95,
+    "plane": "xy",
+    "note": "Large orbit ring around the dragon midsection/pelvis area."
+  },
+  "shoulder_ring": {
+    "center_world": [
+      1.85,
+      0.0,
+      4.7
+    ],
+    "height_world": 4.7,
+    "radius_world": 1.1,
+    "plane": "xy",
+    "left_anchor_world": [
+      1.85,
+      0.78,
+      4.7
+    ],
+    "right_anchor_world": [
+      1.85,
+      -0.78,
+      4.7
+    ],
+    "clearance_above_head_world": 1.55,
+    "clearance_below_belly_world": 1.95,
+    "note": "Suitable for large shoulder-orbiting fireballs below horn level and above the chest line."
+  }
+}

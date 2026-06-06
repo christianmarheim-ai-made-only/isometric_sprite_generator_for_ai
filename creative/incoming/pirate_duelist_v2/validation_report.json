@@ -1,0 +1,31 @@
+{
+  "asset_id": "pirate_duelist_v2",
+  "status": "ok",
+  "checks": [
+    {
+      "file": "pirate_duelist_v2.asset.json",
+      "schema": "external_asset",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "file": "pirate_duelist_v2.source_asset.json",
+      "schema": "source_asset",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "file": "pirate_duelist_v2_anim.json",
+      "schema": "animation_clips",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "file": "pirate_duelist_v2_hitbox.json",
+      "schema": "hitbox",
+      "valid": true,
+      "errors": []
+    }
+  ],
+  "notes": "Schema validation checks structure only. Blender bake-time will still validate GLB rig/bone compatibility and clip embedding."
+}

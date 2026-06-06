@@ -1,0 +1,20 @@
+{
+  "package_manifest_version": "generated_asset_package_v1",
+  "asset_id": "pirate_duelist_v2",
+  "package_role": "biped character / pirate ranged NPC",
+  "entry_files": {
+    "external_asset": "pirate_duelist_v2.asset.json",
+    "glb_mesh": "pirate_duelist_v2.glb",
+    "source_asset": "pirate_duelist_v2.source_asset.json",
+    "model_source": "pirate_duelist_v2.model_source.json",
+    "animation_data": "pirate_duelist_v2_anim.json",
+    "hitbox": "pirate_duelist_v2_hitbox.json",
+    "physical_metrics": "pirate_duelist_v2_physical_metrics.json",
+    "spell_orbits": "pirate_duelist_v2_spell_orbits.json",
+    "sockets": "pirate_duelist_v2_sockets.json",
+    "combat_hooks": "pirate_duelist_v2_combat_hooks.json",
+    "materials": "pirate_duelist_v2_materials.json",
+    "texture_atlas": "pirate_duelist_v2_texture_atlas.png",
+    "concept_art_folder": "concept_art/"
+  }
+}

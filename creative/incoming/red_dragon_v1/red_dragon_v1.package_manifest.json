@@ -1,0 +1,17 @@
+{
+  "package_manifest_version": "generated_asset_package_v1",
+  "asset_id": "red_dragon_v1",
+  "entry_files": {
+    "glb_mesh": "red_dragon_v1.glb",
+    "model_source": "red_dragon_v1.model_source.json",
+    "source_asset": "red_dragon_v1.source_asset.json",
+    "animation_data": "red_dragon_v1_anim.json",
+    "hitbox": "red_dragon_v1_hitbox.json",
+    "physical_metrics": "red_dragon_v1_physical_metrics.json",
+    "spell_orbits": "red_dragon_v1_spell_orbits.json",
+    "sockets": "red_dragon_v1_sockets.json",
+    "materials": "red_dragon_v1_materials.json",
+    "texture_atlas": "red_dragon_v1_texture_atlas.png",
+    "concept_art": "red_dragon_v1_concept_art.png"
+  }
+}

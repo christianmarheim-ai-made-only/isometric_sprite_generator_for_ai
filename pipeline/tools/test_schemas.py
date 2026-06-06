@@ -61,8 +61,11 @@ def main() -> int:
                         not es, "; ".join(es[:4]))
 
     # the schemas must also REJECT malformed input (not vacuous)
+    # NB: archetype/forward use values that are STILL invalid -- 'dragon' is now a valid archetype and
+    # forward is now a planar enum {+x,-x,+y,-y}, so the negative case uses an unknown archetype + a
+    # vertical (invalid) forward.
     bad_asset = {"asset_contract_version": "external_asset_v1", "variant_id": "Bad Caps",
-                 "archetype": "dragon", "files": {}, "geometry": {"forward": "-y"}}
+                 "archetype": "griffon", "files": {}, "geometry": {"forward": "+z"}}
     ok &= check("external_asset rejects bad id/archetype/forward/missing-mesh",
                 len(errs_for(SCHEMA / "external_asset.schema.json", bad_asset)) >= 3)
     bad_anim = {"anim_spec_version": "anim_clips_v1", "rig": "bird_v1",

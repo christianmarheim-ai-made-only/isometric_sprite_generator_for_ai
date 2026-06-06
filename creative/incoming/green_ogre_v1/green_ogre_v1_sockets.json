@@ -1,0 +1,57 @@
+{
+  "socket_spec_version": "socket_points_v1",
+  "asset_id": "green_ogre_v1",
+  "unit": "meter",
+  "sockets": {
+    "head_socket": [
+      0.14,
+      0.0,
+      2.34
+    ],
+    "eye.L": [
+      0.2,
+      0.08,
+      2.18
+    ],
+    "eye.R": [
+      0.2,
+      -0.08,
+      2.18
+    ],
+    "shoulder.L": [
+      0.02,
+      0.48,
+      1.88
+    ],
+    "shoulder.R": [
+      0.02,
+      -0.48,
+      1.88
+    ],
+    "hand.L": [
+      0.06,
+      0.54,
+      0.75
+    ],
+    "hand.R": [
+      0.06,
+      -0.54,
+      0.75
+    ],
+    "pelvis_ring_center": [
+      0.0,
+      0.0,
+      1.12
+    ],
+    "shoulder_ring_center": [
+      0.06,
+      0.0,
+      1.88
+    ],
+    "back_socket": [
+      -0.18,
+      0.0,
+      1.84
+    ]
+  }
+}

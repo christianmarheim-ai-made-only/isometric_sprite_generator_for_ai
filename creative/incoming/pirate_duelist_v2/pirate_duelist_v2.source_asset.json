@@ -1,0 +1,288 @@
+{
+  "asset_id": "pirate_duelist_v2",
+  "variant_class": "character",
+  "source_format": "gltf",
+  "source_file": "pirate_duelist_v2.glb",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "ground_footprint_center",
+  "archetype": "biped",
+  "rig": "biped_v1",
+  "visual_objects": [
+    "torso_pelvis_body",
+    "torso_chest_body",
+    "torso_shirt_front_panel",
+    "torso_waist_sash_front",
+    "torso_waist_sash_left",
+    "torso_waist_sash_right",
+    "torso_belt_front",
+    "torso_belt_buckle",
+    "torso_coat_tail_left",
+    "torso_coat_tail_right",
+    "torso_pendant",
+    "head_neck",
+    "head_face",
+    "head_nose",
+    "head_hair_back",
+    "head_beard_front",
+    "head_bandana_wrap",
+    "head_hat_brim",
+    "head_hat_crown",
+    "head_hat_front_gold_trim",
+    "head_hat_left_gold_trim",
+    "head_hat_right_gold_trim",
+    "arms_upper_L_sleeve",
+    "arms_forearm_L_sleeve",
+    "arms_hand_L_skin",
+    "arms_upper_R_sleeve",
+    "arms_forearm_R_sleeve",
+    "arms_hand_R_skin",
+    "arms_pistol_barrel",
+    "arms_pistol_grip",
+    "arms_pistol_gold_lock",
+    "legs_thigh_L_pants",
+    "legs_shin_L_boot",
+    "legs_foot_L_boot",
+    "legs_thigh_R_pants",
+    "legs_shin_R_boot",
+    "legs_foot_R_boot"
+  ],
+  "hit_proxy_objects": [
+    {
+      "name": "torso_pelvis_body",
+      "region": "torso"
+    },
+    {
+      "name": "torso_chest_body",
+      "region": "torso"
+    },
+    {
+      "name": "torso_shirt_front_panel",
+      "region": "torso"
+    },
+    {
+      "name": "torso_waist_sash_front",
+      "region": "torso"
+    },
+    {
+      "name": "torso_waist_sash_left",
+      "region": "torso"
+    },
+    {
+      "name": "torso_waist_sash_right",
+      "region": "torso"
+    },
+    {
+      "name": "torso_belt_front",
+      "region": "torso"
+    },
+    {
+      "name": "torso_belt_buckle",
+      "region": "torso"
+    },
+    {
+      "name": "torso_coat_tail_left",
+      "region": "torso"
+    },
+    {
+      "name": "torso_coat_tail_right",
+      "region": "torso"
+    },
+    {
+      "name": "torso_pendant",
+      "region": "torso"
+    },
+    {
+      "name": "head_neck",
+      "region": "head"
+    },
+    {
+      "name": "head_face",
+      "region": "head"
+    },
+    {
+      "name": "head_nose",
+      "region": "head"
+    },
+    {
+      "name": "head_hair_back",
+      "region": "head"
+    },
+    {
+      "name": "head_beard_front",
+      "region": "head"
+    },
+    {
+      "name": "head_bandana_wrap",
+      "region": "head"
+    },
+    {
+      "name": "head_hat_brim",
+      "region": "head"
+    },
+    {
+      "name": "head_hat_crown",
+      "region": "head"
+    },
+    {
+      "name": "head_hat_front_gold_trim",
+      "region": "head"
+    },
+    {
+      "name": "head_hat_left_gold_trim",
+      "region": "head"
+    },
+    {
+      "name": "head_hat_right_gold_trim",
+      "region": "head"
+    },
+    {
+      "name": "arms_upper_L_sleeve",
+      "region": "arms"
+    },
+    {
+      "name": "arms_forearm_L_sleeve",
+      "region": "arms"
+    },
+    {
+      "name": "arms_hand_L_skin",
+      "region": "arms"
+    },
+    {
+      "name": "arms_upper_R_sleeve",
+      "region": "arms"
+    },
+    {
+      "name": "arms_forearm_R_sleeve",
+      "region": "arms"
+    },
+    {
+      "name": "arms_hand_R_skin",
+      "region": "arms"
+    },
+    {
+      "name": "arms_pistol_barrel",
+      "region": "arms"
+    },
+    {
+      "name": "arms_pistol_grip",
+      "region": "arms"
+    },
+    {
+      "name": "arms_pistol_gold_lock",
+      "region": "arms"
+    },
+    {
+      "name": "legs_thigh_L_pants",
+      "region": "legs"
+    },
+    {
+      "name": "legs_shin_L_boot",
+      "region": "legs"
+    },
+    {
+      "name": "legs_foot_L_boot",
+      "region": "legs"
+    },
+    {
+      "name": "legs_thigh_R_pants",
+      "region": "legs"
+    },
+    {
+      "name": "legs_shin_R_boot",
+      "region": "legs"
+    },
+    {
+      "name": "legs_foot_R_boot",
+      "region": "legs"
+    }
+  ],
+  "metric_proxy_objects": [
+    "torso_chest_abdomen_proxy",
+    "pelvis_proxy",
+    "head_neck_proxy",
+    "upper_arms_pair_proxy",
+    "forearms_pair_proxy",
+    "hands_pair_proxy",
+    "thighs_pair_proxy",
+    "lower_legs_pair_proxy",
+    "feet_pair_proxy"
+  ],
+  "sockets": [
+    "eye",
+    "head_socket",
+    "shoulder_perch.L",
+    "shoulder_perch.R",
+    "hand.L",
+    "hand.R",
+    "muzzle.R",
+    "back_socket",
+    "belt_socket",
+    "foot.L",
+    "foot.R",
+    "pelvis_ring_center",
+    "shoulder_ring_center",
+    "shoulder.L",
+    "shoulder.R"
+  ],
+  "clips_states": [
+    {
+      "state": "idle",
+      "frames": 12,
+      "playback": "loop",
+      "clip": "idle",
+      "directional": true
+    },
+    {
+      "state": "walk",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "move",
+      "directional": true
+    },
+    {
+      "state": "run",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "run",
+      "directional": true
+    },
+    {
+      "state": "attack",
+      "frames": 6,
+      "playback": "once",
+      "clip": "shoot",
+      "directional": true
+    },
+    {
+      "state": "reload",
+      "frames": 10,
+      "playback": "once",
+      "clip": "reload",
+      "directional": true
+    },
+    {
+      "state": "hit",
+      "frames": 5,
+      "playback": "once",
+      "clip": "hurt",
+      "directional": true
+    },
+    {
+      "state": "death",
+      "frames": 8,
+      "playback": "once",
+      "clip": "death",
+      "directional": true
+    },
+    {
+      "state": "celebrate",
+      "frames": 8,
+      "playback": "once",
+      "clip": "celebrate",
+      "directional": true
+    }
+  ],
+  "notes": "Source-side pirate descriptor. Pistol and hat remain visual body-geometry until weapon/gear regions become official contract fields."
+}

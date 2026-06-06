@@ -1,0 +1,194 @@
+{
+  "socket_spec_version": "socket_points_v1",
+  "asset_id": "pirate_duelist_v2",
+  "unit": "meter",
+  "sockets": {
+    "eye": [
+      0.13,
+      0.0,
+      1.64
+    ],
+    "head_socket": [
+      0.0,
+      0.0,
+      1.92
+    ],
+    "shoulder_perch.L": [
+      0.02,
+      0.23,
+      1.43
+    ],
+    "shoulder_perch.R": [
+      0.02,
+      -0.23,
+      1.43
+    ],
+    "hand.L": [
+      0.03,
+      0.49,
+      0.88
+    ],
+    "hand.R": [
+      0.03,
+      -0.49,
+      0.88
+    ],
+    "muzzle.R": [
+      0.48,
+      -0.5,
+      0.91
+    ],
+    "back_socket": [
+      -0.16,
+      0.0,
+      1.25
+    ],
+    "belt_socket": [
+      0.1,
+      -0.24,
+      0.94
+    ],
+    "foot.L": [
+      0.12,
+      0.1,
+      0.02
+    ],
+    "foot.R": [
+      0.12,
+      -0.1,
+      0.02
+    ],
+    "pelvis_ring_center": [
+      0.0,
+      0.0,
+      0.94
+    ],
+    "shoulder_ring_center": [
+      0.02,
+      0.0,
+      1.43
+    ],
+    "shoulder.L": [
+      0.02,
+      0.23,
+      1.43
+    ],
+    "shoulder.R": [
+      0.02,
+      -0.23,
+      1.43
+    ]
+  },
+  "detailed_sockets": [
+    {
+      "name": "eye",
+      "parent_bone": "head",
+      "position_world": [
+        0.13,
+        0.0,
+        1.64
+      ],
+      "purpose": "vision/aim origin"
+    },
+    {
+      "name": "head_socket",
+      "parent_bone": "head",
+      "position_world": [
+        0.0,
+        0.0,
+        1.92
+      ],
+      "purpose": "hat/top-of-head attachment"
+    },
+    {
+      "name": "shoulder_perch.L",
+      "parent_bone": "chest",
+      "position_world": [
+        0.02,
+        0.23,
+        1.43
+      ],
+      "purpose": "parrot/perch attachment"
+    },
+    {
+      "name": "shoulder_perch.R",
+      "parent_bone": "chest",
+      "position_world": [
+        0.02,
+        -0.23,
+        1.43
+      ],
+      "purpose": "parrot/perch attachment"
+    },
+    {
+      "name": "hand.L",
+      "parent_bone": "hand.L",
+      "position_world": [
+        0.03,
+        0.49,
+        0.88
+      ],
+      "purpose": "offhand item attach"
+    },
+    {
+      "name": "hand.R",
+      "parent_bone": "hand.R",
+      "position_world": [
+        0.03,
+        -0.49,
+        0.88
+      ],
+      "purpose": "weapon attach"
+    },
+    {
+      "name": "muzzle.R",
+      "parent_bone": "hand.R",
+      "position_world": [
+        0.48,
+        -0.5,
+        0.91
+      ],
+      "purpose": "projectile/VFX spawn; forward +X"
+    },
+    {
+      "name": "back_socket",
+      "parent_bone": "chest",
+      "position_world": [
+        -0.16,
+        0.0,
+        1.25
+      ],
+      "purpose": "back/cape/loot attach"
+    },
+    {
+      "name": "belt_socket",
+      "parent_bone": "hips",
+      "position_world": [
+        0.1,
+        -0.24,
+        0.94
+      ],
+      "purpose": "belt/holster attach"
+    },
+    {
+      "name": "foot.L",
+      "parent_bone": "foot.L",
+      "position_world": [
+        0.12,
+        0.1,
+        0.02
+      ],
+      "purpose": "left footstep/contact"
+    },
+    {
+      "name": "foot.R",
+      "parent_bone": "foot.R",
+      "position_world": [
+        0.12,
+        -0.1,
+        0.02
+      ],
+      "purpose": "right footstep/contact"
+    }
+  ]
+}

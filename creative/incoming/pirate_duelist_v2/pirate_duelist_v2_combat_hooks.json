@@ -1,0 +1,57 @@
+{
+  "combat_hooks_version": "combat_hooks_v1",
+  "asset_id": "pirate_duelist_v2",
+  "unit": "meter",
+  "ranged_weapon": {
+    "weapon_visual_policy": "visual mesh attached to right hand; still material-mapped under arms/body regions by current body-only HIT contract",
+    "muzzle_socket": "muzzle.R",
+    "muzzle_world": [
+      0.48,
+      -0.5,
+      0.91
+    ],
+    "projectile_forward_axis": "+X",
+    "fire_events": [
+      {
+        "clip": "shoot",
+        "frame": 4,
+        "event": "fire_muzzle"
+      }
+    ],
+    "reload_events": [
+      {
+        "clip": "reload",
+        "frame": 10,
+        "event": "reload_complete"
+      }
+    ]
+  },
+  "footstep_events": [
+    {
+      "clip": "move",
+      "frame": 1,
+      "socket": "foot.L"
+    },
+    {
+      "clip": "move",
+      "frame": 9,
+      "socket": "foot.R"
+    },
+    {
+      "clip": "run",
+      "frame": 1,
+      "socket": "foot.L"
+    },
+    {
+      "clip": "run",
+      "frame": 7,
+      "socket": "foot.R"
+    }
+  ],
+  "attachment_hooks": {
+    "parrot_perch_left": "shoulder_perch.L",
+    "parrot_perch_right": "shoulder_perch.R",
+    "belt": "belt_socket",
+    "back": "back_socket"
+  }
+}

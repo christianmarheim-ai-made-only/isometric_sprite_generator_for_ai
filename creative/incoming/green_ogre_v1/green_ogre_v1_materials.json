@@ -1,0 +1,54 @@
+{
+  "materials_spec_version": "materials_v1",
+  "asset_id": "green_ogre_v1",
+  "materials": [
+    {
+      "name": "ogre_skin_base",
+      "region": "torso",
+      "base_color": [
+        0.56,
+        0.62,
+        0.35,
+        1.0
+      ],
+      "surface": "rough green skin",
+      "texture": "green_ogre_v1_texture_atlas.png"
+    },
+    {
+      "name": "ogre_skin_detail",
+      "region": "head",
+      "base_color": [
+        0.6,
+        0.66,
+        0.39,
+        1.0
+      ],
+      "surface": "mottled skin with pores and wrinkles",
+      "texture": "green_ogre_v1_texture_atlas.png"
+    },
+    {
+      "name": "ogre_cloth",
+      "region": "torso",
+      "base_color": [
+        0.38,
+        0.29,
+        0.23,
+        1.0
+      ],
+      "surface": "coarse worn cloth",
+      "texture": "green_ogre_v1_texture_atlas.png"
+    },
+    {
+      "name": "ogre_nail_tusk",
+      "region": "head",
+      "base_color": [
+        0.74,
+        0.67,
+        0.51,
+        1.0
+      ],
+      "surface": "rough keratin",
+      "texture": "green_ogre_v1_texture_atlas.png"
+    }
+  ]
+}

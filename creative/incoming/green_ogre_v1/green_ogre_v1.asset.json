@@ -1,0 +1,64 @@
+{
+  "asset_contract_version": "external_asset_v1",
+  "variant_id": "green_ogre_v1",
+  "archetype": "biped",
+  "files": {
+    "mesh": "green_ogre_v1.glb",
+    "animation_clips": "green_ogre_v1_anim.json"
+  },
+  "geometry": {
+    "up": "z",
+    "forward": "+x",
+    "unit": "meter"
+  },
+  "rig": "biped_v1",
+  "region_source": "material_name",
+  "default_state": "idle",
+  "textures": {
+    "base_color": "green_ogre_v1_texture_atlas.png"
+  },
+  "animations": {
+    "idle": {
+      "clip": "idle",
+      "frames": 8,
+      "fps": 8,
+      "playback": "loop"
+    },
+    "walk": {
+      "clip": "move",
+      "frames": 8,
+      "fps": 10,
+      "playback": "loop"
+    },
+    "attack": {
+      "clip": "attack",
+      "frames": 6,
+      "fps": 12,
+      "playback": "once"
+    },
+    "roar": {
+      "clip": "roar",
+      "frames": 6,
+      "fps": 10,
+      "playback": "once"
+    },
+    "hit": {
+      "clip": "hurt",
+      "frames": 5,
+      "fps": 12,
+      "playback": "once"
+    },
+    "death": {
+      "clip": "death",
+      "frames": 8,
+      "fps": 10,
+      "playback": "once"
+    }
+  },
+  "world_metrics": {
+    "height_world": 2.42,
+    "footprint_radius_world": 0.46,
+    "eye_height_world": 2.18
+  },
+  "notes": "Green ogre asset manifest. Companion JSON files contain richer authored metrics, physical metrics, sockets, spell orbits, and generation data."
+}

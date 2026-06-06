@@ -1,0 +1,66 @@
+{
+  "materials_spec_version": "materials_v1",
+  "asset_id": "red_dragon_v1",
+  "materials": [
+    {
+      "name": "dragon_scales_primary",
+      "region": "torso",
+      "base_color": [
+        0.52,
+        0.15,
+        0.11,
+        1.0
+      ],
+      "surface": "large layered scales",
+      "texture": "red_dragon_v1_texture_atlas.png"
+    },
+    {
+      "name": "dragon_scales_secondary",
+      "region": "head",
+      "base_color": [
+        0.6,
+        0.21,
+        0.15,
+        1.0
+      ],
+      "surface": "smaller armored scales",
+      "texture": "red_dragon_v1_texture_atlas.png"
+    },
+    {
+      "name": "dragon_wing_membrane",
+      "region": "arms",
+      "base_color": [
+        0.54,
+        0.16,
+        0.12,
+        1.0
+      ],
+      "surface": "thin leathery membrane",
+      "texture": "red_dragon_v1_texture_atlas.png"
+    },
+    {
+      "name": "dragon_belly_plates",
+      "region": "torso",
+      "base_color": [
+        0.72,
+        0.67,
+        0.57,
+        1.0
+      ],
+      "surface": "large interlocking belly plates",
+      "texture": "red_dragon_v1_texture_atlas.png"
+    },
+    {
+      "name": "dragon_horn_claw",
+      "region": "head",
+      "base_color": [
+        0.3,
+        0.26,
+        0.22,
+        1.0
+      ],
+      "surface": "ridged horn and claw keratin",
+      "texture": "red_dragon_v1_texture_atlas.png"
+    }
+  ]
+}

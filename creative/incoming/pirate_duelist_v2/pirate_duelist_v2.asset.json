@@ -1,0 +1,76 @@
+{
+  "asset_contract_version": "external_asset_v1",
+  "variant_id": "pirate_duelist_v2",
+  "archetype": "biped",
+  "files": {
+    "mesh": "pirate_duelist_v2.glb",
+    "animation_clips": "pirate_duelist_v2_anim.json"
+  },
+  "geometry": {
+    "up": "z",
+    "forward": "+x",
+    "unit": "meter"
+  },
+  "rig": "biped_v1",
+  "region_source": "material_name",
+  "default_state": "idle",
+  "textures": {
+    "base_color": "pirate_duelist_v2_texture_atlas.png"
+  },
+  "animations": {
+    "idle": {
+      "clip": "idle",
+      "frames": 12,
+      "fps": 12,
+      "playback": "loop"
+    },
+    "walk": {
+      "clip": "move",
+      "frames": 8,
+      "fps": 12,
+      "playback": "loop"
+    },
+    "run": {
+      "clip": "run",
+      "frames": 8,
+      "fps": 16,
+      "playback": "loop"
+    },
+    "attack": {
+      "clip": "shoot",
+      "frames": 6,
+      "fps": 12,
+      "playback": "once"
+    },
+    "reload": {
+      "clip": "reload",
+      "frames": 10,
+      "fps": 12,
+      "playback": "once"
+    },
+    "hit": {
+      "clip": "hurt",
+      "frames": 5,
+      "fps": 12,
+      "playback": "once"
+    },
+    "death": {
+      "clip": "death",
+      "frames": 8,
+      "fps": 10,
+      "playback": "once"
+    },
+    "celebrate": {
+      "clip": "celebrate",
+      "frames": 8,
+      "fps": 12,
+      "playback": "once"
+    }
+  },
+  "world_metrics": {
+    "height_world": 1.82,
+    "footprint_radius_world": 0.38,
+    "eye_height_world": 1.64
+  },
+  "notes": "Stylized pirate duelist. Current-contract external_asset_v1 manifest; richer authored metrics, sockets, mass, spell orbit rings and generator data are stored in companion JSON files."
+}

@@ -1,0 +1,29 @@
+{
+  "asset_id": "green_ogre_v1",
+  "checks": [
+    {
+      "schema": "external_asset",
+      "file": "green_ogre_v1.asset.json",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "schema": "source_asset",
+      "file": "green_ogre_v1.source_asset.json",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "schema": "animation_clips",
+      "file": "green_ogre_v1_anim.json",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "schema": "hitbox",
+      "file": "green_ogre_v1_hitbox.json",
+      "valid": true,
+      "errors": []
+    }
+  ]
+}

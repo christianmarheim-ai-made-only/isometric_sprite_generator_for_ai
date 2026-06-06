@@ -1,0 +1,35 @@
+{
+  "physical_metrics_version": "physical_metrics_v1",
+  "asset_id": "red_dragon_v1",
+  "unit": "meter_kg_second",
+  "metrics_source": "authored_from_metric_proxy_volume",
+  "density_profile": "draconic_reptile_v1",
+  "density_kg_per_m3": 920.0,
+  "body_volume_m3": 7.08,
+  "mass_kg": 6513.6,
+  "weight_newtons_earth": 63868.62,
+  "gravity_m_per_s2": 9.80665,
+  "volume_policy": "Wing membranes excluded from main mass; body, neck, head, tail and limbs included.",
+  "metric_proxy_volume_breakdown_m3": [
+    {
+      "name": "torso_proxy",
+      "volume_m3": 3.45
+    },
+    {
+      "name": "neck_head_proxy",
+      "volume_m3": 1.1
+    },
+    {
+      "name": "forelimb_proxy",
+      "volume_m3": 0.72
+    },
+    {
+      "name": "hindlimb_proxy",
+      "volume_m3": 0.88
+    },
+    {
+      "name": "tail_proxy",
+      "volume_m3": 0.93
+    }
+  ]
+}

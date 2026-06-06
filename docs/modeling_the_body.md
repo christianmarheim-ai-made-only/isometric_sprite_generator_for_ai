@@ -95,6 +95,11 @@ If any of these is wrong the body will look wrong in-engine no matter how good t
      hindshin.R, hindhoof.R` — head/neck at `+X`, tail at `−X`; **forelegs map to the `arms` HIT
      region, hindlegs to `legs`** (the four-region contract has no extra slots — see the cow).
    - **ball_v1** bones: `root, body, marker` — for a directional prop; align `marker` to `+X`.
+   - **dragon_v1** bones: `root, pelvis, spine, chest, neck, head, jaw, horn.L, horn.R, wing.L, wing.R,
+     foreleg.L, foreleg.R, hindleg.L, hindleg.R, tail.1, tail.2, tail.3` — winged quadruped; head/jaw at
+     `+X`, tail at `−X`; **wings + forelegs map to `arms`, hindlegs to `legs`, tail to `torso`, horns/jaw
+     to `head`** (the four-region contract; see the red dragon). Paint every region in the materials
+     sidecar — an unpainted region inherits the body colour (a warning fires), not a true colour.
 
    (A static body with no rig is fine too — the pipeline animates it procedurally. Then you only owe
    the named-by-region mesh.)

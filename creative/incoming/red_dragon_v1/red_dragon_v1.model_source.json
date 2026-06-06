@@ -1,0 +1,209 @@
+{
+  "model_source_version": "procedural_character_model_source_v1",
+  "asset_id": "red_dragon_v1",
+  "asset_name": "Red Dragon",
+  "variant_class": "character",
+  "source_format": "gltf",
+  "source_file": "red_dragon_v1.glb",
+  "forward_axis": "+X",
+  "up_axis": "+Z",
+  "units": "meter",
+  "origin_policy": "ground_footprint_center",
+  "art_direction": {
+    "style": "large readable red western dragon for 3D production",
+    "silhouette": "massive quadruped with large wings, long neck and tail, strong chest and red scales",
+    "palette": [
+      "crimson scales",
+      "dark red membranes",
+      "tan belly plates",
+      "dark horn and claw"
+    ],
+    "concept_art": "red_dragon_v1_concept_art.png"
+  },
+  "visual_objects": [
+    "torso_body",
+    "torso_chest",
+    "torso_belly_plates",
+    "head_head",
+    "head_neck",
+    "arms_wing_arm_L",
+    "arms_wing_arm_R",
+    "arms_foreleg_L",
+    "arms_foreleg_R",
+    "legs_hindleg_L",
+    "legs_hindleg_R"
+  ],
+  "hit_proxy_objects": [
+    {
+      "name": "head_head",
+      "region": "head"
+    },
+    {
+      "name": "head_jaw",
+      "region": "head"
+    },
+    {
+      "name": "head_neck",
+      "region": "head"
+    },
+    {
+      "name": "torso_body",
+      "region": "torso"
+    },
+    {
+      "name": "torso_chest",
+      "region": "torso"
+    },
+    {
+      "name": "torso_belly_plates",
+      "region": "torso"
+    },
+    {
+      "name": "legs_tail_0",
+      "region": "torso"
+    },
+    {
+      "name": "legs_tail_1",
+      "region": "torso"
+    },
+    {
+      "name": "legs_tail_2",
+      "region": "torso"
+    },
+    {
+      "name": "arms_wing_arm_L",
+      "region": "arms"
+    },
+    {
+      "name": "arms_wing_arm_R",
+      "region": "arms"
+    },
+    {
+      "name": "arms_wing_membrane_L",
+      "region": "arms"
+    },
+    {
+      "name": "arms_wing_membrane_R",
+      "region": "arms"
+    },
+    {
+      "name": "arms_foreleg_L",
+      "region": "arms"
+    },
+    {
+      "name": "arms_foreleg_R",
+      "region": "arms"
+    },
+    {
+      "name": "legs_hindleg_L",
+      "region": "legs"
+    },
+    {
+      "name": "legs_hindleg_R",
+      "region": "legs"
+    }
+  ],
+  "metric_proxy_objects": [
+    "torso_body",
+    "torso_chest",
+    "torso_belly_plates",
+    "head_head",
+    "head_neck",
+    "arms_foreleg_L",
+    "arms_foreleg_R",
+    "legs_hindleg_L",
+    "legs_hindleg_R",
+    "legs_tail_0",
+    "legs_tail_1"
+  ],
+  "sockets": [
+    "head_socket",
+    "mouth_socket",
+    "eye.L",
+    "eye.R",
+    "shoulder.L",
+    "shoulder.R",
+    "wing_root.L",
+    "wing_root.R",
+    "pelvis_ring_center",
+    "shoulder_ring_center",
+    "back_socket"
+  ],
+  "clips_states": [
+    {
+      "state": "idle",
+      "frames": 4,
+      "playback": "loop",
+      "clip": "idle",
+      "directional": true
+    },
+    {
+      "state": "walk",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "walk",
+      "directional": true
+    },
+    {
+      "state": "run",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "run",
+      "directional": true
+    },
+    {
+      "state": "bite",
+      "frames": 6,
+      "playback": "once",
+      "clip": "bite",
+      "directional": true
+    },
+    {
+      "state": "breath",
+      "frames": 8,
+      "playback": "once",
+      "clip": "breath",
+      "directional": true
+    },
+    {
+      "state": "takeoff",
+      "frames": 8,
+      "playback": "once",
+      "clip": "takeoff",
+      "directional": true
+    },
+    {
+      "state": "fly",
+      "frames": 8,
+      "playback": "loop",
+      "clip": "fly",
+      "directional": true
+    },
+    {
+      "state": "hurt",
+      "frames": 5,
+      "playback": "once",
+      "clip": "hurt",
+      "directional": true
+    },
+    {
+      "state": "death",
+      "frames": 8,
+      "playback": "once",
+      "clip": "death",
+      "directional": true
+    }
+  ],
+  "world_metrics": {
+    "height_world": 8.6,
+    "visual_height_world": 8.6,
+    "footprint_radius_world": 4.2,
+    "eye_height_world": 6.25,
+    "eye_position_world": [
+      4.9,
+      0.18,
+      6.25
+    ]
+  },
+  "notes": "Custom dragon_v1 rig profile shipped in schema_extensions. Current external_asset_v1 does not support dragon archetypes, so no schema-valid external asset manifest is included."
+}

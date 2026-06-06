@@ -1,0 +1,24 @@
+{
+  "asset_id": "red_dragon_v1",
+  "checks": [
+    {
+      "schema": "source_asset",
+      "file": "red_dragon_v1.source_asset.json",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "schema": "animation_clips",
+      "file": "red_dragon_v1_anim.json",
+      "valid": true,
+      "errors": []
+    },
+    {
+      "schema": "hitbox",
+      "file": "red_dragon_v1_hitbox.json",
+      "valid": true,
+      "errors": []
+    }
+  ],
+  "notes": "No external_asset_v1 manifest included because the current contract does not support dragon archetypes."
+}

@@ -1,0 +1,39 @@
+{
+  "spell_orbit_spec_version": "spell_orbit_points_v1",
+  "asset_id": "green_ogre_v1",
+  "unit": "meter",
+  "pelvis_ring": {
+    "center_world": [
+      0.0,
+      0.0,
+      1.12
+    ],
+    "height_world": 1.12,
+    "radius_world": 0.42,
+    "plane": "xy",
+    "note": "Centered around the ogre beltline/pelvis for orbiting orb spells."
+  },
+  "shoulder_ring": {
+    "center_world": [
+      0.06,
+      0.0,
+      1.88
+    ],
+    "height_world": 1.88,
+    "radius_world": 0.34,
+    "plane": "xy",
+    "left_anchor_world": [
+      0.06,
+      0.28,
+      1.88
+    ],
+    "right_anchor_world": [
+      0.06,
+      -0.28,
+      1.88
+    ],
+    "clearance_above_head_world": 0.54,
+    "clearance_below_belly_world": 0.72,
+    "note": "Keeps shoulder fireballs below the head crown and above the chest/belly."
+  }
+}
