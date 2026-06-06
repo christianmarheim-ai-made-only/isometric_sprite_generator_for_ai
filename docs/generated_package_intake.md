@@ -108,8 +108,8 @@ Run **before** baking. **Errors** mean *do not bake* (the package is incomplete/
   engine body regions `{head, torso, arms, legs}` (shield/weapon/gear are deferred).
 - **world_metrics** present (else the mismatch detector is disabled — a warning).
 - **fps** resolvable for every clip; **default_state** is a real state.
-- **Rig readiness** — warns if no `<id>_rigged.glb` is present yet (an unrigged part-mesh delivery must
-  go through the rig step first).
+- **Rig readiness** — notes if no `<id>_rigged.glb` is present; `bake_asset` **auto-rigs** an unrigged
+  delivery from the declared rig profile at bake time (see below), so no manual rig step is needed.
 
 **`bake_batch` runs this automatically.** It discovers delivered packages (by `package_manifest.json`),
 gates each, synthesizes the missing `asset.json`, then bakes — a gate-failing package is skipped and
@@ -146,12 +146,18 @@ A new creature class = one enum line + one rig profile:
 3. declare `archetype` + `rig` in the delivery's `source_asset.json`.
 The gate fails loudly if the archetype is unknown or the rig profile is missing — at intake, not mid-bake.
 
-### 3. Know the auto-rigger's limit: it does RIGID part-skinning
-`rig_from_profile.py` binds each **part-mesh** 100 % to its nearest bone — perfect for discrete parts
-(cow legs, a dragon's segmented tail), but a single continuous mesh that should *deform* smoothly across
-many bones (an octopus tentacle that curls, a membranous wing) will move rigidly. Deliver such creatures
-either **pre-rigged with smooth skin weights** (point the asset at the rigged glb directly) or as
-**segmented parts** (one mesh per bone-ish segment), so rigid skinning reads as articulation.
+### 3. Auto-rig is automatic — but it does RIGID part-skinning
+An UNRIGGED part-mesh delivery (separate meshes + a rig profile but no armature in the glb) does **not**
+need a manual rig step: `bake_asset` detects the missing armature and **auto-invokes `rig_from_profile`**
+at bake time (threading the source up-axis + the materials/source_asset sidecars, and recording an
+`auto_rigged` provenance note in the build log). The manual path still works — point `files.mesh` at a
+pre-rigged glb and the auto-rig is skipped (a rigged glb already has a skin).
+
+The limit to know: `rig_from_profile` binds each **part-mesh** 100 % to its nearest bone — perfect for
+discrete parts (cow legs, a dragon's segmented tail), but a single continuous mesh that should *deform*
+smoothly across many bones (an octopus tentacle that curls, a membranous wing) will move rigidly. Deliver
+such creatures either **pre-rigged with smooth skin weights** or as **segmented parts** (one mesh per
+bone-ish segment), so rigid skinning reads as articulation.
 
 ### 4. Watch the atlas budget
 A big multi-clip creature at 256² overflows the 4096 single-page advisory (the cow already trips

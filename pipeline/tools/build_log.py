@@ -145,6 +145,12 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
                          "detail": f"material '{nm}' Base Color is driven by a node graph (e.g. vertex-colour Mix from a "
                                    "glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from "
                                    "the upstream constant; verify the rendered colour (risk of silent flat grey)"})
+    if meta.get("auto_rigged_from"):
+        from pathlib import Path as _P
+        warnings.append({"code": "auto_rigged", "severity": "info",
+                         "detail": f"delivery had no armature -> the pipeline auto-rigged it (rig_from_profile) "
+                                   f"from '{_P(meta['auto_rigged_from']).name}'; the baked glb is PIPELINE-DERIVED, "
+                                   "not the delivered mesh (provenance.mesh hashes the derived rigged glb)"})
     eff, over = _packing(manifest)
     if over:
         warnings.append({"code": "oversize_atlas_page", "severity": "error",

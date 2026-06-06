@@ -14,7 +14,8 @@ human eyeballing each one.**
 3. Look up each code below for what it means and what to do.
 
 `ok` is `false` when Gate-1 fails **or** any `error`-severity warning fired. A `warn`-severity code
-does not flip `ok` (the package is shippable but has a quality issue).
+does not flip `ok` (the package is shippable but has a quality issue); an `info` code is pure
+provenance (e.g. `auto_rigged`) and never flips `ok`.
 
 ## Warning codes
 
@@ -23,6 +24,7 @@ does not flip `ok` (the package is shippable but has a quality issue).
 | **`non_upright_biped`** | error | A biped's silhouette is **landscape, not portrait** (median frame aspect > 1.0, or > 35% of frames wider than tall). The character almost certainly **baked lying down / wrong up-axis**. *This is the failure that passes Gate-1 + 16/16-distinctness silently — a flat character still spins into 16 distinct frames.* | Check `geometry.up` in the asset matches how the glb is actually authored (a Z-up glb must declare `up:"z"`). |
 | **`world_metrics_mismatch`** | error | The asset's **authored** `world_metrics.height_world` and the bake's **measured** height diverge by > 25%. Wrong scale, or the model baked lying down (measured height collapses). | Verify the glb scale (1 unit = 1 m) and orientation. ~10% over authored is normal (a hat sits above the body-height); 40%+ is a bug. |
 | **`degenerate_uv`** | warn | A **textured** material's UVs collapse to ~one point, so the embedded atlas renders as one **flat swatch** (textured-but-flat). Per material. | Producer-side: author real per-vertex UVs spanning each tile rect. Colors are still correct; only fine detail is lost. |
+| **`auto_rigged`** | info | The delivery had **no armature**, so `bake_asset` built one from the declared rig profile (`rig_from_profile`) on the fly. The baked glb is **pipeline-derived**, not the delivered mesh (`provenance.mesh` hashes the derived rigged glb). Not a defect — a provenance record. | None. To ship pre-rigged instead, point `files.mesh` at a rigged glb. |
 | **`base_color_linked`** | warn | A material's Principled **Base Color is driven by a node graph** (not the socket default). A glTF **re-import of a mesh that shipped vertex colours** wires `Color-Attribute → Mix → Base Color`, leaving the socket default at flat **0.8 grey** while the real colour sits upstream. MATERIAL-mode reads the default → **silent grey render**. The renderer now recovers the upstream constant colour, but flags the material so the recovery is verified. | If colour looks right, no action. To remove at source, strip vertex-colour attributes before export (the auto-rigger `rig_from_profile.py` now does this). |
 | **`oversize_atlas_page`** | error | An atlas page exceeds `MAX_PAGE_PX` (4096). A full multi-clip combat character at 256² overflows a single page. | Engine consumes single-page only today (loads up to the ~8192 GPU cap, so it still works). For production: shard (paging = TASK-018), shrink the canvas, or curate clips. |
 | **`region_fallback_torso`** | warn | A material name matched **no** region keyword (`head`/`torso`/`arms`/`legs`) and silently defaulted to torso (id 2). The hitmask region for those faces is wrong. | Rename the material to contain the body-part keyword (`region_source: material_name`). |

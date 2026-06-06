@@ -26,6 +26,38 @@ from lint_external_asset import lint  # noqa: E402
 from gate_engine_accept import engine_accept  # noqa: E402
 
 
+def _gltf_json(path: Path) -> dict:
+    """Top-level glTF JSON from a .glb (binary JSON chunk) or a .gltf (text)."""
+    path = Path(path)
+    if path.suffix.lower() == ".gltf":
+        return json.loads(path.read_text(encoding="utf-8"))
+    import struct
+    with open(path, "rb") as f:
+        f.read(12)                                   # 12-byte glb header
+        clen, _ = struct.unpack("<II", f.read(8))    # first chunk = JSON
+        return json.loads(f.read(clen).decode("utf-8"))
+
+
+def _glb_has_armature(path: Path) -> bool:
+    """True if the glTF declares a skin (an armature). An UNRIGGED part-mesh delivery has none. On any
+    parse trouble, assume rigged (True) so we never auto-rig blindly -- the existing 'no armature found'
+    failure still applies, i.e. zero behaviour change for the un-parseable case."""
+    try:
+        return bool(_gltf_json(path).get("skins"))
+    except Exception:
+        return True
+
+
+def _resolve_rig_profile(rig: str, base: Path) -> Path | None:
+    """A rig profile installed in the pipeline OR shipped in the delivery's schema_extensions/."""
+    for c in (PIPELINE_ROOT / "schema" / "rig_profiles" / f"{rig}.json",
+              base / "schema_extensions" / f"{rig}.rig_profile.json",
+              base / "schema_extensions" / f"{rig}.json"):
+        if c.exists():
+            return c
+    return None
+
+
 def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
     errs = lint(manifest_path)
     if errs:
@@ -42,6 +74,7 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
     anims = asset.get("animations")
     clips_rel = (asset.get("files") or {}).get("animation_clips")
     ext = mesh_path.suffix.lower()
+    auto_rigged_from = None   # set if the pipeline rigs an unrigged delivery on the fly (provenance)
 
     import time
     t0 = time.perf_counter()
@@ -56,6 +89,34 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
         if not blender:
             raise SystemExit("Blender not found; needed to bake a glTF (set $BLENDER).")
         if asset.get("rig") and anims:
+            # AUTO-RIG: the rigged+animated route needs an armature, but a producer may deliver UNRIGGED
+            # part-meshes + a rig profile (no skeleton in the glb) -> bake_anim_from_json would hard-fail
+            # "no armature found". Detect that and build the armature from the declared rig profile
+            # (rig_from_profile) here, then bake from the derived glb. rig_from_profile re-exports standard
+            # Y-up glTF, so the subsequent bake switches up -> "y". The manual path (asset already points
+            # at a rigged glb) is unaffected: a rigged glb has a skin, so this block is skipped.
+            if not _glb_has_armature(mesh_path):
+                profile = _resolve_rig_profile(asset["rig"], base)
+                if profile is None:
+                    raise SystemExit(f"asset declares rig '{asset['rig']}' and the delivered mesh has no "
+                                     f"armature, but no rig profile was found "
+                                     f"(schema/rig_profiles/{asset['rig']}.json or "
+                                     f"{base.name}/schema_extensions/{asset['rig']}.rig_profile.json)")
+                out.mkdir(parents=True, exist_ok=True)
+                rigged = out / f"{variant_id}_rigged.glb"
+                materials = base / f"{variant_id}_materials.json"          # optional: per-region base colour
+                source_asset = base / f"{variant_id}.source_asset.json"    # optional: DECLARED hit regions
+                cmd = [blender, "--background", "--python", str(SCRIPT_DIR / "rig_from_profile.py"), "--",
+                       str(mesh_path), str(profile), up, str(rigged),
+                       str(materials) if materials.exists() else "",
+                       str(source_asset) if source_asset.exists() else ""]
+                proc = subprocess.run(cmd, capture_output=True, text=True)
+                if proc.returncode != 0 or not rigged.exists():
+                    raise SystemExit("auto-rig (rig_from_profile) failed:\n"
+                                     + (proc.stdout or "")[-1500:] + (proc.stderr or "")[-1500:])
+                auto_rigged_from = mesh_path           # remember the delivered mesh for provenance
+                mesh_path = rigged                     # everything downstream bakes from the rigged glb
+                up = "y"                               # rig_from_profile output is standard Y-up glTF
             mesh_for_bake = str(mesh_path)
             clips_rel = (asset.get("files") or {}).get("animation_clips")
             route = "Blender / rigged + animated"
@@ -91,6 +152,8 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
         if mp.exists():
             meta = json.loads(mp.read_text(encoding="utf-8"))
             break
+    if auto_rigged_from is not None:                 # record the on-the-fly rig in the build log
+        meta["auto_rigged_from"] = str(auto_rigged_from)
     clips_path = (base / clips_rel).resolve() if clips_rel else None
     rig = asset.get("rig")
     log = write_build_log(out, manifest, route, asset_path=manifest_path, mesh=mesh_path,

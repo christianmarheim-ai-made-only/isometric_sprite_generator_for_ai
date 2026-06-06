@@ -22,8 +22,8 @@ from constants import region_for_name, material_region_name, REGION_NAMES, REGIO
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 GLB, PROFILE, UP, OUT = argv[0], argv[1], argv[2], argv[3]
-MATERIALS = argv[4] if len(argv) > 4 else None      # optional sidecar materials.json (region + base_color)
-SOURCE_ASSET = argv[5] if len(argv) > 5 else None   # optional source_asset.json (DECLARED hit_proxy regions)
+MATERIALS = argv[4] if len(argv) > 4 and argv[4] else None      # optional sidecar materials.json (region + base_color)
+SOURCE_ASSET = argv[5] if len(argv) > 5 and argv[5] else None   # optional source_asset.json (DECLARED hit_proxy regions)
 
 for o in list(bpy.data.objects):           # clean default scene (cube/camera/light) so it doesn't export
     bpy.data.objects.remove(o, do_unlink=True)

@@ -284,10 +284,11 @@ def lint_package(package_dir: Path) -> Report:
     if ds and ds not in states:
         r.err(f"{rid}: default_state '{ds}' is not one of the declared states {states}")
 
-    # 8. rig step readiness: warn if the delivery looks unrigged (no *_rigged.glb yet).
+    # 8. rig step readiness: note if the delivery looks unrigged (no *_rigged.glb yet). bake_asset
+    #    AUTO-RIGS an unrigged glb from the declared rig profile at bake time, so this is informational.
     if rig and not (package_dir / f"{rid}_rigged.glb").exists():
         r.warn(f"{rid}: no {rid}_rigged.glb present -> if the delivered glb is an UNRIGGED part-mesh set, "
-               "run rig_from_profile (or the auto-rig step) before baking")
+               "bake_asset will auto-rig it from the declared rig profile at bake time")
 
     # 9. the synthesized asset.json must itself be schema-valid (closes the loop).
     try:
