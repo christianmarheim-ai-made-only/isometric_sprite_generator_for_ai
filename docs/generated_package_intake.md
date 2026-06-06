@@ -108,6 +108,11 @@ Run **before** baking. **Errors** mean *do not bake* (the package is incomplete/
   engine body regions `{head, torso, arms, legs}` (shield/weapon/gear are deferred).
 - **world_metrics** present (else the mismatch detector is disabled — a warning).
 - **fps** resolvable for every clip; **default_state** is a real state.
+- **Clip vocabulary** — warns when a clip is named off the **engine clip vocabulary** (`idle`, `walk`,
+  `run`, `attack`, `hit`, + `jump`/`fall`/`crouch_idle`/`crouch_walk`). A clip authored as a synonym
+  (`move`→`walk`, `shoot`→`attack`, `hurt`→`hit`, `punch`→`attack`) **bakes fine but the engine renderer
+  never selects it** — it silently falls back to `idle`. Name a character's locomotion/attack/hit clips
+  with the canonical names so they actually play. (This also runs in `lint_external_asset` on every bake.)
 - **Rig readiness** — notes if no `<id>_rigged.glb` is present; `bake_asset` **auto-rigs** an unrigged
   delivery from the declared rig profile at bake time (see below), so no manual rig step is needed.
 

@@ -100,5 +100,37 @@ def forward_yaw(forward: str) -> float:
     return -math.atan2(fy, fx)
 
 
+# --- Engine clip vocabulary -----------------------------------------------------------------
+#     The engine renderer (slay_slayer_3 crates/client_bevy/src/render.rs) SELECTS animation clips by
+#     these canonical names; a clip authored under any other name is never selected and silently falls
+#     back to `idle` (the motion is baked but dead). The proven failure: a combatant authored with
+#     move/shoot/hurt walks-as-idle and attacks with no swing. CLIP_SYNONYMS maps the common
+#     off-vocabulary names -> the canonical clip, so the linter can say "rename move -> walk".
+#     NOTE (cross-repo drift, deliberate follow-up): the pipeline's own ADR-044 canon + the grunt
+#     fixture use `punch`, but render.rs selects `attack` -- so `punch` is off-vocab for the live engine.
+ENGINE_CLIP_VOCAB = ("idle", "walk", "run", "attack", "hit", "jump", "fall", "crouch_idle", "crouch_walk")
+CLIP_SYNONYMS = {
+    "move": "walk", "stroll": "walk", "jog": "run", "sprint": "run", "dash": "run",
+    "shoot": "attack", "fire": "attack", "swing": "attack", "slash": "attack", "stab": "attack",
+    "cast": "attack", "punch": "attack", "melee": "attack", "strike": "attack", "jab": "attack",
+    "hurt": "hit", "damage": "hit", "flinch": "hit", "stagger": "hit", "recoil": "hit",
+    "hitreact": "hit", "hit_react": "hit",
+    "die": "death", "dead": "death", "dying": "death", "ko": "death",
+}
+
+
+def offvocab_clip_renames(clip_names):
+    """[(declared, canonical)] for each declared clip that is an off-vocabulary SYNONYM of a canonical
+    engine clip, when that canonical name is NOT also declared. Empty = clean. Catches 'right motion,
+    wrong name' (move->walk, shoot->attack, hurt->hit) -- bakes fine but the engine never selects it."""
+    declared = {str(c).lower() for c in clip_names}
+    out = []
+    for c in clip_names:
+        canon = CLIP_SYNONYMS.get(str(c).lower())
+        if canon and canon not in declared:
+            out.append((c, canon))
+    return out
+
+
 # --- Atlas paging ---------------------------------------------------------------------------
 MAX_PAGE_PX = 4096    # a single atlas page must fit within MAX_PAGE_PX in each dimension

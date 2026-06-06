@@ -1,0 +1,310 @@
+{
+  "environment": {
+    "blender_version": "5.1.2",
+    "contract_hash": "sha256:b7c81e01b339eea708556343ebd5c568bf4978c1b77a66f3376b26b65ad5bae4",
+    "git": {
+      "commit": "b885bb4",
+      "dirty": true
+    },
+    "python": "3.14.5",
+    "state_contract_version": "sprite_states_multistate_v1"
+  },
+  "gates": {
+    "gate_1_engine_accept": {
+      "pass": true,
+      "reasons": []
+    }
+  },
+  "inputs": {
+    "asset_path": "creative\\pirate\\chr_pirate_duelist_v1.asset.json",
+    "clips": {
+      "bytes": 30240,
+      "path": "C:\\Code\\isometric_sprite_generator_for_ai\\creative\\pirate\\chr_pirate_duelist_v1_anim.json",
+      "sha256": "40dcd8316d0c6d2cad227c4ac5f61cf0888c2289d8dda35fdf8fdad5cb1b2b93"
+    },
+    "mesh": {
+      "bytes": 300284,
+      "path": "C:\\Code\\isometric_sprite_generator_for_ai\\creative\\pirate\\chr_pirate_duelist_v1.glb",
+      "sha256": "987f50e4646b55607ba2d27058158363980c5163271d5e395d1f5af3d15a0adc"
+    },
+    "rig": "biped_v1"
+  },
+  "ok": false,
+  "outputs": {
+    "artifacts": {
+      "color_atlas": {
+        "bytes": 8829193,
+        "path": "C:\\Code\\isometric_sprite_generator_for_ai\\pipeline\\output\\pirate_demo\\color_atlas.png",
+        "sha256": "8692b1f1536234952dac57bee7523c15a314aa5142e8b0a1647c238b32d6964f"
+      },
+      "hitmask_atlas": {
+        "bytes": 404853,
+        "path": "C:\\Code\\isometric_sprite_generator_for_ai\\pipeline\\output\\pirate_demo\\hitmask_atlas.png",
+        "sha256": "1598336b6c8b57f1a2485f1a64a1e9b07283ddb5e150786698e2be75d195ad06"
+      }
+    },
+    "atlases": {
+      "color": {
+        "size": [
+          2052,
+          5062
+        ]
+      },
+      "hitmask": {
+        "size": [
+          2052,
+          5062
+        ]
+      }
+    },
+    "frame_count": 1040,
+    "packing_efficiency": 0.8247
+  },
+  "params": {
+    "default_state": "idle",
+    "direction_count": 16,
+    "frame_canvas": [
+      256,
+      256
+    ],
+    "states": {
+      "attack": {
+        "fps": 12,
+        "frames": 6,
+        "playback": "once"
+      },
+      "celebrate": {
+        "fps": 12,
+        "frames": 8,
+        "playback": "once"
+      },
+      "death": {
+        "fps": 10,
+        "frames": 8,
+        "playback": "once"
+      },
+      "hit": {
+        "fps": 12,
+        "frames": 5,
+        "playback": "once"
+      },
+      "idle": {
+        "fps": 12,
+        "frames": 12,
+        "playback": "loop"
+      },
+      "reload": {
+        "fps": 12,
+        "frames": 10,
+        "playback": "once"
+      },
+      "run": {
+        "fps": 16,
+        "frames": 8,
+        "playback": "loop"
+      },
+      "walk": {
+        "fps": 12,
+        "frames": 8,
+        "playback": "loop"
+      }
+    }
+  },
+  "route": "Blender / rigged + animated (clips embedded from animation_clips JSON)",
+  "schema": "sprite_build_log_v1",
+  "stages": [
+    {
+      "ms": 53055.4,
+      "name": "bake"
+    }
+  ],
+  "variant_class": "character",
+  "variant_id": "chr_pirate_duelist_v1",
+  "warnings": [
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'torso_coat_navy' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'torso_shirt_cream' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'torso_sash_red' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'torso_belt_leather' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'torso_trim_gold' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'torso_pendant_gold' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'head_skin_warm' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'head_hair_dark' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'head_bandana_red' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'head_hat_navy' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'head_trim_gold' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'arms_sleeve_navy' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'arms_hand_skin' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'arms_pistol_steel' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'arms_pistol_wood' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'arms_pistol_gold' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'legs_pants_brown' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "degenerate_uv",
+      "detail": "material 'legs_boot_leather' has collapsed UVs -> textured but renders FLAT per-material (no detail)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'torso_coat_navy' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'torso_shirt_cream' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'torso_sash_red' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'torso_belt_leather' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'torso_trim_gold' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'torso_pendant_gold' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'head_skin_warm' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'head_hair_dark' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'head_bandana_red' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'head_hat_navy' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'head_trim_gold' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'arms_sleeve_navy' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'arms_hand_skin' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'arms_pistol_steel' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'arms_pistol_wood' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'arms_pistol_gold' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'legs_pants_brown' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "base_color_linked",
+      "detail": "material 'legs_boot_leather' Base Color is driven by a node graph (e.g. vertex-colour Mix from a glTF re-import), not the Principled default -> MATERIAL-mode colour was recovered from the upstream constant; verify the rendered colour (risk of silent flat grey)",
+      "severity": "warn"
+    },
+    {
+      "code": "oversize_atlas_page",
+      "detail": "an atlas page exceeds 4096px",
+      "severity": "error"
+    }
+  ]
+}

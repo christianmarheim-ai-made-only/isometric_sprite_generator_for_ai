@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -23,6 +24,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 PIPELINE_ROOT = SCRIPT_DIR.parent
 SCHEMA = PIPELINE_ROOT / "schema" / "external_asset.schema.json"
 RIG_DIR = PIPELINE_ROOT / "schema" / "rig_profiles"
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+from constants import offvocab_clip_renames  # noqa: E402
 
 
 def lint(path: Path, check_files: bool = True) -> list[str]:
@@ -70,6 +74,11 @@ def lint(path: Path, check_files: bool = True) -> list[str]:
             errs.append(f"animations.{state}.playback must be loop|once")
         if not (isinstance(spec.get("frames"), int) and spec["frames"] >= 1):
             errs.append(f"animations.{state}.frames must be an integer >= 1")
+    # Clip-vocabulary WARNING (non-aborting): a clip named off the engine's vocabulary (move/shoot/hurt)
+    # bakes fine but the renderer never selects it -> it silently falls back to idle. Catch the rename.
+    for declared, canon in offvocab_clip_renames(list((asset.get("animations") or {}).keys())):
+        print(f"WARN: animation '{declared}' is off the engine clip vocabulary -- the renderer selects "
+              f"'{canon}' for that action and falls back to idle for '{declared}'. Rename '{declared}' -> '{canon}'.")
     return errs
 
 

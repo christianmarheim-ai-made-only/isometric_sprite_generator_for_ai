@@ -22,7 +22,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 import mesh_io  # noqa: E402
-from constants import material_region_name, region_for_name, REGION_NAME_TO_ID  # noqa: E402
+from constants import material_region_name, offvocab_clip_renames, region_for_name, REGION_NAME_TO_ID  # noqa: E402
 from intake_package import lint_package, synthesize_asset  # noqa: E402
 
 PKG = REPO / "creative" / "incoming"
@@ -96,6 +96,20 @@ def main() -> int:
     for part, rid in [("tentacle_3", legs), ("siphon", head), ("wing_L", legs), ("head_head", head)]:
         nm = material_region_name(part, rid)
         ok &= check(f"round-trip region_for_name('{nm}') == {rid}", region_for_name(nm) == rid)
+
+    # 6. clip-vocab gate: a clip named off the engine's vocabulary (move/shoot/hurt) bakes fine but the
+    #    renderer never selects it -> silent idle fallback. Catch the rename; never false-positive on
+    #    legit non-engine extras (graze/reload/celebrate) or when the canonical is already declared.
+    ok &= check("clip-vocab: move/shoot/hurt flagged -> walk/attack/hit",
+                dict(offvocab_clip_renames(["idle", "move", "run", "shoot", "hurt", "death"]))
+                == {"move": "walk", "shoot": "attack", "hurt": "hit"})
+    ok &= check("clip-vocab: canonical idle/walk/run/attack/hit is clean",
+                offvocab_clip_renames(["idle", "walk", "run", "attack", "hit", "death"]) == [])
+    ok &= check("clip-vocab: no false positive on legit extras (cow graze/death, ball roll/pop/explode)",
+                offvocab_clip_renames(["idle", "walk", "run", "graze", "hit", "death"]) == []
+                and offvocab_clip_renames(["idle", "roll", "pop", "explode"]) == [])
+    ok &= check("clip-vocab: a synonym is NOT flagged when its canonical is also declared",
+                offvocab_clip_renames(["walk", "move"]) == [])
 
     print("ALL PASS" if ok else "SOME FAILED")
     return 0 if ok else 1

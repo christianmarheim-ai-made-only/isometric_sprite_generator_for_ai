@@ -52,6 +52,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 PIPELINE_ROOT = SCRIPT_DIR.parent
 SCHEMA_DIR = PIPELINE_ROOT / "schema"
 RIG_PROFILE_DIR = SCHEMA_DIR / "rig_profiles"
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+from constants import offvocab_clip_renames  # noqa: E402
 
 DEFAULT_FPS = 12                                   # last-resort playback fps when none is declared
 BODY_REGIONS = {"head", "torso", "arms", "legs"}   # the 4 engine R8 body regions (5-7 = deferred gear)
@@ -283,6 +286,11 @@ def lint_package(package_dir: Path) -> Report:
     ds = sa.get("default_state")
     if ds and ds not in states:
         r.err(f"{rid}: default_state '{ds}' is not one of the declared states {states}")
+    # clip vocabulary: a clip named off the engine vocabulary (move/shoot/hurt) bakes fine but the
+    # renderer never selects it -> it silently plays idle for that action. Flag the rename.
+    for declared, canon in offvocab_clip_renames(states):
+        r.warn(f"{rid}: clip '{declared}' is off the engine clip vocabulary -> the renderer selects "
+               f"'{canon}' and falls back to idle for '{declared}'; rename '{declared}' -> '{canon}'")
 
     # 8. rig step readiness: note if the delivery looks unrigged (no *_rigged.glb yet). bake_asset
     #    AUTO-RIGS an unrigged glb from the declared rig profile at bake time, so this is informational.
