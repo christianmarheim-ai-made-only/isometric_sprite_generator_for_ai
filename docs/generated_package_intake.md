@@ -126,6 +126,15 @@ python pipeline/tools/bake_batch.py creative/incoming --dry-run   # gate + list 
 
 The cow surfaced the template stresses; here is what to do so a squid or dragon lands cleanly.
 
+### 0. Orient it forward = +X — the head/travel direction
+The bake spins the model about vertical Z in 16 equal steps from **exactly how it was authored** and
+**reads no `forward` metadata**, so +X *is* heading-0. Build any non-biped facing +X by its travel
+direction: a **quadruped**'s head/nose at `+X` (spine `+X`→`−X` tail), a fish/serpent's mouth, a
+dragon's snout. A model built facing the wrong axis bakes 90/180° rotated **and passes every gate
+silently** — the fix is to re-orient the *source* (`forward_axis` is inert; the bake will not correct
+it). A radially-symmetric prop (ball/orb) has no forward and bakes near-identical in every direction —
+that's correct; align a directional marker (the ball's arrow) to +X. See `modeling_the_body.md` rule 3.
+
 ### 1. Declare regions explicitly — never rely on part names
 The four engine HIT regions are `head/torso/arms/legs` (R8 ids 1–4); there is **no** `tentacle`,
 `wing`, or `tail` region. The producer **maps** creature parts onto the four, *explicitly*, in

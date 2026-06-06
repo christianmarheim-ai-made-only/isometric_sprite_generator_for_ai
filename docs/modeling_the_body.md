@@ -32,9 +32,14 @@ If any of these is wrong the body will look wrong in-engine no matter how good t
    sized from real height; wrong scale ⇒ wrong on-screen size next to everything else.
 2. **Up axis.** Build Z-up, or Y-up and declare `up: "y"` in the manifest later. (glTF is Y-up by
    default; the pipeline converts.)
-3. **Forward = +X — required.** The body **faces +X** (direction 0); nose/chest/beak point down the
-   +X axis. `forward` is declared-only (the schema pins it to `+x`) and is **not applied by any baker
-   yet** — a body built facing another way renders 90/180° wrong. Build it facing +X.
+3. **Forward = +X — required (every archetype).** The model **faces +X** (direction 0) — +X is the way
+   it *travels / looks*, whatever the body plan: a biped's chest/face, a bird's beak, a **quadruped's
+   head/nose** (the spine runs head `+X` → tail `−X`, belly down, front legs toward `+X`), a
+   fish/serpent's mouth. The bake spins the model about vertical Z in 16 equal steps from **exactly how
+   you built it** — it never rotates to a heading, and `forward` is declared-only (schema pins it to
+   `+x`) **read by no baker**. So a model built facing another way renders 90/180° wrong **and still
+   passes every gate** (silent — there is no facing oracle). Build it facing +X. *(Radially-symmetric
+   props — a ball, an orb — have no forward; see rule 5.)*
 4. **Origin = ground footprint centre.** The lowest point sits at **z = 0**, and the standing
    footprint is centred on **x = y = 0**. Feet on the floor, body over the origin.
 5. **Give it a FRONT — front and back must look different.** This is the rule people miss. If the
@@ -43,6 +48,10 @@ If any of these is wrong the body will look wrong in-engine no matter how good t
    directions and the engine can't tell front from back.** Break it on purpose: a face / visor on
    the front of the head, a chest vs. a flat back, a snout, a beak + tail. Anything that reads as
    "this side is the front." (This actually shipped as a bug here once — see *Worked references*.)
+   **Exempt: radially-symmetric props.** A ball, orb, or sphere legitimately looks the same from every
+   heading — its 16 direction frames *should* be near-identical, and that is **not** the aliasing bug
+   and needs no front. If such a prop carries a directional marker (a painted arrow, a seam, a point),
+   align that marker to **+X**; if it has none, leave it symmetric.
 6. **One clean, triangulatable mesh.** One logical mesh (or cleanly separable parts), no stray loose
    geometry, manifold-ish, **~300–8 000 triangles** total. More detail than that is wasted at sprite
    size and slows the bake.
@@ -80,6 +89,11 @@ If any of these is wrong the body will look wrong in-engine no matter how good t
      forearm.R, hand.R, thigh.L, shin.L, foot.L, thigh.R, shin.R, foot.R`
    - **bird_v1** bones: `root, body, neck, head, wing.L, wingtip.L, wing.R, wingtip.R, tail, leg.L,
      leg.R`
+   - **quadruped_v1** bones: `root, pelvis, spine, chest, neck, head, tail, foreleg.L, foreshin.L,
+     forehoof.L, foreleg.R, foreshin.R, forehoof.R, hindleg.L, hindshin.L, hindhoof.L, hindleg.R,
+     hindshin.R, hindhoof.R` — head/neck at `+X`, tail at `−X`; **forelegs map to the `arms` HIT
+     region, hindlegs to `legs`** (the four-region contract has no extra slots — see the cow).
+   - **ball_v1** bones: `root, body, marker` — for a directional prop; align `marker` to `+X`.
 
    (A static body with no rig is fine too — the pipeline animates it procedurally. Then you only owe
    the named-by-region mesh.)
@@ -110,6 +124,10 @@ You pass the body stage when:
 
 - [ ] **16 *distinct* directions** — front-facing and back-facing frames clearly differ (rule 5). If
       heading N looks the same as the one 180° opposite, the body has no front — go back to step 3.
+      *(A radially-symmetric prop — ball/orb — is exempt: near-identical directions are correct for it.)*
+- [ ] **Faces the right way** — at direction 0 the front (face/nose/beak/head) points **down-right** on
+      screen; the cyan facing arrow points the same way. If it's 90/180° off, the model was built facing
+      the wrong axis — re-orient the source to **+X** (the bake will not fix it; see rule 3).
 - [ ] **Scale reads right** — height looks correct relative to a 1.8 m reference.
 - [ ] **Stands and faces correctly** — feet on the ground, facing down-right at direction 0, anchor
       (magenta cross) at the feet.
