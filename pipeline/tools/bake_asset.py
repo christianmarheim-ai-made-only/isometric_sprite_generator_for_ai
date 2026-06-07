@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -192,6 +193,38 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
                              lockfile_hashes=compute_individual_hashes(PIPELINE_ROOT / "lockfiles"),
                              texture=tex_block)
     manifest["provenance"] = block
+
+    # === SPRITE_DEBUG troubleshooting dump (spiking/discovery phase ONLY -- delete this block later) ===
+    # Set the env var SPRITE_DEBUG=1 to drop an out/_debug/diagnostics.json with everything useful for
+    # debugging BOTH the model the producer shipped and what the bake decided. Off by default; never
+    # affects the shipped package. Remove this block (grep SPRITE_DEBUG) once the pipeline is stable.
+    if os.environ.get("SPRITE_DEBUG"):
+        try:
+            from glb_texture_probe import texture_capable
+            dbg = out / "_debug"
+            dbg.mkdir(parents=True, exist_ok=True)
+            try:
+                tc_ok, tc_reasons, tc_rec = texture_capable(str(auto_rigged_from or mesh_path))
+            except Exception as _e:
+                tc_ok, tc_reasons, tc_rec = None, [f"probe_error:{_e}"], None
+            diag = {
+                "marker": "SPRITE_DEBUG_DIAGNOSTICS (spiking phase -- safe to delete)",
+                "variant_id": variant_id, "route": route, "bake_ms": bake_ms,
+                "texture_mode": texture_mode, "calibration": calibration,
+                "texture_capable": {"ok": tc_ok, "reasons": tc_reasons, "record": tc_rec},
+                "texture_provenance": tex_block,
+                "render_signals": {k: meta.get(k) for k in
+                                   ("degenerate_uv_materials", "base_color_linked_materials",
+                                    "region_fallback_materials", "missing_clips", "blender_version")},
+                "verification_report": {"ok": vrep["ok"], "errors": vrep["errors"], "warnings": vrep["warnings"]},
+                "build_log_ok": log["ok"], "git": log["environment"]["git"],
+            }
+            (dbg / "diagnostics.json").write_text(json.dumps(diag, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            print(f"  [SPRITE_DEBUG] -> {dbg / 'diagnostics.json'}")
+        except Exception as _e:
+            print(f"  [SPRITE_DEBUG] diagnostics dump failed: {_e}")
+    # === end SPRITE_DEBUG block ===
+
     nwarn = len(log["warnings"])
     tail = f"  [{nwarn} warning(s): {', '.join(sorted({w['code'] for w in log['warnings']}))}]" if nwarn else ""
     print(f"BAKE_ASSET OK [{route}]: {variant_id} -> {out}  ({len(manifest['frames'])} frames){tail}")
