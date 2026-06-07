@@ -125,7 +125,8 @@ def _non_upright(manifest: dict, archetype, land_tol: float = 0.35, med_tol: flo
 
 def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=None, clips=None,
                     rig=None, archetype=None, authored_metrics=None,
-                    gate_reasons=None, meta: dict | None = None, stages=None) -> dict:
+                    gate_reasons=None, meta: dict | None = None, stages=None,
+                    texture_mode="flat_region", calibration=False) -> dict:
     """Assemble + write out_dir/build_log.json and return the log dict."""
     out_dir = Path(out_dir)
     meta = meta or {}
@@ -161,6 +162,25 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
     nu = _non_upright(manifest, archetype)
     if nu:
         warnings.append(nu)
+
+    # --- Output fidelity gate (ADR-0028): a TEXTURED, non-calibration delivery that bakes flat/wrong
+    # turns its diagnostic warnings into ERRORS (so build_log.ok flips false). flat_region keeps them
+    # as warnings (unchanged behaviour); calibration bypasses (debug colours are intentional). ---
+    if texture_mode == "textured" and not calibration:
+        for w in warnings:
+            if w["code"] in ("degenerate_uv", "region_fallback_torso"):
+                w["severity"] = "error"
+        try:
+            from texture_metrics import atlas_colour_rich
+            cap = out_dir / "color_atlas.png"
+            if cap.exists():
+                rich_ok, rich_m = atlas_colour_rich(str(cap))
+                if not rich_ok:
+                    warnings.append({"code": "atlas_colour_rich_low", "severity": "error",
+                                     "detail": f"textured colour atlas is not rich enough {rich_m} "
+                                               "(need unique>=64, entropy>=3.0, largest<=0.65) -- baked flat/swatch"})
+        except Exception:
+            pass
 
     anims = manifest.get("animations") or {}
     gate1_ok = not gate_reasons
@@ -206,7 +226,7 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
 
 
 def stamp_provenance(manifest_path, *, asset_path=None, mesh=None, clips=None, rig=None,
-                     lockfile_hashes=None, batch_id=None) -> dict:
+                     lockfile_hashes=None, batch_id=None, texture=None) -> dict:
     """Stamp a self-describing `provenance` block into a baked manifest.json (additive -- the engine
     schema is additionalProperties:true). Lets the SHIPPED package answer 'which model + clips + rig
     + lockfiles produced this' from manifest.json alone, and points at the build_log sidecar. Only
@@ -223,6 +243,7 @@ def stamp_provenance(manifest_path, *, asset_path=None, mesh=None, clips=None, r
         "rig": rig,
         "contract_hash": m.get("contract_hash"),
         "lockfile_hashes": lockfile_hashes,
+        "texture": texture,
         "build_log": "build_log.json",
     }
     m["provenance"] = block

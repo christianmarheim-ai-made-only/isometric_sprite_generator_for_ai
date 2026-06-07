@@ -157,14 +157,40 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
         meta["auto_rigged_from"] = str(auto_rigged_from)
     clips_path = (base / clips_rel).resolve() if clips_rel else None
     rig = asset.get("rig")
+    texture_mode = asset.get("texture_mode", "flat_region")
+    calibration = bool(asset.get("calibration")
+                       or ((asset.get("provenance") or {}).get("texture") or {}).get("calibration_texture"))
     log = write_build_log(out, manifest, route, asset_path=manifest_path, mesh=mesh_path,
                           clips=clips_path, rig=rig, archetype=asset.get("archetype"),
                           authored_metrics=asset.get("world_metrics"), gate_reasons=[], meta=meta,
-                          stages=[{"name": "bake", "ms": bake_ms}])
-    # Self-describing provenance in the shipped manifest: which model+clips+rig+lockfiles made it.
+                          stages=[{"name": "bake", "ms": bake_ms}],
+                          texture_mode=texture_mode, calibration=calibration)
+    # Deterministic OUTPUT-verify artifact: project the build_log warnings into a per-stage report;
+    # verification_report.ok == build_log.ok by construction (both = "no severity==error").
+    from verification_report import write_report
+    from build_log import file_sha256
+    vrep = write_report(out / "verification_report.json", variant_id, texture_mode, log["warnings"], log["ok"])
+    if not vrep["ok_agrees_with_build_log"]:
+        print("WARN: verification_build_log_disagree -- verification_report.ok != build_log.ok")
+    # Texture/UV provenance for the shipped manifest (ADR-0029): real_albedo is true ONLY for real
+    # painted art (textured AND not calibration), computed at this single site so it can never leak.
+    bc = (asset.get("textures") or {}).get("base_color")
+    bc_path = (base / bc) if bc else None
+    tex_block = {
+        "texture_mode": texture_mode,
+        "has_bound_tex": texture_mode == "textured",
+        "real_albedo": (texture_mode == "textured") and not calibration,
+        "calibration_texture": bool(calibration),
+        "basecolor_sha256": (file_sha256(bc_path) or {}).get("sha256") if (bc_path and bc_path.exists()) else None,
+        "degenerate_uv_materials": sorted(meta.get("degenerate_uv_materials", [])),
+        "flat_fallback": False,
+        "uv_repaired": bool(auto_rigged_from is not None and texture_mode == "textured"),
+    }
+    # Self-describing provenance in the shipped manifest: which model+clips+rig+lockfiles+texture made it.
     block = stamp_provenance(out / "manifest.json", asset_path=manifest_path, mesh=mesh_path,
                              clips=clips_path, rig=rig,
-                             lockfile_hashes=compute_individual_hashes(PIPELINE_ROOT / "lockfiles"))
+                             lockfile_hashes=compute_individual_hashes(PIPELINE_ROOT / "lockfiles"),
+                             texture=tex_block)
     manifest["provenance"] = block
     nwarn = len(log["warnings"])
     tail = f"  [{nwarn} warning(s): {', '.join(sorted({w['code'] for w in log['warnings']}))}]" if nwarn else ""
