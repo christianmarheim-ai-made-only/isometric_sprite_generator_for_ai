@@ -26,6 +26,15 @@ All ADRs are **Proposed** unless ratified by the engine/gameplay review group. T
 | ADR-0023 | `world_scale_multiplier` deferred; measured height is sufficient | — (parked) |
 | ADR-0024 | Color variations (runtime tint first) + effects as separate layers, never baked in | effects/M2A milestone |
 | ADR-0025 | Hit-region output: keep per-frame region mask, ADD per-region AABBs derived from it (align pipeline to engine ADR-029/030) | M3 hit detection / roadmap hitmask Phase-0 |
+| ADR-0026 | Texture-mode declaration + the `texture-capable(glb)` contract (real UVs + bound texture) | ARC-0001 / textured deliveries |
+| ADR-0027 | Auto-rig preserves textures + UVs; textured models ship pre-rigged | ARC-0001 / textured deliveries |
+| ADR-0028 | A textured delivery that bakes flat is a **blocking** failure (fidelity gates + severity) | ARC-0001 / textured deliveries |
+| ADR-0029 | Texture/UV provenance in the baked manifest (`real_albedo` the engine reads) | ARC-0001 / engine tint |
+| ADR-0030 | Color-coded calibration model + region↔color oracle (e2e visual-regression basis) | ARC-0001 / verification |
+| ADR-0031 | Per-bake cross-stage verification report + severity policy (model/skin/anim/hitbox verified-applied); implements ADR-0025 AABBs | ARC-0001 / verification |
+| ADR-0032 | Faithful color: pinned Standard/sRGB color management + baked-atlas contract | ARC-0001 / textured deliveries |
+
+**ADR-0026 – ADR-0032 belong to [ARC-0001: Textured & verified skinned models](../docs/arcs/ARC-0001-textured-verified-skinned-models.md)** — the arc that closes the verified gap where "textured/skinned" deliveries bake flat and ship green (no UVs / orphan atlases / degenerate UVs; auto-rig flattens; no gate). The arc carries the per-asset evidence, the merged backlog (Epic A pipeline hardening + Epic B verification), the critical path, and the handoffs (incl. the standalone Model Producer delivery spec). Implementation order and the locks-to-resolve are in the arc §6–§7.
 
 **ADR-0020 – ADR-0023 are explicitly PARKED** (Proposed, recorded for later review, not scheduled): metallic materials, M2A execution detail, the 256² canvas lock, and the world-scale multiplier. They capture decisions + recommendations so a future session can ratify cold. See each ADR's `Related:` line for the source investigation doc.
 
