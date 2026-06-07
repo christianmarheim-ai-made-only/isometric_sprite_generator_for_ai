@@ -19,6 +19,8 @@ pipeline/output/verify_set/*/blender_meta.json
 
 # packaging: ship the zip, not the regenerable staging tree (package_authoring_contract.py)
 dist/model_authoring_contract_v1/
+# spec-v2 bundle: commit the source tree, not the regenerable binary zip artifact
+dist/*.zip
 
 # production logs are per-run/volatile (timing + commit hash) -> regenerable, not committed
 pipeline/output/verify_set/*/build_log.json

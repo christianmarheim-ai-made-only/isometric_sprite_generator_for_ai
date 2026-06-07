@@ -1,0 +1,13 @@
+{
+  "waivers": [
+    {
+      "waiver_id": "WAIVE_TEXTURE_RICHNESS_0001",
+      "code": "atlas_colour_rich_low",
+      "reason": "Calibration texture intentionally uses flat debug colours.",
+      "approved_by": "pipeline-owner",
+      "created_at": "2026-06-07",
+      "expires_at": "2026-07-01",
+      "engine_real_albedo": false
+    }
+  ]
+}

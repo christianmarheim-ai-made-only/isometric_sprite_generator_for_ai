@@ -1,0 +1,42 @@
+{
+  "asset_contract_version": "external_asset_v2",
+  "variant_id": "calibration_dragon_v1",
+  "archetype": "dragon",
+  "texture_mode": "textured",
+  "files": {
+    "mesh": "calibration_dragon_v1.glb",
+    "animation_clips": "calibration_dragon_v1_anim.json"
+  },
+  "geometry": {
+    "up": "z",
+    "forward": "+x",
+    "unit": "meter"
+  },
+  "rig": "dragon_v1",
+  "region_source": "material_name",
+  "animations": {
+    "idle": {
+      "clip": "idle",
+      "frames": 4,
+      "fps": 6,
+      "playback": "loop"
+    },
+    "walk": {
+      "clip": "walk",
+      "frames": 8,
+      "fps": 10,
+      "playback": "loop"
+    },
+    "hit": {
+      "clip": "hit",
+      "frames": 8,
+      "fps": 12,
+      "playback": "once"
+    }
+  },
+  "world_metrics": {
+    "height_world": 8.95,
+    "footprint_radius_world": 4.35,
+    "eye_height_world": 6.3
+  }
+}

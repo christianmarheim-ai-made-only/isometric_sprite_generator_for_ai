@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external_asset.schema.json",
+  "title": "External asset manifest (external_asset_v1)",
+  "description": "What an external producer delivers alongside a 3D model so the game_iso_v1 pipeline can read it. See docs/external_asset_contract.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["asset_contract_version", "variant_id", "archetype", "files"],
+  "properties": {
+    "asset_contract_version": { "const": "external_asset_v1" },
+    "variant_id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "unique per variant; becomes the output dir name, so two assets must not share it" },
+    "archetype": { "enum": ["biped", "bird", "quadruped", "ball", "dragon"], "description": "logical family; selects the shared rig + animation library. Add a value here when a new archetype is introduced. (quadruped: 4-legged creatures, forelegs->arms / hindlegs->legs region reuse; ball: rolling-ball prop; dragon: winged quadruped, wings+forelegs->arms / hindlegs->legs / tail->torso / horns+jaw->head.)" },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mesh"],
+      "properties": {
+        "mesh": { "type": "string", "description": ".glb (preferred) or .obj, relative to this manifest. For a rigged+animated variant this is the glb AFTER bake_anim_from_json.py has embedded the clips, OR pair a clip-less rigged glb with files.animation_clips below." },
+        "animation_clips": { "type": "string", "description": "optional path to an anim_clips_v1 JSON (schema/animation_clips.schema.json). When present, bake_asset.py runs bake_anim_from_json.py to embed these clips into files.mesh (a rigged glb) before baking." }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "up": { "enum": ["y", "z"], "default": "z", "description": "source up axis. HONORED for .obj (a Y-up obj without up:\"y\" bakes sideways). For .glb/.gltf the importer reads the file's own axis and this field is currently inert -- set it correctly anyway for portability." },
+        "forward": { "enum": ["+x", "-x", "+y", "-y"], "default": "+x", "description": "The model's forward / travel heading (the way it faces). Optional -- omit it and `+x` (= direction 0) is assumed. The baker ROTATES the declared forward onto +X (a +y-authored model bakes identically to a +x-authored one), so this is a LIVE correction, not just a label. Planar only: forward is a ground-plane heading (+z/-z are not valid)." },
+        "unit": { "const": "meter" }
+      }
+    },
+    "rig": { "type": "string", "description": "rig profile id (pipeline/schema/rig_profiles/<rig>.json). Omit for a static mesh -> procedural animation." },
+    "default_state": { "type": "string", "description": "the state shown when nothing is playing (must be an `animations` key). Omit -> engine uses `idle` if present, else the lexicographically-first state." },
+    "region_source": { "enum": ["material_name", "vertex_attribute", "region_texture"], "description": "how HIT regions are tagged. Only material_name bakes today; the others are documented extensions." },
+    "textures": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "named texture maps relative to this manifest. RENDER STATUS this iteration: only an embedded-glb base color renders (Workbench TEXTURE pass); base_color listed here, and normal/roughness/metallic, are RECORDED but NOT rendered. OBJ deliveries render a flat per-region color (no texture).",
+      "properties": {
+        "base_color": { "type": "string" },
+        "normal": { "type": "string" },
+        "roughness": { "type": "string" },
+        "metallic": { "type": "string" }
+      }
+    },
+    "animations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["frames", "fps", "playback"],
+        "properties": {
+          "clip": { "type": "string", "description": "glTF animation clip name embedded in the glb (defaults to the state key)" },
+          "frames": { "type": "integer", "minimum": 1, "description": "sprite frames sampled per direction (the same value as the matching anim_clips_v1 clip's `frames`)" },
+          "fps": { "type": "number", "exclusiveMinimum": 0 },
+          "playback": { "enum": ["loop", "once"], "description": "loop wraps; once holds the last frame (engine ADR-044)" }
+        }
+      },
+      "description": "state name -> clip sampling. The pipeline samples each named glb clip into `frames` poses x direction_count directions."
+    },
+    "world_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "height_world": { "type": "number", "exclusiveMinimum": 0 },
+        "footprint_radius_world": { "type": "number", "exclusiveMinimum": 0 },
+        "eye_height_world": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "description": "optional override; otherwise measured from the mesh AABB"
+    },
+    "notes": { "type": "string" },
+    "texture_mode": {
+      "enum": ["flat_region", "textured"],
+      "description": "OPTIONAL in external_asset_v1 (absent => flat_region); becomes REQUIRED in external_asset_v2. 'textured' obliges a real UV unwrap + a baseColorTexture bound IN the glb -- verified by glb_texture_probe.texture_capable BEFORE any bake (ADR-0026). 'flat_region' shades by per-region material base colour and needs no UVs/atlas."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "recording-only provenance. The texture sub-block (has_bound_tex/real_albedo/basecolor_sha256/uv_coverage_ratio/degenerate_uv_materials/uv_repaired/flat_fallback/calibration_texture/waiver_id) follows ADR-0029 / review snippet 06.",
+      "properties": { "texture": { "type": "object", "additionalProperties": true } }
+    },
+    "waivers": {
+      "type": "array",
+      "description": "named, single-check, expiring downgrades (review snippet 07). A waiver must never set real_albedo true and must carry expires_at.",
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "marks a debug/oracle package (review snippet 09): CALIB_RGB colour pass, debug_region_legend/skin_binding/texture_regions sidecars, real_albedo false."
+    },
+    "radial_symmetric": { "type": "boolean", "description": "true for radial props (ball/orb) that have no inherent front; pairs with front_back_distinctness_exempt (ADR-0033 creature traits)." },
+    "front_back_distinctness_exempt": { "type": "boolean", "description": "exempt from the front!=back distinctness gate (radial/symmetric props only)." }
+  }
+}

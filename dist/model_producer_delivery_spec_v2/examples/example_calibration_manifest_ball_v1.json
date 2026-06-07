@@ -1,0 +1,44 @@
+{
+  "asset_contract_version": "external_asset_v2",
+  "variant_id": "calibration_ball_v1",
+  "archetype": "ball",
+  "texture_mode": "textured",
+  "files": {
+    "mesh": "calibration_ball_v1.glb",
+    "animation_clips": "calibration_ball_v1_anim.json"
+  },
+  "geometry": {
+    "up": "z",
+    "forward": "+x",
+    "unit": "meter"
+  },
+  "rig": "ball_v1",
+  "region_source": "material_name",
+  "animations": {
+    "idle": {
+      "clip": "idle",
+      "frames": 1,
+      "fps": 1,
+      "playback": "loop"
+    },
+    "roll": {
+      "clip": "roll",
+      "frames": 8,
+      "fps": 12,
+      "playback": "loop"
+    },
+    "hit": {
+      "clip": "hit",
+      "frames": 6,
+      "fps": 12,
+      "playback": "once"
+    }
+  },
+  "world_metrics": {
+    "height_world": 0.8,
+    "footprint_radius_world": 0.4,
+    "eye_height_world": 0.4
+  },
+  "radial_symmetric": true,
+  "front_back_distinctness_exempt": true
+}

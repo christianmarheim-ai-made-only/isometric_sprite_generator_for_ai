@@ -1,0 +1,56 @@
+{
+  "verification_report_version": "verification_report_v1",
+  "asset_id": "example_variant",
+  "ok": true,
+  "texture_mode": "textured",
+  "stages": {
+    "modeling": {
+      "ok": true,
+      "checks": {
+        "scale": "pass",
+        "up_axis": "pass",
+        "forward_axis": "pass",
+        "ground_origin": "pass",
+        "front_back_distinctness": "pass"
+      }
+    },
+    "texture": {
+      "ok": true,
+      "checks": {
+        "has_bound_tex": "pass",
+        "degenerate_uv": "pass",
+        "atlas_colour_rich": "pass",
+        "orphan_texture": "pass"
+      }
+    },
+    "skinning": {
+      "ok": true,
+      "checks": {
+        "required_bones_present": "pass",
+        "all_parts_weighted": "pass",
+        "max_4_influences": "pass"
+      }
+    },
+    "animation": {
+      "ok": true,
+      "checks": {
+        "clip_vocab": "pass",
+        "declared_clips_exist": "pass",
+        "loop_continuity": "pass",
+        "intended_regions_move": "pass"
+      }
+    },
+    "hitbox": {
+      "ok": true,
+      "checks": {
+        "regions_present": "pass",
+        "no_region_fallback": "pass",
+        "mask_tiles_silhouette": "pass",
+        "aabbs_match_masks": "pass"
+      }
+    }
+  },
+  "errors": [],
+  "warnings": [],
+  "waivers": []
+}

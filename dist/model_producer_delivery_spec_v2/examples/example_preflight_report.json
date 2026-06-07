@@ -1,0 +1,37 @@
+{
+  "preflight_report_version": "producer_preflight_v1",
+  "producer_spec_version": "model_producer_delivery_spec_v1",
+  "asset_id": "example_variant",
+  "texture_mode": "textured",
+  "ok": true,
+  "tool_versions": {
+    "blender": "4.2.0",
+    "pipeline_commit": "unknown"
+  },
+  "checks": {
+    "geometry": {
+      "status": "pass"
+    },
+    "texture": {
+      "status": "pass"
+    },
+    "rig_skin": {
+      "status": "pass"
+    },
+    "animation": {
+      "status": "pass"
+    },
+    "hitbox": {
+      "status": "pass"
+    },
+    "bake": {
+      "status": "pass"
+    }
+  },
+  "artifacts": {
+    "color_sheet": "contact_sheets/example_variant_color_sheet.png",
+    "hit_sheet": "contact_sheets/example_variant_hit_sheet.png",
+    "build_log": "build_log.json",
+    "verification_report": "verification_report.json"
+  }
+}

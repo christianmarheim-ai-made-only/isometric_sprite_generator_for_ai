@@ -1,0 +1,18 @@
+{
+  "provenance": {
+    "texture": {
+      "texture_mode": "textured",
+      "has_bound_tex": true,
+      "real_albedo": true,
+      "basecolor_sha256": "replace_with_sha256",
+      "embedded_image_count": 1,
+      "sidecar_image_count": 0,
+      "uv_coverage_ratio": 0.73,
+      "degenerate_uv_materials": [],
+      "uv_repaired": false,
+      "flat_fallback": false,
+      "calibration_texture": false,
+      "waiver_id": null
+    }
+  }
+}

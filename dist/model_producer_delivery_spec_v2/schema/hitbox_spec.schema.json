@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hitbox_spec.schema.json",
+  "title": "hitbox_v1",
+  "description": "Model-derived hit/collision data: a collision capsule (world_metrics) + per-region world AABBs. Companion to the per-pixel R8 hit-mask the renderer bakes from the same region tags. OPTIONAL verification-only artifact: no asset.json field references it and no baker consumes it; generate it to sanity-check the bake. See docs/generating_hitbox_data.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["hitbox_spec_version", "unit", "world_metrics", "regions"],
+  "properties": {
+    "hitbox_spec_version": { "const": "hitbox_v1" },
+    "from_mesh": { "type": "string" },
+    "unit": { "const": "meter" },
+    "up": { "enum": ["z", "y"] },
+    "world_metrics": {
+      "type": "object",
+      "required": ["height_world", "footprint_radius_world", "unit"],
+      "additionalProperties": false,
+      "properties": {
+        "height_world": { "type": "number", "exclusiveMinimum": 0 },
+        "footprint_radius_world": { "type": "number", "exclusiveMinimum": 0 },
+        "eye_height_world": { "type": "number", "exclusiveMinimum": 0 },
+        "unit": { "const": "meter" }
+      }
+    },
+    "collision_capsule": {
+      "type": "object",
+      "required": ["radius_world", "height_world"],
+      "additionalProperties": false,
+      "properties": {
+        "radius_world": { "type": "number", "exclusiveMinimum": 0 },
+        "height_world": { "type": "number", "exclusiveMinimum": 0 },
+        "note": { "type": "string" }
+      }
+    },
+    "regions": {
+      "type": "object",
+      "description": "keyed by region name (head/torso/arms/legs)",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["id", "aabb_min", "aabb_max"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "integer", "minimum": 1, "maximum": 4 },
+          "aabb_min": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "aabb_max": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }
+        }
+      }
+    },
+    "hitmask_note": { "type": "string" }
+  }
+}
