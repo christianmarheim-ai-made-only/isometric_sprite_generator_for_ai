@@ -291,6 +291,7 @@
     "hindhoof.R": "legs"
   },
   "states": {
+    "_note": "State names target the engine clip vocabulary (constants.ENGINE_CLIP_VOCAB) or resolve through constants.CLIP_SYNONYMS to a canonical clip -- no off-vocab orphan the renderer would silently play as idle (R-5). 'graze' is a distinct flavour locomotion kept under its own name (CLIP_SYNONYMS: graze->walk) -- the engine selects it as 'walk', co-declared above. 'death' stays NON-load-bearing (not in ENGINE_CLIP_VOCAB; self-mapped in CLIP_SYNONYMS so it is not an orphan).",
     "idle": {
       "required": true,
       "frames": 1,

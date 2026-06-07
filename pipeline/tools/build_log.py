@@ -18,6 +18,7 @@ import json
 import platform
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 
 if str(Path(__file__).resolve().parent) not in sys.path:
@@ -126,8 +127,17 @@ def _non_upright(manifest: dict, archetype, land_tol: float = 0.35, med_tol: flo
 def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=None, clips=None,
                     rig=None, archetype=None, authored_metrics=None,
                     gate_reasons=None, meta: dict | None = None, stages=None,
-                    texture_mode="flat_region", calibration=False) -> dict:
-    """Assemble + write out_dir/build_log.json and return the log dict."""
+                    texture_mode="flat_region", calibration=False,
+                    waivers=None, today=None) -> dict:
+    """Assemble + write out_dir/build_log.json and return the log dict.
+
+    `waivers` (review snippet 07; ADR-0028/0031): an optional list of named, single-check, expiring
+    severity downgrades from the delivered package. After the texture escalation, an `error` warning
+    whose code has a VALID matching waiver is downgraded to severity `waived` (so `ok` stays true) with
+    the waiver_id recorded on it -- the warning is NOT removed, a waived check still appears. An
+    EXPIRED / malformed / real-albedo waiver instead ADDS a `waiver_*` error (which fails `ok`).
+    `today` is the injectable ISO `YYYY-MM-DD` bake date the waiver expiry is measured against
+    (defaults to date.today() -- tests pass an explicit date)."""
     out_dir = Path(out_dir)
     meta = meta or {}
     gate_reasons = gate_reasons or []
@@ -194,6 +204,22 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
                                  "detail": "the baked R8 hitmask has NO body region (all background)"})
     except Exception:
         pass
+
+    # --- Waivers (review snippet 07; ADR-0028/0031): apply AFTER the texture escalation so the
+    # severities are final. For each `error` warning whose code has a VALID matching waiver, downgrade
+    # it to `waived` (so ok stays true) and stamp the waiver_id -- the warning is NOT removed (a waived
+    # check still appears). Any EXPIRED / malformed / real-albedo waiver instead becomes a waiver_* ERROR.
+    if waivers:
+        from waivers import resolve as _resolve_waiver, validate as _validate_waivers  # noqa: E402
+        today_iso = today or date.today().isoformat()
+        for w in warnings:
+            if w.get("severity") != "error":
+                continue
+            wv = _resolve_waiver(w["code"], waivers, today_iso)
+            if wv:
+                w["severity"] = "waived"
+                w["waiver_id"] = wv.get("waiver_id")
+        warnings.extend(_validate_waivers(waivers, today_iso))
 
     anims = manifest.get("animations") or {}
     gate1_ok = not gate_reasons

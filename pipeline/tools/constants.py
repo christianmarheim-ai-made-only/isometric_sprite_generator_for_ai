@@ -116,6 +116,19 @@ CLIP_SYNONYMS = {
     "hurt": "hit", "damage": "hit", "flinch": "hit", "stagger": "hit", "recoil": "hit",
     "hitreact": "hit", "hit_react": "hit",
     "die": "death", "dead": "death", "dying": "death", "ko": "death",
+    # --- creature-rig flavour clips (R-5: reconcile rig_profiles/*.json off-vocab states). A rig
+    #     profile MAY keep a distinct flavour state name (dragon `breath`, quadruped `graze`) instead of
+    #     collapsing it onto the canonical -- these map it to the engine clip the renderer actually
+    #     selects, so the flavour state is NOT an off-vocab orphan that silently plays as idle. The
+    #     canonical target is co-declared in the same profile, so offvocab_clip_renames stays clean.
+    "breath": "attack", "graze": "walk",
+    # --- NON-load-bearing terminal/locomotion clips (death/fly/roll). These are deliberately NOT in
+    #     ENGINE_CLIP_VOCAB (the read-only engine never SELECTS them), but a producer MAY ship them and
+    #     a rig profile MAY declare them. Self-mapping makes each resolve to a canonical *name* (itself)
+    #     so it is not an orphan, WITHOUT making it load-bearing and WITHOUT being flagged by
+    #     offvocab_clip_renames (the canonical == the declared state, so it is never a "rename").
+    #     Distinct from die/dead/dying/ko above, which fold ONTO `death`; `death` here is the identity.
+    "death": "death", "fly": "fly", "roll": "roll",
 }
 
 # Per-archetype clip requirements (ADR-0031 / review snippet 08). The GATE checks `required` only --

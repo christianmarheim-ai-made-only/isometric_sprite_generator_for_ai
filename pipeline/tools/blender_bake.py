@@ -70,6 +70,24 @@ def _run_blender(blender: str, out: Path, mesh_file=None, forward: str = "+x") -
     return json.loads(meta.read_text(encoding="utf-8"))
 
 
+def region_aabbs(region_ids: np.ndarray, ids=(1, 2, 3, 4)) -> dict[str, list[int]]:
+    """ADR-0025: per-region TIGHT screen-space AABB derived from an R8 region-id array.
+
+    `region_ids` is a 2-D uint8 array of region ids (0=bg, 1..4 body regions) -- e.g. the cropped
+    per-frame region map placed into the hitmask atlas. For each PRESENT id, return the tight bounding
+    box of that id's pixels as [x, y, w, h] in the SAME frame-local pixel space as the array (origin =
+    array [0,0] = top-left of the frame's cropped mask == the frame's mask_rect origin). The engine
+    reconstructs the identical space by cropping hitmask_atlas.png with the frame's mask_rect, so these
+    boxes index straight into that sub-image. Absent regions are omitted (no zero-area boxes)."""
+    out: dict[str, list[int]] = {}
+    for rid in ids:
+        ys, xs = np.nonzero(region_ids == rid)
+        if len(xs):
+            x0, y0 = int(xs.min()), int(ys.min())
+            out[str(int(rid))] = [x0, y0, int(xs.max()) - x0 + 1, int(ys.max()) - y0 + 1]
+    return out
+
+
 def _region_ids(png: Path, targets: dict[int, list[int]]) -> np.ndarray:
     arr = np.asarray(Image.open(png).convert("RGBA"))
     rgb = arr[:, :, :3].astype(np.int32)
@@ -186,7 +204,7 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
     targets = {int(k): [round(_srgb(c) * 255) for c in v] for k, v in meta["region_color"].items()}
     canvas = (CANVAS, CANVAS)
 
-    color_imgs, region_imgs, fmeta = [], [], []
+    color_imgs, region_imgs, fmeta, frame_aabbs = [], [], [], []
     for state, fi in meta["poses"]:
         for d in range(DIRS):
             cimg = Image.open(out / f"color_{state}_f{fi}_dir{d:02d}.png").convert("RGBA")
@@ -195,9 +213,13 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
             ys, xs = np.nonzero(a > 0)
             bx, by, bw, bh = (int(xs.min()), int(ys.min()), int(xs.max() - xs.min() + 1),
                               int(ys.max() - ys.min() + 1)) if len(xs) else (0, 0, 1, 1)
+            crop_ids = rids[by:by + bh, bx:bx + bw]
             color_imgs.append(cimg.crop((bx, by, bx + bw, by + bh)))
-            region_imgs.append(Image.fromarray(rids[by:by + bh, bx:bx + bw], "L"))
+            region_imgs.append(Image.fromarray(crop_ids, "L"))
             fmeta.append((state, d, fi, [bx, by]))
+            # ADR-0025: per-region TIGHT AABB derived from the SAME cropped region map that becomes the
+            # frame's hitmask sub-image -> frame-local coords (origin == the frame's mask_rect origin).
+            frame_aabbs.append(region_aabbs(crop_ids))
 
     placements, atlas_size = shelf_place([im.size for im in color_imgs])
     color_atlas, rects = place_into(color_imgs, placements, atlas_size, "RGBA")
@@ -210,12 +232,13 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
     ax, ay = round(meta["anchor_frac"][0] * CANVAS, 3), round(meta["anchor_frac"][1] * CANVAS, 3)
     tip_len = CANVAS * 0.1
     frames, expected = [], []
-    for (state, d, fi, trim), rect in zip(fmeta, rects):
+    for (state, d, fi, trim), rect, aabbs in zip(fmeta, rects, frame_aabbs):
         yaw = d * (2 * math.pi / DIRS)
         sdv = [round(v, 6) for v in ground_screen_direction(yaw).tolist()]
         frames.append({
             "state": state, "direction": d, "frame_index": fi, "rect": rect, "mask_rect": rect,
             "trim": trim, "logical_frame_canvas": list(canvas), "anchor": [ax, ay],
+            "region_aabbs": aabbs,
             "world_yaw_degrees": round(math.degrees(yaw), 6), "screen_direction_vector": sdv,
             "sockets": {"origin": [ax, ay],
                         "direction_tip": [round(ax + sdv[0] * tip_len, 3), round(ay + sdv[1] * tip_len, 3)]},

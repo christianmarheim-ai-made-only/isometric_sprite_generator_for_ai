@@ -171,6 +171,12 @@
         "boxes": {
           "type": "object",
           "additionalProperties": {"$ref": "#/$defs/rect"}
+        },
+        "region_aabbs": {
+          "type": "object",
+          "description": "ADR-0025: optional per-region TIGHT screen-space AABB [x,y,w,h], keyed by R8 region id ('1'..'4'), derived from this frame's region mask. Coords are frame-local (origin = the frame's mask_rect origin), so they index straight into the hitmask sub-image cropped by mask_rect. Absent regions are omitted.",
+          "propertyNames": {"pattern": "^[1-4]$"},
+          "additionalProperties": {"$ref": "#/$defs/rect"}
         }
       },
       "additionalProperties": true

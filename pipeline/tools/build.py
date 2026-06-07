@@ -59,6 +59,10 @@ STEPS = [
     ("test_auto_rig", [str(SCRIPT_DIR / "test_auto_rig.py")]),
     ("test_forward_axis", [str(SCRIPT_DIR / "test_forward_axis.py")]),
     ("test_gate_modules", [str(SCRIPT_DIR / "test_gate_modules.py")]),
+    ("test_calib_oracle", [str(SCRIPT_DIR / "test_calib_oracle.py")]),
+    ("test_waivers", [str(SCRIPT_DIR / "test_waivers.py")]),
+    ("test_rig_states", [str(SCRIPT_DIR / "test_rig_states.py")]),
+    ("test_region_aabbs", [str(SCRIPT_DIR / "test_region_aabbs.py")]),
 ]
 
 

@@ -51,6 +51,7 @@
     "marker": "torso"
   },
   "states": {
+    "_note": "State names target the engine clip vocabulary (constants.ENGINE_CLIP_VOCAB) or resolve through constants.CLIP_SYNONYMS to a canonical clip -- no off-vocab orphan the renderer would silently play as idle (R-5). 'pop' was renamed to the canonical 'attack' (the ball's burst action); 'explode' to 'death' (the terminal effect). 'roll' is the ball's flavour locomotion kept under its own name (CLIP_SYNONYMS: roll->roll, NON-load-bearing -- the engine has no canonical roll clip). 'death' stays NON-load-bearing (not in ENGINE_CLIP_VOCAB; self-mapped in CLIP_SYNONYMS so it is not an orphan).",
     "idle": {
       "required": true,
       "frames": 1,
@@ -63,13 +64,13 @@
       "fps": 12,
       "playback": "loop"
     },
-    "pop": {
+    "attack": {
       "required": false,
       "frames": 5,
       "fps": 14,
       "playback": "once"
     },
-    "explode": {
+    "death": {
       "required": false,
       "frames": 8,
       "fps": 16,

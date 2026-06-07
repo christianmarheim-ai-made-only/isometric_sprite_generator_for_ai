@@ -165,7 +165,8 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
                           clips=clips_path, rig=rig, archetype=asset.get("archetype"),
                           authored_metrics=asset.get("world_metrics"), gate_reasons=[], meta=meta,
                           stages=[{"name": "bake", "ms": bake_ms}],
-                          texture_mode=texture_mode, calibration=calibration)
+                          texture_mode=texture_mode, calibration=calibration,
+                          waivers=asset.get("waivers"))   # a valid in-date waiver downgrades a gate error to 'waived'
     # Deterministic OUTPUT-verify artifact: project the build_log warnings into a per-stage report;
     # verification_report.ok == build_log.ok by construction (both = "no severity==error").
     from verification_report import write_report
@@ -224,6 +225,28 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
         except Exception as _e:
             print(f"  [SPRITE_DEBUG] diagnostics dump failed: {_e}")
     # === end SPRITE_DEBUG block ===
+
+    # CALIBRATION COLOUR-ORACLE (ADR-0030/0031): a calibration bake exists to PROVE skinning+animation
+    # are verified-applied. Run the deform-live / intended-region-move / per-region-AABB oracle on the
+    # baked output, drop calib_oracle_report.json, and fold its ok into the result. Calibration only --
+    # zero change to the normal textured/flat_region path.
+    if calibration:
+        try:
+            from calib_oracle import oracle as _calib_oracle
+            orep = _calib_oracle(out)
+            (out / "calib_oracle_report.json").write_text(
+                json.dumps(orep, indent=2) + "\n", encoding="utf-8")
+            manifest["calib_oracle"] = {"ok": orep["ok"], "failures": orep["failures"],
+                                        "report": "calib_oracle_report.json"}
+            if orep["ok"]:
+                clips_ok = sorted(s for s, e in orep["states"].items() if e.get("verdict") == "ok")
+                print(f"  CALIB_ORACLE OK: skinning+animation verified-applied "
+                      f"[adjudicated clips: {', '.join(clips_ok) or 'none (all static)'}]")
+            else:
+                print("  CALIB_ORACLE FAIL: " + "; ".join(orep["failures"]))
+        except Exception as _e:  # never let the oracle crash a bake; surface it instead
+            manifest["calib_oracle"] = {"ok": None, "error": str(_e)}
+            print(f"  CALIB_ORACLE ERROR: {_e}")
 
     nwarn = len(log["warnings"])
     tail = f"  [{nwarn} warning(s): {', '.join(sorted({w['code'] for w in log['warnings']}))}]" if nwarn else ""

@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -27,10 +28,14 @@ RIG_DIR = PIPELINE_ROOT / "schema" / "rig_profiles"
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 from constants import offvocab_clip_renames, CLIP_REQUIREMENTS  # noqa: E402
+from waivers import validate as validate_waivers  # noqa: E402
 
 
-def lint(path: Path, check_files: bool = True) -> list[str]:
-    """Return a list of contract violations for an asset manifest (empty = OK)."""
+def lint(path: Path, check_files: bool = True, today: str | None = None) -> list[str]:
+    """Return a list of contract violations for an asset manifest (empty = OK).
+
+    `today` is the injectable ISO `YYYY-MM-DD` lint date the waiver-expiry checks measure against
+    (defaults to date.today() -- tests pass an explicit date)."""
     errs: list[str] = []
     asset = json.loads(Path(path).read_text(encoding="utf-8"))
     schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
@@ -38,6 +43,14 @@ def lint(path: Path, check_files: bool = True) -> list[str]:
         errs.append(f"schema /{'/'.join(map(str, e.path))}: {e.message}")
     if errs:
         return errs  # structure broken; deeper checks would just be noise
+
+    # --- WAIVER front door (review snippet 07; ADR-0028/0031): validate any declared waivers BEFORE
+    # any bake. An expired / unknown-or-non-waivable code / real-albedo-claiming waiver is rejected
+    # here (waiver_expired / waiver_unknown_code / waiver_missing / waiver_attempts_real_albedo_true),
+    # so a package can never carry a stale or over-broad waiver into the baker. ---
+    today_iso = today or date.today().isoformat()
+    for we in validate_waivers(asset.get("waivers"), today_iso):
+        errs.append(f"{we['code']}: {we['detail']}")
 
     base = Path(path).parent
     if check_files:

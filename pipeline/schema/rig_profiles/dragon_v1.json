@@ -276,6 +276,7 @@
     "hindleg.R": "legs"
   },
   "states": {
+    "_note": "State names target the engine clip vocabulary (constants.ENGINE_CLIP_VOCAB) or resolve through constants.CLIP_SYNONYMS to a canonical clip -- no off-vocab orphan the renderer would silently play as idle (R-5). 'bite' was renamed to the canonical 'attack'; 'takeoff' to 'jump'; 'hurt' to 'hit'. 'breath' is a distinct flavour attack kept under its own name (CLIP_SYNONYMS: breath->attack) -- the engine selects it as 'attack', co-declared above. 'fly' and 'death' stay NON-load-bearing (not in ENGINE_CLIP_VOCAB; self-mapped in CLIP_SYNONYMS so they are not orphans) -- a producer MAY ship them.",
     "idle": {
       "required": true,
       "frames": 4,
@@ -294,7 +295,7 @@
       "fps": 14,
       "playback": "loop"
     },
-    "bite": {
+    "attack": {
       "required": false,
       "frames": 6,
       "fps": 12,
@@ -306,7 +307,7 @@
       "fps": 12,
       "playback": "once"
     },
-    "takeoff": {
+    "jump": {
       "required": false,
       "frames": 8,
       "fps": 12,
@@ -318,7 +319,7 @@
       "fps": 12,
       "playback": "loop"
     },
-    "hurt": {
+    "hit": {
       "required": false,
       "frames": 5,
       "fps": 12,
