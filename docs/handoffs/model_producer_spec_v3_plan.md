@@ -94,3 +94,39 @@ v3 also defines a **source package** (`<variant>.blend` + `source_asset.json` + 
 
 ## 8. Build order
 1. (this doc + ADR-0035) — done. 2. Code: tokenized regions (#5) + UV-line check (#8). 3. Schemas: the 6 JSON schemas (#3). 4. Regenerate pack from live pipeline (#1,2,4,9,11,12). 5. Stage contracts + prompt library + invalidation matrix. 6. Fixtures (positive + negative). 7. `self_test.py` green → flip status Accepted.
+
+## 9. pirate_duelist_v2 pre-v3 audit (2026-06-08) — required coverage additions
+
+Audited `creative/incoming/pirate_duelist_v2` before building v3 (biped, `flat_region`, rig `biped_v1`,
+8 anim states via `*_anim.json` clip sidecar; 1 mesh / 37 prims / 19 region-named materials / 1 embedded
+image; rigged JOINTS+WEIGHTS).
+
+**What's actually wrong (the suspected "missing UV … and more"):**
+- **UVs are present but DEGENERATE on 18/19 materials** (collapsed → ~1 texel each) — the "flat-colour-
+  via-texture" hack, NOT missing UVs. The materials *also* carry real `base_color_factor`, so the bound
+  texture is **redundant**.
+- Live bake = **ok=False** (the gate already rejects it). Breakdown: `oversize_atlas_page` ×1 **(error)**,
+  `degenerate_uv` ×18 (warn — `flat_region`, so not escalated), `base_color_linked` ×18 (warn).
+- **Root blocker:** the 8-state × 16-dir bake packs to a **2052×5062** atlas; 5062 > `MAX_PAGE_PX` 4096
+  → `oversize_atlas_page`. (Source `texture_atlas.png` is a fine 1024².)
+
+**Already covered by v3 — no action:** `degenerate_uv` point AND line (§6 fixtures + the live probe,
+`66fcb98`); region naming / texture binding (§1 #5/#6).
+
+**v3 MUST ADD (gaps this audit exposed):**
+1. **Multi-page atlas paging for many-state characters — the real blocker.** A realistic combat biped
+   (8 states) exceeds a single 4096 page and `bake_animated` currently *fails* instead of paging. v3
+   decision + impl: wire `pages`-based atlas sharding (the manifest schema + `shard_atlas.py` already
+   support multi-page) into the animated bake so >4096 packs into N ≤4096 pages — OR pin a per-bake
+   state/frame budget in the spec. Add a **positive** fixture (8-state biped pages cleanly) and keep
+   `oversize_atlas_page` as the **negative** when a single page is forced.
+2. **`flat_region` must not bind a base-colour texture.** A `flat_region` delivery that binds a base-colour
+   texture (here with degenerate UVs) is the misleading hack — flat colours belong in `base_color_factor`.
+   Add a check (e.g. `flat_region_bound_texture`) + negative fixture; the spec states `flat_region` =
+   material base colours, no texture.
+3. **`base_color_linked` negative fixture** in §6 (node-driven base colour → silent-grey risk): the
+   detector exists in code; add the fixture so the v3 self-tests pin it.
+
+Net: the pipeline correctly REJECTS pirate_duelist_v2 today, but for the right reason only by accident
+(atlas size). The two real producer lessons — *don't fake flat colours with a degenerate-UV texture*, and
+*many-state characters need atlas paging* — must be first-class in v3.
