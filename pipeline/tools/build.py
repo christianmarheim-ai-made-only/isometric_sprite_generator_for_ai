@@ -58,6 +58,7 @@ STEPS = [
     ("test_intake", [str(SCRIPT_DIR / "test_intake.py")]),
     ("test_auto_rig", [str(SCRIPT_DIR / "test_auto_rig.py")]),
     ("test_forward_axis", [str(SCRIPT_DIR / "test_forward_axis.py")]),
+    ("test_gate_modules", [str(SCRIPT_DIR / "test_gate_modules.py")]),
 ]
 
 
