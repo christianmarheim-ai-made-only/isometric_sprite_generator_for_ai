@@ -67,6 +67,28 @@
       },
       "description": "optional override; otherwise measured from the mesh AABB"
     },
-    "notes": { "type": "string" }
+    "notes": { "type": "string" },
+    "texture_mode": {
+      "enum": ["flat_region", "textured"],
+      "description": "OPTIONAL in external_asset_v1 (absent => flat_region); becomes REQUIRED in external_asset_v2. 'textured' obliges a real UV unwrap + a baseColorTexture bound IN the glb -- verified by glb_texture_probe.texture_capable BEFORE any bake (ADR-0026). 'flat_region' shades by per-region material base colour and needs no UVs/atlas."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "recording-only provenance. The texture sub-block (has_bound_tex/real_albedo/basecolor_sha256/uv_coverage_ratio/degenerate_uv_materials/uv_repaired/flat_fallback/calibration_texture/waiver_id) follows ADR-0029 / review snippet 06.",
+      "properties": { "texture": { "type": "object", "additionalProperties": true } }
+    },
+    "waivers": {
+      "type": "array",
+      "description": "named, single-check, expiring downgrades (review snippet 07). A waiver must never set real_albedo true and must carry expires_at.",
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "marks a debug/oracle package (review snippet 09): CALIB_RGB colour pass, debug_region_legend/skin_binding/texture_regions sidecars, real_albedo false."
+    },
+    "radial_symmetric": { "type": "boolean", "description": "true for radial props (ball/orb) that have no inherent front; pairs with front_back_distinctness_exempt (ADR-0033 creature traits)." },
+    "front_back_distinctness_exempt": { "type": "boolean", "description": "exempt from the front!=back distinctness gate (radial/symmetric props only)." }
   }
 }

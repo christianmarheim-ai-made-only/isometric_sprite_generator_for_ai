@@ -79,6 +79,33 @@ def lint(path: Path, check_files: bool = True) -> list[str]:
     for declared, canon in offvocab_clip_renames(list((asset.get("animations") or {}).keys())):
         print(f"WARN: animation '{declared}' is off the engine clip vocabulary -- the renderer selects "
               f"'{canon}' for that action and falls back to idle for '{declared}'. Rename '{declared}' -> '{canon}'.")
+
+    # --- texture_mode INPUT GATE (ADR-0026; additive -- engages only when the producer DECLARES it) ---
+    # Absent texture_mode == flat_region (back-compat), so existing v1 assets are unaffected. A
+    # 'textured' delivery must be texture-capable (real UVs + a bound baseColorTexture) BEFORE any
+    # bake, so an orphan atlas / collapsed UVs are rejected at the front door, never baked flat.
+    texture_mode = asset.get("texture_mode", "flat_region")
+    mesh_rel = (asset.get("files") or {}).get("mesh", "")
+    if texture_mode == "textured":
+        if mesh_rel.lower().endswith(".obj"):
+            errs.append("obj_textured_unsupported: a textured package must be GLB/GLTF with real UVs "
+                        "and a bound baseColorTexture (.obj is only for static flat_region assets)")
+        elif check_files and mesh_rel and (base / mesh_rel).suffix.lower() in (".glb", ".gltf") and (base / mesh_rel).exists():
+            try:
+                from glb_texture_probe import texture_capable
+                cap, reasons, rec = texture_capable(str(base / mesh_rel))
+                if not cap:
+                    for code in reasons:
+                        errs.append(f"{code}: texture_mode=textured but the GLB is not texture-capable "
+                                    f"(prims={rec['primitives']} no_uv={rec['no_uv']} "
+                                    f"degenerate_uv={len(rec['degenerate_uv'])} bound_tex={rec['bound_textures']}). "
+                                    f"A real UV unwrap + a bound baseColorTexture are required (ADR-0026).")
+            except Exception as ex:
+                errs.append(f"texture_capable probe failed on '{mesh_rel}': {ex}")
+    elif texture_mode == "flat_region":
+        prov = ((asset.get("provenance") or {}).get("texture") or {})
+        if prov.get("real_albedo") is True:
+            errs.append("flat_region_real_albedo: a flat_region package must not claim real_albedo:true")
     return errs
 
 
