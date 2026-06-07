@@ -109,9 +109,19 @@ def _region_of(part_name):
 # base_color per material). region id -> colour; the first material seen for a region wins.
 _region_color = {}
 if MATERIALS:
-    for mm in json.loads(open(MATERIALS, encoding="utf-8").read()).get("materials", []):
+    _mats_raw = json.loads(open(MATERIALS, encoding="utf-8").read()).get("materials", [])
+    # materials.json ships in TWO shapes: a LIST of {name,region,base_color} (materials_v1) OR a
+    # name-keyed DICT {name: {region, base_color_factor, ...}} (character_materials_v1, e.g. the
+    # pirate). Iterating a dict yields its string keys -> AttributeError; normalise both to dicts.
+    if isinstance(_mats_raw, dict):
+        _mats_iter = [dict(v, name=v.get("name", k)) for k, v in _mats_raw.items() if isinstance(v, dict)]
+    else:
+        _mats_iter = [mm for mm in _mats_raw if isinstance(mm, dict)]
+    for mm in _mats_iter:
         rid = REGION_NAME_TO_ID.get(mm.get("region")) or region_for_name(mm.get("name", ""))
-        _region_color.setdefault(rid, mm.get("base_color"))
+        col = mm.get("base_color") or mm.get("base_color_factor")
+        if col:
+            _region_color.setdefault(rid, col)
 
 # Uncovered-region fallback: a region present on the mesh but with NO base_color in materials.json (a
 # common producer gap -- e.g. limbs left unpainted, as in the green ogre's arms/legs and the red dragon's
@@ -139,7 +149,28 @@ def _color_for(rid):
 # keyword already resolves correctly, else append the canonical region keyword (e.g. a `tentacle_3`
 # declared `legs` becomes `tentacle_3__legs`) so region_for_name agrees. The base colour comes from the
 # sidecar, so the bake renders true per-region colour instead of grey.
+def _mesh_is_textured(m):
+    """A part-mesh that ALREADY carries a bound base-colour image + real (non-degenerate) UVs is a
+    genuine textured delivery -- PRESERVE it through rigging (ADR-0027) instead of flattening it to a
+    per-region colour. (Today's deliveries are all un-textured part-meshes, so this is a forward-looking
+    guard; an unrigged+textured delivery keeps its texture instead of silently baking flat.)"""
+    if not m.data.uv_layers or not m.data.uv_layers.active:
+        return False
+    uv = m.data.uv_layers.active.data
+    if not uv:
+        return False
+    us = [d.uv[0] for d in uv]
+    vs = [d.uv[1] for d in uv]
+    if max(max(us) - min(us), max(vs) - min(vs)) < 1e-4:
+        return False
+    return any(mat and mat.use_nodes and any(n.type == 'TEX_IMAGE' and n.image for n in mat.node_tree.nodes)
+               for mat in m.data.materials)
+
+
 for _idx, m in enumerate(meshes):
+    if _mesh_is_textured(m):
+        print(f"MAT: {m.name} -> PRESERVED (bound texture + real UVs kept; flat per-region replace skipped)")
+        continue
     region_id = _region_of(m.name)
     col = _color_for(region_id)
     mat_name = material_region_name(m.name, region_id, _idx)
@@ -159,5 +190,6 @@ for _idx, m in enumerate(meshes):
     src = "declared" if m.name in _declared else "keyword"
     print(f"MAT: {m.name} -> region {region_id} ({src}) mat='{mat_name}'  base {[round(c, 2) for c in (col[0], col[1], col[2])]}")
 
-bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', use_selection=False)
+bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', use_selection=False,
+                          export_materials='EXPORT')   # keep bound base-colour images on round-trip
 print(f"RIGGED -> {OUT}  ({len(meshes)} parts, {len(prof['bones'])} bones)")
