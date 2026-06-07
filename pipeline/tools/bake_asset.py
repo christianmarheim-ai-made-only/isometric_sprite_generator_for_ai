@@ -78,6 +78,31 @@ def _has_explicit_regions(asset: dict, base: Path, variant_id: str) -> bool:
     return _explicit_region_path(asset, base, variant_id) is not None
 
 
+def _page_if_oversize(out: Path, manifest: dict) -> dict:
+    """Atlas paging (ADR-0037, docs/atlas_paging_contract.md). A single-page bake that overflows
+    MAX_PAGE_PX (8+ state combat characters do) is re-packed IN PLACE into per-state atlas pages so the
+    engine can load it -- and the per-frame `page` lets it lazy-load by state. A character that already
+    fits one page is returned unchanged (byte-identical -> goldens/parity stable). A single STATE that
+    still exceeds one page is a hard, explained failure (the greedy-within-state split is FUTURE)."""
+    from constants import MAX_PAGE_PX
+    col = (manifest.get("atlases") or {}).get("color") or {}
+    if "pages" in col:                                   # already paged
+        return manifest
+    size = col.get("size") or [0, 0]
+    if not (len(size) == 2 and max(size) > MAX_PAGE_PX):  # fits one page -> leave it
+        return manifest
+    from shard_atlas import shard, OversizePageError
+    try:
+        paged = shard(out, out)                          # in place: single-page atlases -> per-state pages
+    except OversizePageError as e:
+        raise SystemExit(f"atlas paging: {e}")
+    for orphan in ("color_atlas.png", "hitmask_atlas.png"):   # the per-state pages replace these
+        p = out / orphan
+        if p.exists():
+            p.unlink()
+    return paged
+
+
 def _resolve_rig_profile(rig: str, base: Path) -> Path | None:
     """A rig profile installed in the pipeline OR shipped in the delivery's schema_extensions/."""
     for c in (PIPELINE_ROOT / "schema" / "rig_profiles" / f"{rig}.json",
@@ -174,6 +199,8 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
     else:
         raise SystemExit(f"unsupported mesh format: {ext}")
 
+    # Atlas paging: re-pack into per-state pages if the single page overflows MAX_PAGE_PX (ADR-0037).
+    manifest = _page_if_oversize(out, manifest)
     bake_ms = round((time.perf_counter() - t0) * 1000, 1)
     errs = engine_accept(manifest)
     if errs:

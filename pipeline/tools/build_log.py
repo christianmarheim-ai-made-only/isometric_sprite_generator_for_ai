@@ -73,14 +73,67 @@ def _atlases(manifest: dict) -> dict:
     return out
 
 
-def _artifacts(out_dir: Path) -> dict:
+def _atlas_paths(out_dir: Path, manifest: dict, which: str) -> list:
+    """On-disk atlas PNG path(s) for 'color'|'hitmask': the single-page `path`, else every `pages[].path`
+    (atlas paging). So the colour-richness + region-presence + artifact-hash checks all keep working
+    after a bake is sharded into per-state pages (the single color_atlas.png/hitmask_atlas.png are gone)."""
+    a = (manifest.get("atlases") or {}).get(which) or {}
+    if a.get("pages"):
+        return [out_dir / p["path"] for p in a["pages"] if isinstance(p, dict) and p.get("path")]
+    if a.get("path"):
+        return [out_dir / a["path"]]
+    legacy = out_dir / f"{which}_atlas.png"     # legacy fixed name fallback
+    return [legacy] if legacy.exists() else []
+
+
+def _frame_lbl(f: dict) -> str:
+    if "state" in f:
+        return f"frame ({f.get('state')},dir{f.get('direction')},f{f.get('frame_index', 0)})"
+    return f"frame dir {f.get('direction')}"
+
+
+def _blank_frames(out_dir: Path, manifest: dict) -> list:
+    """Frames whose baked hitmask sub-rect is ENTIRELY background -> nothing rendered for that
+    direction/state: a USELESS frame (a failed/empty render). The process must KNOW it baked junk.
+    Paging-aware (indexes the frame's page). getbbox() is None iff the crop is all-zero."""
+    try:
+        from PIL import Image as _Img
+    except Exception:
+        return []
+    hmps = _atlas_paths(out_dir, manifest, "hitmask")
+    if not hmps or not all(p.exists() for p in hmps):
+        return []
+    pages = []
+    for p in hmps:
+        try:
+            pages.append(_Img.open(p).convert("L"))
+        except Exception:
+            pages.append(None)
+    blank = []
+    for f in manifest.get("frames", []) or []:
+        pi = f.get("page", 0)
+        pg = pages[pi] if isinstance(pi, int) and 0 <= pi < len(pages) else None
+        mr = f.get("mask_rect") or f.get("rect")
+        if pg is None or not (isinstance(mr, list) and len(mr) == 4):
+            continue
+        x, y, w, h = mr
+        if pg.crop((x, y, x + w, y + h)).getbbox() is None:   # all-zero crop -> empty silhouette
+            blank.append(_frame_lbl(f))
+    return blank
+
+
+def _artifacts(out_dir: Path, manifest: dict | None = None) -> dict:
     """sha256 the produced output files so a reviewer can answer 'which hitmask came from which
-    model' end-to-end: inputs.mesh.sha256 -> outputs.artifacts.hitmask_atlas.sha256."""
+    model' end-to-end: inputs.mesh.sha256 -> outputs.artifacts.hitmask_atlas.sha256. Paging-aware:
+    a sharded package hashes each per-state page."""
     arts = {}
-    for key, fname in (("color_atlas", "color_atlas.png"), ("hitmask_atlas", "hitmask_atlas.png")):
-        h = file_sha256(out_dir / fname)
-        if h:
-            arts[key] = h
+    for key, which in (("color_atlas", "color"), ("hitmask_atlas", "hitmask")):
+        paths = _atlas_paths(out_dir, manifest or {}, which) if manifest else [out_dir / f"{key}.png"]
+        hashes = [h for h in (file_sha256(p) for p in paths) if h]
+        if len(hashes) == 1:
+            arts[key] = hashes[0]
+        elif hashes:
+            arts[key] = {"pages": hashes}
     return arts
 
 
@@ -190,10 +243,11 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
                 w["severity"] = "error"
         try:
             from texture_metrics import atlas_colour_rich
-            cap = out_dir / "color_atlas.png"
-            if cap.exists():
-                rich_ok, rich_m = atlas_colour_rich(str(cap))
-                if not rich_ok:
+            caps = [p for p in _atlas_paths(out_dir, manifest, "color") if p.exists()]
+            if caps:
+                results = [atlas_colour_rich(str(p)) for p in caps]   # paging-aware: per color page
+                if not any(ok for ok, _ in results):                  # EVERY page baked flat/swatch
+                    rich_m = results[0][1]
                     warnings.append({"code": "atlas_colour_rich_low", "severity": "error",
                                      "detail": f"textured colour atlas is not rich enough {rich_m} "
                                                "(need unique>=64, entropy>=3.0, largest<=0.65) -- baked flat/swatch"})
@@ -204,14 +258,22 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
     hit_ids = None
     try:
         from PIL import Image as _Img
-        _hm = out_dir / "hitmask_atlas.png"
-        if _hm.exists():
-            hit_ids = sorted({int(v) for v in _Img.open(_hm).convert("L").getdata() if v})
+        hmps = [p for p in _atlas_paths(out_dir, manifest, "hitmask") if p.exists()]
+        if hmps:
+            ids = set()
+            for p in hmps:                                  # paging-aware: union region ids over all pages
+                ids |= {int(v) for v in _Img.open(p).convert("L").getdata() if v}
+            hit_ids = sorted(ids)
             if not hit_ids:
                 warnings.append({"code": "region_missing", "severity": "error",
                                  "detail": "the baked R8 hitmask has NO body region (all background)"})
     except Exception:
         pass
+
+    # --- USELESS-content: a baked direction/state that rendered ENTIRELY empty (the process must know). ---
+    for lbl in _blank_frames(out_dir, manifest):
+        warnings.append({"code": "blank_frame", "severity": "error",
+                         "detail": f"{lbl}: baked hitmask is all background -> nothing rendered (empty/failed frame)"})
 
     # --- Waivers (review snippet 07; ADR-0028/0031): apply AFTER the texture escalation so the
     # severities are final. For each `error` warning whose code has a VALID matching waiver, downgrade
@@ -261,7 +323,7 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
         "outputs": {
             "frame_count": len(manifest.get("frames", [])),
             "atlases": _atlases(manifest),
-            "artifacts": _artifacts(out_dir),
+            "artifacts": _artifacts(out_dir, manifest),
             "packing_efficiency": eff,
             "hit_regions_present": hit_ids,
         },

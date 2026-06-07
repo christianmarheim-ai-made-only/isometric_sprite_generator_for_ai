@@ -37,6 +37,7 @@ All ADRs are **Proposed** unless ratified by the engine/gameplay review group. T
 | ADR-0034 | Mounting (rider on horse/motorbike/skateboard/airship) — runtime socket-composited, **DEFERRED until after combat** | seams (deferred) |
 | ADR-0035 | Model origin = ground-footprint anchor; bake pivot = +Z through origin; sprite anchor = projected origin; never mesh-bounds-center; in-place/no-root-motion + model_space metadata | v3 producer spec (hard gate) |
 | ADR-0036 | Bake per-region hit-mask/AABBs from the explicit hitbox map for single-material models (project world AABBs through the locked camera, re-label the degenerate render mask); gated, normal bakes byte-identical | implemented |
+| ADR-0037 | In-baker atlas paging (auto-shard an oversize bake into per-state pages so 8+ state combat characters bake) + sync vendored engine schema to its loader (accepts `pages`) + paged-aware Gate-1/build_log + useless-content gates (flat_region_bound_texture, blank_frame) | implemented |
 
 **ADR-0026 – ADR-0032 belong to [ARC-0001: Textured & verified skinned models](../docs/arcs/ARC-0001-textured-verified-skinned-models.md)** — the arc that closes the verified gap where "textured/skinned" deliveries bake flat and ship green (no UVs / orphan atlases / degenerate UVs; auto-rig flattens; no gate). The arc carries the per-asset evidence, the merged backlog (Epic A pipeline hardening + Epic B verification), the critical path, and the handoffs (incl. the standalone Model Producer delivery spec). Implementation order and the locks-to-resolve are in the arc §6–§7.
 

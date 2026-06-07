@@ -100,11 +100,13 @@ pages per variant** as a runaway guard. PAD=4 + 4 px extrusion per page, no rota
 ## 7. Status of pipeline emission
 
 Implemented today: the **per-frame `page`** field end-to-end (schema + `shard_atlas.py` emitter +
-loader parsing/validation + tests), the single-page alias + back-compat, and **`per_state`** sharding.
+loader parsing/validation + tests), the single-page alias + back-compat, **`per_state`** sharding, and
+**in-baker auto-paging** (ADR-0037): `bake_asset` auto-shards any single-page bake that overflows
+`MAX_PAGE_PX` into per-state pages, so the one-command bake of an 8+ state combat character just works
+(a character that fits one page stays single-page, byte-identical). Gate-1 (`gate_engine_accept`) and the
+build log validate the paged form; the vendored engine schema was synced to its loader (accepts `pages`).
 
 FUTURE (not yet implemented; the manifest/loader contract above does **not** change when they land):
-- **In-baker paging** — folding `per_state` paging into `bake_animated`/`bake_character_anim` so large
-  characters page during the bake instead of via the `shard_atlas.py` post-step.
 - **greedy-within-state split** — splitting a single oversized state across pages, emitting
   `animations[state].pages = [start, end]`, and teaching the loader to read + validate that span
   (today `AnimDef`/`AnimMeta` ignore it). Until then a single state must fit one 4096-wide page.

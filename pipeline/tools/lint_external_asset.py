@@ -142,6 +142,22 @@ def lint(path: Path, check_files: bool = True, today: str | None = None) -> list
         prov = ((asset.get("provenance") or {}).get("texture") or {})
         if prov.get("real_albedo") is True:
             errs.append("flat_region_real_albedo: a flat_region package must not claim real_albedo:true")
+        # flat_region = flat per-region colours via MATERIAL base colours. A bound base-colour texture is
+        # the "flat-via-degenerate-UV-texture" hack (looks textured, bakes ~one texel/material): reject it.
+        if check_files and mesh_rel and (base / mesh_rel).suffix.lower() in (".glb", ".gltf") and (base / mesh_rel).exists():
+            try:
+                from glb_texture_probe import texture_capable
+                _cap, _reasons, rec = texture_capable(str(base / mesh_rel))
+                bound = rec.get("bound_textures", 0)
+                prims, degen = rec.get("primitives", 0), len(rec.get("degenerate_uv", []))
+                if isinstance(bound, int) and bound > 0:
+                    hint = (f" and every material's UVs are degenerate ({degen}/{prims}) -> the texture "
+                            "contributes ~one texel per part") if degen and degen >= prims else ""
+                    errs.append(f"flat_region_bound_texture: a flat_region delivery binds {bound} base-colour "
+                                f"texture(s){hint}. flat_region uses material base colours, not a texture -- "
+                                "drop the texture, or declare texture_mode=textured with a real UV unwrap.")
+            except Exception as ex:
+                errs.append(f"texture_capable probe failed on '{mesh_rel}': {ex}")
     return errs
 
 

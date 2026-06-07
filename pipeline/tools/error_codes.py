@@ -36,6 +36,9 @@ CODES = {
     "uv_overlap_undeclared":            ("error", "texture",   "uv_overlap"),
     "base_color_linked":                ("warn",  "texture",   "base_color_source"),  # never error (real grey-bug only)
     "flat_region_real_albedo":          ("error", "texture",   "flat_region_no_real_albedo"),
+    "flat_region_bound_texture":        ("error", "texture",   "flat_region_no_bound_texture"),  # the flat-via-texture hack
+    # --- bake: USELESS-content (the process must KNOW it baked junk) ---
+    "blank_frame":                      ("error", "bake",      "no_blank_frames"),                # a baked direction/state rendered empty
     # --- skinning ---
     "missing_required_bone":            ("error", "skinning",  "required_bones_present"),
     "unweighted_part":                  ("error", "skinning",  "all_parts_weighted"),

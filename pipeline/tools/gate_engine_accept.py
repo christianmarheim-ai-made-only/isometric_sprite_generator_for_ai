@@ -33,6 +33,18 @@ PIPELINE_ROOT = SCRIPT_DIR.parent
 ENGINE_SCHEMA = PIPELINE_ROOT / "schema" / "engine" / "manifest.schema.json"
 
 
+def _page_list(atlas: dict) -> list:
+    """Resolve an atlas spec to a page list -- mirrors the loader's AtlasDef::page_list: explicit
+    `pages`, else the single-page `path`+`size` alias as page 0 (atlas paging contract)."""
+    if not isinstance(atlas, dict):
+        return []
+    if atlas.get("pages"):
+        return [p for p in atlas["pages"] if isinstance(p, dict)]
+    if atlas.get("path") and atlas.get("size"):
+        return [{"path": atlas["path"], "size": atlas["size"]}]
+    return []
+
+
 def _frame_label(f: dict) -> str:
     if "state" in f:
         return f"frame ({f.get('state')},dir{f.get('direction')},f{f.get('frame_index')})"
@@ -96,15 +108,33 @@ def engine_accept(manifest: dict) -> list[str]:
         if dirs != list(range(dc)):
             errors.append(f"directions must be 0..{dc - 1} unique+covered (got {dirs})")
 
-    # rect w,h > 0 and within the color atlas (mirrors the loader bounds check), every frame.
-    size = (((manifest.get("atlases") or {}).get("color") or {}).get("size")) or [0, 0]
-    aw, ah = (list(size) + [0, 0])[:2]
+    # Atlas pages (single-page alias OR multi-page) -- mirrors the loader's AtlasDef::page_list +
+    # per-frame rect-within-its-page validation (docs/atlas_paging_contract.md invariants 1-4).
+    atlases = manifest.get("atlases") or {}
+    color_pages = _page_list(atlases.get("color") or {})
+    hit_pages = _page_list(atlases.get("hitmask") or {})
+    if hit_pages and len(hit_pages) != len(color_pages):
+        errors.append(f"atlases.hitmask pages ({len(hit_pages)}) must equal atlases.color pages ({len(color_pages)})")
+    for i, pg in enumerate(color_pages):
+        sz = (pg.get("size") or [0, 0])
+        if not (len(sz) == 2 and isinstance(sz[0], int) and isinstance(sz[1], int) and sz[0] > 0 and sz[1] > 0):
+            errors.append(f"atlases.color page {i} has a non-positive size {sz}")
+    npages = len(color_pages)
     for f in frames:
         rect = f.get("rect", [])
         if not (len(rect) == 4 and rect[2] > 0 and rect[3] > 0):
             errors.append(f"{_frame_label(f)}: rect w,h must be > 0 (got {rect})")
-        elif isinstance(aw, int) and aw > 0 and (rect[0] + rect[2] > aw or rect[1] + rect[3] > ah):
-            errors.append(f"{_frame_label(f)}: rect {rect} exceeds the atlas {aw}x{ah}")
+            continue
+        page = f.get("page", 0)
+        if not (isinstance(page, int) and 0 <= page < npages):
+            errors.append(f"{_frame_label(f)}: page {page} out of range 0..{npages - 1}")
+            continue
+        pw, ph = ((color_pages[page].get("size") or [0, 0]) + [0, 0])[:2]
+        if isinstance(pw, int) and pw > 0 and (rect[0] + rect[2] > pw or rect[1] + rect[3] > ph):
+            errors.append(f"{_frame_label(f)}: rect {rect} exceeds page {page} ({pw}x{ph})")
+        mr = f.get("mask_rect")
+        if isinstance(mr, list) and len(mr) == 4 and (mr[2] != rect[2] or mr[3] != rect[3]):
+            errors.append(f"{_frame_label(f)}: mask_rect w,h {mr[2:]} must equal rect w,h {rect[2:]}")
 
     # Non-probe variants: the engine rejects eye_height_world > height_world.
     if manifest.get("variant_class") != "probe":

@@ -58,25 +58,43 @@
       "properties": {
         "color": {
           "type": "object",
-          "required": ["path", "size"],
           "additionalProperties": true,
+          "description": "Single-page atlas (path+size) OR multi-page (pages[]). The loader (bevy_reference page_list) accepts either; see docs/atlas_paging_contract.md.",
           "properties": {
             "path": {
               "type": "string",
-              "description": "Color atlas PNG path, RELATIVE TO THE MANIFEST'S OWN DIRECTORY (e.g. \"color_atlas.png\"). The engine re-roots it to assets/."
+              "description": "Color atlas PNG path, RELATIVE TO THE MANIFEST'S OWN DIRECTORY (e.g. \"color_atlas.png\"). The engine re-roots it to assets/. Single-page form only."
             },
             "size": {
               "type": "array",
               "items": { "type": "integer", "minimum": 1 },
               "minItems": 2,
               "maxItems": 2,
-              "description": "[w, h] of the atlas image in px."
+              "description": "[w, h] of the atlas image in px. Single-page form only."
+            },
+            "pages": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Multi-page form (atlas paging): one entry per page; a frame's `page` indexes this list and its `rect` is local to that page. Same length as hitmask.pages.",
+              "items": {
+                "type": "object",
+                "required": ["path", "size"],
+                "additionalProperties": true,
+                "properties": {
+                  "path": { "type": "string" },
+                  "size": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 2, "maxItems": 2 }
+                }
+              }
             }
-          }
+          },
+          "anyOf": [
+            { "required": ["path", "size"] },
+            { "required": ["pages"] }
+          ]
         },
         "hitmask": {
           "type": "object",
-          "description": "Optional hit-region mask atlas (R8). Not consumed by the engine yet (future ADR-030/031); keep emitting it.",
+          "description": "Optional hit-region mask atlas (R8). Not consumed by the engine yet (future ADR-030/031); keep emitting it. Single-page (path+size) or multi-page (pages[], same length as color.pages).",
           "additionalProperties": true
         }
       }
@@ -100,7 +118,12 @@
             "items": { "type": "integer", "minimum": 0 },
             "minItems": 4,
             "maxItems": 4,
-            "description": "[x, y, w, h] placement in the color atlas, px. Explicit per-frame, so padding + extrusion are fine. w,h MUST be > 0 (loader-enforced)."
+            "description": "[x, y, w, h] placement in the color atlas, px. Explicit per-frame, so padding + extrusion are fine. w,h MUST be > 0 (loader-enforced). With atlas paging, x/y are LOCAL to `page`."
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Atlas page index this frame's rect/mask_rect are local to (default 0). Indexes atlases.color.pages / atlases.hitmask.pages. See docs/atlas_paging_contract.md."
           },
           "anchor": {
             "type": "array",
