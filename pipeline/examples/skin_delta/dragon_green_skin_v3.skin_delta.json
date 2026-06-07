@@ -1,0 +1,10 @@
+{
+  "skin_delta_version": "skin_delta_v1",
+  "variant_id": "dragon_green_skin_v3",
+  "base_asset_id": "dragon_calibration_v3",
+  "base_glb": "dragon_calibration_v3.glb",
+  "base_color": "dragon_green_basecolor.png",
+  "real_albedo": true,
+  "archetype": "dragon",
+  "_comment": "A texture-only SKIN DELTA: it ships ONLY this descriptor + the new base-colour PNG. Geometry, UVs, rig, anchors, world-metrics and region hitboxes are CLONED from base_asset_id. base_glb resolves under the base package dir; base_color resolves next to THIS file. Validate then apply: see README.md."
+}

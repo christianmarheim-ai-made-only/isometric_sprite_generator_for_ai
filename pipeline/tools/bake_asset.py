@@ -49,6 +49,30 @@ def _glb_has_armature(path: Path) -> bool:
         return True
 
 
+def _has_explicit_regions(asset: dict, base: Path, variant_id: str) -> bool:
+    """True if the asset declares its regions in an EXPLICIT authoritative hitbox map -- via files.hitbox
+    or the `<variant>_hitbox.json` sibling convention (how calibration packages + resolved skin deltas ship
+    their region_hitboxes). Requires >=2 distinct regions with valid min/max AABBs so a stub file cannot
+    dodge the region gate. Lets a single-material art model (or a skin delta cloned from one) bake without
+    region_fallback_torso being treated as a SILENT fallback."""
+    cands = []
+    hb = (asset.get("files") or {}).get("hitbox")
+    if hb:
+        cands.append(base / hb)
+    cands.append(base / f"{variant_id}_hitbox.json")
+    for p in cands:
+        try:
+            if p.exists():
+                regions = (json.loads(p.read_text(encoding="utf-8")).get("region_hitboxes") or {})
+                good = [k for k, v in regions.items()
+                        if isinstance(v, dict) and isinstance(v.get("min"), list) and isinstance(v.get("max"), list)]
+                if len(good) >= 2:
+                    return True
+        except Exception:
+            pass
+    return False
+
+
 def _resolve_rig_profile(rig: str, base: Path) -> Path | None:
     """A rig profile installed in the pipeline OR shipped in the delivery's schema_extensions/."""
     for c in (PIPELINE_ROOT / "schema" / "rig_profiles" / f"{rig}.json",
@@ -166,7 +190,8 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
                           authored_metrics=asset.get("world_metrics"), gate_reasons=[], meta=meta,
                           stages=[{"name": "bake", "ms": bake_ms}],
                           texture_mode=texture_mode, calibration=calibration,
-                          waivers=asset.get("waivers"))   # a valid in-date waiver downgrades a gate error to 'waived'
+                          waivers=asset.get("waivers"),   # a valid in-date waiver downgrades a gate error to 'waived'
+                          explicit_regions=_has_explicit_regions(asset, base, variant_id))
     # Deterministic OUTPUT-verify artifact: project the build_log warnings into a per-stage report;
     # verification_report.ok == build_log.ok by construction (both = "no severity==error").
     from verification_report import write_report

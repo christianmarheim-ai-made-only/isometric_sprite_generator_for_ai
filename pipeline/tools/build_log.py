@@ -128,7 +128,7 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
                     rig=None, archetype=None, authored_metrics=None,
                     gate_reasons=None, meta: dict | None = None, stages=None,
                     texture_mode="flat_region", calibration=False,
-                    waivers=None, today=None) -> dict:
+                    waivers=None, explicit_regions=False, today=None) -> dict:
     """Assemble + write out_dir/build_log.json and return the log dict.
 
     `waivers` (review snippet 07; ADR-0028/0031): an optional list of named, single-check, expiring
@@ -178,6 +178,14 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
     # as warnings (unchanged behaviour); calibration bypasses (debug colours are intentional). ---
     if texture_mode == "textured" and not calibration:
         for w in warnings:
+            # region_fallback_torso escalates because a material SILENTLY defaulted to torso -> unknown
+            # regions. But if the asset declares its regions in an EXPLICIT authoritative hitbox map
+            # (a single-material art model, or a skin delta cloned from such a base), the regions are
+            # NOT unknown -- it is not a silent fallback. Keep it a visible warn, do not fail `ok`.
+            if w["code"] == "region_fallback_torso" and explicit_regions:
+                w["detail"] += ("  [not escalated: an explicit authoritative region map is present -> "
+                                "regions are declared, not silently defaulted]")
+                continue
             if w["code"] in ("degenerate_uv", "region_fallback_torso"):
                 w["severity"] = "error"
         try:

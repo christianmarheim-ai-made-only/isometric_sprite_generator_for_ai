@@ -33,6 +33,11 @@ pipeline/output/arrow_pilot/frames/
 pipeline/output/incoming_batch/
 pipeline/output/new_creatures/
 
+# calibration / skin-delta verification bakes (regenerable via bake_asset.py; not goldens yet)
+pipeline/output/calibration_humanoid_v1/
+pipeline/output/dragon_calibration_v3/
+pipeline/output/dragon_green_skin_v3/
+
 # delivered human reference art (NOT pipeline inputs -- the bake uses glb + materials + texture_atlas).
 # Already-committed concept art (cow/ball) stays tracked; this keeps NEW deliveries' large refs out.
 creative/incoming/*/concept_art/

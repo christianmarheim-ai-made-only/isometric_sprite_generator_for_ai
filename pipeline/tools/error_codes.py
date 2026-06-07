@@ -57,6 +57,15 @@ CODES = {
     "waiver_expired":                   ("error", "input",     "waiver_valid"),
     "waiver_unknown_code":              ("error", "input",     "waiver_code_known"),
     "waiver_attempts_real_albedo_true": ("error", "input",     "waiver_no_real_albedo"),
+    # --- skin / texture-only variant delta (review #24 variant compatibility) ---
+    "skin_delta_invalid":               ("error", "input",     "skin_delta_well_formed"),
+    "skin_delta_self_reference":        ("error", "input",     "skin_delta_distinct_variant"),
+    "skin_delta_base_missing":          ("error", "input",     "skin_delta_base_present"),
+    "skin_delta_base_not_capable":      ("error", "input",     "skin_delta_base_reskinnable"),
+    "skin_delta_texture_missing":       ("error", "input",     "skin_delta_texture_present"),
+    "skin_delta_texture_invalid":       ("error", "input",     "skin_delta_texture_valid"),
+    "skin_delta_real_albedo_conflict":  ("error", "input",     "skin_delta_albedo_coherent"),
+    "skin_delta_geometry_changed":      ("error", "input",     "skin_delta_geometry_identical"),
 }
 
 

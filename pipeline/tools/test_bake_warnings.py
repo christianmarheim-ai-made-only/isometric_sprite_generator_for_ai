@@ -84,6 +84,20 @@ def main() -> int:
         ok &= check("standing biped: neither orientation detector fires",
                     "non_upright_biped" not in gcodes and "world_metrics_mismatch" not in gcodes)
 
+        # --- explicit-region downgrade: a single-material art model / skin delta declares regions in an
+        # explicit authoritative hitbox map, so region_fallback_torso is NOT a silent fallback (ADR-0028) ---
+        man = {"variant_id": "r", "animations": {}, "frames": [], "atlases": {"color": {"size": [10, 10]}}}
+        meta_fb = {"region_fallback_materials": ["Material_0"]}
+        esc = write_build_log(Path(td), man, "test", meta=meta_fb, texture_mode="textured", calibration=False)
+        ok &= check("textured single-material WITHOUT explicit regions: region_fallback_torso ESCALATES -> error, ok=False",
+                    any(w["code"] == "region_fallback_torso" and w["severity"] == "error" for w in esc["warnings"])
+                    and not esc["ok"])
+        keep = write_build_log(Path(td), man, "test", meta=meta_fb, texture_mode="textured", calibration=False,
+                               explicit_regions=True)
+        ok &= check("textured WITH explicit region map: region_fallback_torso stays WARN, ok=True",
+                    any(w["code"] == "region_fallback_torso" and w["severity"] == "warn" for w in keep["warnings"])
+                    and keep["ok"])
+
     print("ALL PASS" if ok else "SOME FAILED")
     return 0 if ok else 1
 

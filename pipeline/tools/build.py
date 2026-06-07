@@ -63,6 +63,7 @@ STEPS = [
     ("test_waivers", [str(SCRIPT_DIR / "test_waivers.py")]),
     ("test_rig_states", [str(SCRIPT_DIR / "test_rig_states.py")]),
     ("test_region_aabbs", [str(SCRIPT_DIR / "test_region_aabbs.py")]),
+    ("test_skin_delta", [str(SCRIPT_DIR / "test_skin_delta.py")]),
 ]
 
 
