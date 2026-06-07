@@ -1,14 +1,31 @@
 {
-  "asset_contract_version": "external_asset_v1",
+  "asset_contract_version": "external_asset_v2",
   "variant_id": "sparrow",
   "archetype": "bird",
-  "files": { "mesh": "../test_meshes/sparrow.glb" },
-  "geometry": { "up": "y", "forward": "+x", "unit": "meter" },
+  "files": {
+    "mesh": "../test_meshes/sparrow.glb"
+  },
+  "geometry": {
+    "up": "y",
+    "forward": "+x",
+    "unit": "meter"
+  },
   "rig": "bird_v1",
   "region_source": "material_name",
   "animations": {
-    "idle": { "clip": "idle", "frames": 1, "fps": 1, "playback": "loop" },
-    "fly": { "clip": "fly", "frames": 4, "fps": 12, "playback": "loop" }
+    "idle": {
+      "clip": "idle",
+      "frames": 1,
+      "fps": 1,
+      "playback": "loop"
+    },
+    "fly": {
+      "clip": "fly",
+      "frames": 4,
+      "fps": 12,
+      "playback": "loop"
+    }
   },
-  "notes": "Real rigged + animated bird fixture (committed sparrow.glb). bake_asset.py routes this to the Blender animated baker; crow.glb reuses the same rig + animation."
+  "notes": "Real rigged + animated bird fixture (committed sparrow.glb). bake_asset.py routes this to the Blender animated baker; crow.glb reuses the same rig + animation.",
+  "texture_mode": "flat_region"
 }

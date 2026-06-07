@@ -1,15 +1,34 @@
 {
-  "asset_contract_version": "external_asset_v1",
+  "asset_contract_version": "external_asset_v2",
   "variant_id": "bird_v1_template",
   "archetype": "bird",
-  "files": { "mesh": "sparrow.glb" },
-  "geometry": { "up": "y", "forward": "+x", "unit": "meter" },
+  "files": {
+    "mesh": "sparrow.glb"
+  },
+  "geometry": {
+    "up": "y",
+    "forward": "+x",
+    "unit": "meter"
+  },
   "rig": "bird_v1",
   "region_source": "material_name",
-  "textures": { "base_color": "sparrow_basecolor.png" },
-  "animations": {
-    "idle": { "clip": "idle", "frames": 1, "fps": 1,  "playback": "loop" },
-    "fly":  { "clip": "fly",  "frames": 4, "fps": 12, "playback": "loop" }
+  "textures": {
+    "base_color": "sparrow_basecolor.png"
   },
-  "notes": "TEMPLATE for the 'many birds, one rig' case: a bird variant skinned to bird_v1. idle/fly are the shipped bird_v1 animation library (pipeline/examples/animation/bird_v1_anim.json); clips target bone NAMES so they replay on any bird mesh. Distinct variant_id (bird_v1_template) so it never collides with the real sparrow example. sparrow.glb/.png are illustrative -- lint with --no-files."
+  "animations": {
+    "idle": {
+      "clip": "idle",
+      "frames": 1,
+      "fps": 1,
+      "playback": "loop"
+    },
+    "fly": {
+      "clip": "fly",
+      "frames": 4,
+      "fps": 12,
+      "playback": "loop"
+    }
+  },
+  "notes": "TEMPLATE for the 'many birds, one rig' case: a bird variant skinned to bird_v1. idle/fly are the shipped bird_v1 animation library (pipeline/examples/animation/bird_v1_anim.json); clips target bone NAMES so they replay on any bird mesh. Distinct variant_id (bird_v1_template) so it never collides with the real sparrow example. sparrow.glb/.png are illustrative -- lint with --no-files.",
+  "texture_mode": "flat_region"
 }

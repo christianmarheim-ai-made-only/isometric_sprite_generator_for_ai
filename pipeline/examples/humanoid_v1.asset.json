@@ -1,10 +1,20 @@
 {
-  "asset_contract_version": "external_asset_v1",
+  "asset_contract_version": "external_asset_v2",
   "variant_id": "humanoid_v1",
   "archetype": "biped",
-  "files": { "mesh": "../test_meshes/humanoid.glb" },
-  "geometry": { "up": "y", "forward": "+x", "unit": "meter" },
+  "files": {
+    "mesh": "../test_meshes/humanoid.glb"
+  },
+  "geometry": {
+    "up": "y",
+    "forward": "+x",
+    "unit": "meter"
+  },
   "region_source": "material_name",
-  "world_metrics": { "height_world": 1.8, "footprint_radius_world": 0.3 },
-  "notes": "A STATIC reference biped (no rig) -> the pipeline animates procedurally. Materials are named head/torso/arms/legs so HIT regions map by name. This manifest lints clean against the committed test mesh."
+  "world_metrics": {
+    "height_world": 1.8,
+    "footprint_radius_world": 0.3
+  },
+  "notes": "A STATIC reference biped (no rig) -> the pipeline animates procedurally. Materials are named head/torso/arms/legs so HIT regions map by name. This manifest lints clean against the committed test mesh.",
+  "texture_mode": "flat_region"
 }

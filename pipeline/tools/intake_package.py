@@ -23,7 +23,8 @@ isn't installed, a hit region outside the 4-region engine contract, a clip with 
   python pipeline/tools/intake_package.py synth <package_dir> [--write]
 
 FIELD MAP (asset.json  <-  package):
-  asset_contract_version  = "external_asset_v1"
+  asset_contract_version  = "external_asset_v2"
+  texture_mode            = source_asset.texture_mode (REQUIRED in v2; default flat_region)
   variant_id              = source_asset.asset_id
   archetype               = source_asset.archetype                          (REQUIRED, gate-checked)
   rig                     = source_asset.rig                                (REQUIRED, gate-checked)
@@ -108,7 +109,7 @@ def is_package(package_dir: Path) -> bool:
 
 # --------------------------------------------------------------------------- synthesis
 def synthesize_asset(package_dir: Path) -> dict:
-    """Deterministically build the external_asset_v1 .asset.json dict from a delivered package.
+    """Deterministically build the external_asset_v2 .asset.json dict from a delivered package.
 
     Raises ValueError on the designer-only gaps (archetype/rig) so a direct call is as loud as the gate.
     """
@@ -136,9 +137,10 @@ def synthesize_asset(package_dir: Path) -> dict:
         up = sa["up_axis"].lstrip("+-").lower()
 
     asset: dict = {
-        "asset_contract_version": "external_asset_v1",
+        "asset_contract_version": "external_asset_v2",
         "variant_id": rid,
         "archetype": sa["archetype"],
+        "texture_mode": sa.get("texture_mode", "flat_region"),
         "files": {"mesh": mesh},
         "geometry": {
             "up": up,

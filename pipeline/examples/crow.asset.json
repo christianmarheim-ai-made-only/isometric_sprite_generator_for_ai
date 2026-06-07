@@ -1,14 +1,31 @@
 {
-  "asset_contract_version": "external_asset_v1",
+  "asset_contract_version": "external_asset_v2",
   "variant_id": "crow",
   "archetype": "bird",
-  "files": { "mesh": "../test_meshes/crow.glb" },
-  "geometry": { "up": "y", "forward": "+x", "unit": "meter" },
+  "files": {
+    "mesh": "../test_meshes/crow.glb"
+  },
+  "geometry": {
+    "up": "y",
+    "forward": "+x",
+    "unit": "meter"
+  },
   "rig": "bird_v1",
   "region_source": "material_name",
   "animations": {
-    "idle": { "clip": "idle", "frames": 1, "fps": 1, "playback": "loop" },
-    "fly": { "clip": "fly", "frames": 4, "fps": 12, "playback": "loop" }
+    "idle": {
+      "clip": "idle",
+      "frames": 1,
+      "fps": 1,
+      "playback": "loop"
+    },
+    "fly": {
+      "clip": "fly",
+      "frames": 4,
+      "fps": 12,
+      "playback": "loop"
+    }
   },
-  "notes": "Reuse demo: the SAME bird_v1 rig + fly clip as sparrow, different mesh (black crow)."
+  "notes": "Reuse demo: the SAME bird_v1 rig + fly clip as sparrow, different mesh (black crow).",
+  "texture_mode": "flat_region"
 }

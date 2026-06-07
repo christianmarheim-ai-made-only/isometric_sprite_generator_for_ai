@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "external_asset.schema.json",
-  "title": "External asset manifest (external_asset_v1)",
-  "description": "What an external producer delivers alongside a 3D model so the game_iso_v1 pipeline can read it. See docs/external_asset_contract.md.",
+  "title": "External asset manifest (external_asset_v2)",
+  "description": "What an external producer delivers alongside a 3D model so the game_iso_v1 pipeline can read it. See dist/model_producer_delivery_spec_v2/. v2 makes texture_mode REQUIRED.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["asset_contract_version", "variant_id", "archetype", "files"],
+  "required": ["asset_contract_version", "variant_id", "archetype", "files", "texture_mode"],
   "properties": {
-    "asset_contract_version": { "const": "external_asset_v1" },
+    "asset_contract_version": { "const": "external_asset_v2" },
     "variant_id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "unique per variant; becomes the output dir name, so two assets must not share it" },
     "archetype": { "enum": ["biped", "bird", "quadruped", "ball", "dragon"], "description": "logical family; selects the shared rig + animation library. Add a value here when a new archetype is introduced. (quadruped: 4-legged creatures, forelegs->arms / hindlegs->legs region reuse; ball: rolling-ball prop; dragon: winged quadruped, wings+forelegs->arms / hindlegs->legs / tail->torso / horns+jaw->head.)" },
     "files": {
@@ -70,7 +70,7 @@
     "notes": { "type": "string" },
     "texture_mode": {
       "enum": ["flat_region", "textured"],
-      "description": "OPTIONAL in external_asset_v1 (absent => flat_region); becomes REQUIRED in external_asset_v2. 'textured' obliges a real UV unwrap + a baseColorTexture bound IN the glb -- verified by glb_texture_probe.texture_capable BEFORE any bake (ADR-0026). 'flat_region' shades by per-region material base colour and needs no UVs/atlas."
+      "description": "REQUIRED. 'textured' obliges a real UV unwrap + a baseColorTexture bound IN the glb -- verified by glb_texture_probe.texture_capable BEFORE any bake (ADR-0026). 'flat_region' shades by per-region material base colour and needs no UVs/atlas (a first-class, fully-supported delivery)."
     },
     "provenance": {
       "type": "object",

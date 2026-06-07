@@ -58,9 +58,10 @@ def main() -> int:
             shutil.copy(COW / fn, pkg / fn)
         # a minimal asset.json pointing at the RAW (unrigged) glb, up=z, ONE 1-frame state -> 16 frames
         asset = {
-            "asset_contract_version": "external_asset_v1",
+            "asset_contract_version": "external_asset_v2",
             "variant_id": "cow_brown_farm_v1",
             "archetype": "quadruped",
+            "texture_mode": "flat_region",
             "files": {"mesh": "cow_brown_farm_v1.glb", "animation_clips": "cow_brown_farm_v1_anim.json"},
             "geometry": {"up": "z", "forward": "+x", "unit": "meter"},
             "rig": "quadruped_v1",

@@ -1,5 +1,5 @@
 {
-  "asset_contract_version": "external_asset_v1",
+  "asset_contract_version": "external_asset_v2",
   "variant_id": "green_ogre_v1",
   "archetype": "biped",
   "files": {
@@ -60,5 +60,6 @@
     "footprint_radius_world": 0.46,
     "eye_height_world": 2.18
   },
-  "notes": "Green ogre asset manifest. Companion JSON files contain richer authored metrics, physical metrics, sockets, spell orbits, and generation data."
+  "notes": "Green ogre asset manifest. Companion JSON files contain richer authored metrics, physical metrics, sockets, spell orbits, and generation data.",
+  "texture_mode": "flat_region"
 }

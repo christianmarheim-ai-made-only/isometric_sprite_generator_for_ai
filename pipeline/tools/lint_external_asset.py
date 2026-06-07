@@ -110,7 +110,7 @@ def lint(path: Path, check_files: bool = True) -> list[str]:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Lint an external asset manifest against external_asset_v1.")
+    ap = argparse.ArgumentParser(description="Lint an external asset manifest against external_asset_v2.")
     ap.add_argument("manifest", type=Path)
     ap.add_argument("--no-files", action="store_true", help="skip file-existence checks (template mode)")
     args = ap.parse_args()

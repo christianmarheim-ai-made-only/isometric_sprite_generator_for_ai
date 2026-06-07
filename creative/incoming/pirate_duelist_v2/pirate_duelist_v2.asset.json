@@ -1,5 +1,5 @@
 {
-  "asset_contract_version": "external_asset_v1",
+  "asset_contract_version": "external_asset_v2",
   "variant_id": "pirate_duelist_v2",
   "archetype": "biped",
   "files": {
@@ -72,5 +72,6 @@
     "footprint_radius_world": 0.38,
     "eye_height_world": 1.64
   },
-  "notes": "Stylized pirate duelist. Current-contract external_asset_v1 manifest; richer authored metrics, sockets, mass, spell orbit rings and generator data are stored in companion JSON files."
+  "notes": "Stylized pirate duelist. Current-contract external_asset_v1 manifest; richer authored metrics, sockets, mass, spell orbit rings and generator data are stored in companion JSON files.",
+  "texture_mode": "flat_region"
 }

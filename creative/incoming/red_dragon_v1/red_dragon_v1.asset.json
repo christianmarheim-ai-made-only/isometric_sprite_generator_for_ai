@@ -1,5 +1,5 @@
 {
-  "asset_contract_version": "external_asset_v1",
+  "asset_contract_version": "external_asset_v2",
   "variant_id": "red_dragon_v1",
   "archetype": "dragon",
   "files": {
@@ -77,5 +77,6 @@
     "height_world": 8.6,
     "footprint_radius_world": 4.2,
     "eye_height_world": 6.25
-  }
+  },
+  "texture_mode": "flat_region"
 }
