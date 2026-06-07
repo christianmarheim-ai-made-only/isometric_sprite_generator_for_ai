@@ -182,6 +182,19 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
         except Exception:
             pass
 
+    # --- Hitbox region presence (ADR-0031): decode the baked R8 hitmask (0=bg, 1..4 = region ids). ---
+    hit_ids = None
+    try:
+        from PIL import Image as _Img
+        _hm = out_dir / "hitmask_atlas.png"
+        if _hm.exists():
+            hit_ids = sorted({int(v) for v in _Img.open(_hm).convert("L").getdata() if v})
+            if not hit_ids:
+                warnings.append({"code": "region_missing", "severity": "error",
+                                 "detail": "the baked R8 hitmask has NO body region (all background)"})
+    except Exception:
+        pass
+
     anims = manifest.get("animations") or {}
     gate1_ok = not gate_reasons
     log = {
@@ -216,6 +229,7 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
             "atlases": _atlases(manifest),
             "artifacts": _artifacts(out_dir),
             "packing_efficiency": eff,
+            "hit_regions_present": hit_ids,
         },
         "gates": {"gate_1_engine_accept": {"pass": gate1_ok, "reasons": gate_reasons}},
         "warnings": warnings,

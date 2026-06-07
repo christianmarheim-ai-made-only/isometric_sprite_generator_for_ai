@@ -118,6 +118,17 @@ CLIP_SYNONYMS = {
     "die": "death", "dead": "death", "dying": "death", "ko": "death",
 }
 
+# Per-archetype clip requirements (ADR-0031 / review snippet 08). The GATE checks `required` only --
+# death/fly stay NON-load-bearing (the read-only engine vocab does not select them; a producer MAY
+# ship them). recommended/optional are spec guidance. An archetype not listed defaults to `idle`.
+CLIP_REQUIREMENTS = {
+    "biped":     {"required": ["idle"], "recommended": ["walk", "run", "attack", "hit"]},
+    "bird":      {"required": ["idle"], "recommended": ["fly", "hit"]},
+    "quadruped": {"required": ["idle"], "recommended": ["walk", "run", "hit"]},
+    "dragon":    {"required": ["idle"], "recommended": ["walk", "run", "attack", "hit", "fly"]},
+    "ball":      {"required": ["idle"], "recommended": ["roll", "hit"]},
+}
+
 
 def offvocab_clip_renames(clip_names):
     """[(declared, canonical)] for each declared clip that is an off-vocabulary SYNONYM of a canonical

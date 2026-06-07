@@ -26,7 +26,7 @@ SCHEMA = PIPELINE_ROOT / "schema" / "external_asset.schema.json"
 RIG_DIR = PIPELINE_ROOT / "schema" / "rig_profiles"
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
-from constants import offvocab_clip_renames  # noqa: E402
+from constants import offvocab_clip_renames, CLIP_REQUIREMENTS  # noqa: E402
 
 
 def lint(path: Path, check_files: bool = True) -> list[str]:
@@ -79,6 +79,29 @@ def lint(path: Path, check_files: bool = True) -> list[str]:
     for declared, canon in offvocab_clip_renames(list((asset.get("animations") or {}).keys())):
         print(f"WARN: animation '{declared}' is off the engine clip vocabulary -- the renderer selects "
               f"'{canon}' for that action and falls back to idle for '{declared}'. Rename '{declared}' -> '{canon}'.")
+
+    # --- ANIMATION gate (ADR-0031): an ANIMATED delivery must declare its archetype's REQUIRED clip(s).
+    # Static (no-animations) deliveries are unaffected. Off-vocab synonyms count as their canonical name. ---
+    anim_keys = list((asset.get("animations") or {}).keys())
+    if anim_keys:
+        _canon = dict(offvocab_clip_renames(anim_keys))
+        present = {str(k).lower() for k in anim_keys} | {_canon.get(k, k) for k in anim_keys}
+        for req in CLIP_REQUIREMENTS.get(asset.get("archetype"), {}).get("required", ["idle"]):
+            if req not in present:
+                errs.append(f"missing_required_clip: archetype '{asset.get('archetype')}' requires clip "
+                            f"'{req}' but it is not declared (have {sorted(set(anim_keys))})")
+
+    # --- SKINNING gate (ADR-0031): if a *_skin_binding.json sidecar is shipped, every part must bind a
+    # REAL rig bone (catches a mis-named / non-existent bone statically, before any bake). ---
+    if check_files and rig:
+        _sb = base / f"{asset.get('variant_id')}_skin_binding.json"
+        _prof = RIG_DIR / f"{rig}.json"
+        if _sb.exists() and _prof.exists():
+            _bones = {b["name"] for b in json.loads(_prof.read_text(encoding="utf-8")).get("bones", [])}
+            for part, a in (json.loads(_sb.read_text(encoding="utf-8")).get("assignments") or {}).items():
+                if isinstance(a, dict) and a.get("bone") not in _bones:
+                    errs.append(f"missing_required_bone: skin_binding part '{part}' -> bone "
+                                f"'{a.get('bone')}' is not in rig '{rig}'")
 
     # --- texture_mode INPUT GATE (ADR-0026; additive -- engages only when the producer DECLARES it) ---
     # Absent texture_mode == flat_region (back-compat), so existing v1 assets are unaffected. A
