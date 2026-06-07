@@ -57,12 +57,14 @@ def find_blender(explicit: str | None = None) -> str | None:
     return None
 
 
-def _run_blender(blender: str, out: Path, mesh_file=None, forward: str = "+x") -> dict:
+def _run_blender(blender: str, out: Path, mesh_file=None, forward: str = "+x", region_map=None) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     # argv[2]=mesh-or-empty, argv[3]=forward (always passed so positions are stable; forward "+x" is a
-    # no-op inside blender_render.py, so a +x bake is byte-identical to before).
+    # no-op inside blender_render.py, so a +x bake is byte-identical to before). argv[4]=region-map-or-empty
+    # (an explicit hitbox json -> per-frame region rects; absent -> no projection, byte-identical).
     cmd = [blender, "--background", "--python", str(SCRIPT_DIR / "blender_render.py"),
-           "--", str(out), str(SCRIPT_DIR), str(mesh_file) if mesh_file else "", forward]
+           "--", str(out), str(SCRIPT_DIR), str(mesh_file) if mesh_file else "", forward,
+           str(region_map) if region_map else ""]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     meta = out / "blender_meta.json"
     if proc.returncode != 0 or not meta.exists():
@@ -123,11 +125,21 @@ def camera_parity_error(meta: dict) -> float:
 
 
 def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = "humanoid_blender",
-                 forward: str = "+x") -> tuple[dict, dict]:
-    meta = _run_blender(blender_exe, out, mesh_file, forward=forward)
+                 forward: str = "+x", region_map=None) -> tuple[dict, dict]:
+    meta = _run_blender(blender_exe, out, mesh_file, forward=forward, region_map=region_map)
     targets = {int(k): [round(_srgb(c) * 255) for c in v] for k, v in meta["region_color"].items()}
     color_imgs = [Image.open(out / f"color_dir{i:02d}.png").convert("RGBA") for i in range(DIRS)]
     region_arrs = [_region_ids(out / f"region_dir{i:02d}.png", targets) for i in range(DIRS)]
+    # Explicit-hitbox region recovery: a single-material model renders an all-torso (degenerate) region
+    # pass; re-label its silhouette from the projected per-region screen boxes (region_paint) so the R8
+    # mask carries the body regions the materials couldn't. ONLY degenerate frames are touched, so a real
+    # multi-material region pass is never overwritten (a no-op when no region_map was projected).
+    region_rects = meta.get("region_rects") or {}
+    if region_rects:
+        from region_paint import relabel_region_ids
+        for i in range(DIRS):
+            if len({int(v) for v in np.unique(region_arrs[i]) if v}) <= 1:
+                region_arrs[i] = relabel_region_ids(region_arrs[i], region_rects.get(str(i), []))
     canvas = (CANVAS, CANVAS)
     color_atlas, rects = _pack(color_imgs, canvas, "RGBA")
     mask_atlas, _ = _pack([Image.fromarray(a, "L") for a in region_arrs], canvas, "L")
@@ -146,12 +158,17 @@ def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = 
     for i, rect in enumerate(rects):
         yaw = i * (2 * math.pi / DIRS)
         sdv = [round(v, 6) for v in ground_screen_direction(yaw).tolist()]
-        frames.append({
+        frame = {
             "direction": i, "rect": rect, "mask_rect": rect, "anchor": [ax, ay],
             "world_yaw_degrees": round(math.degrees(yaw), 6), "screen_direction_vector": sdv,
             "sockets": {"origin": [ax, ay],
                         "direction_tip": [round(ax + sdv[0] * tip_len, 3), round(ay + sdv[1] * tip_len, 3)]},
-        })
+        }
+        # ADR-0025 per-region tight AABBs (frame-local, mask_rect origin) -- only when an explicit region
+        # map drove a relabel, so a normal static bake's manifest is unchanged (goldens/parity stable).
+        if region_rects:
+            frame["region_aabbs"] = region_aabbs(region_arrs[i])
+        frames.append(frame)
         expected.append({"direction": i, "world_yaw_degrees": round(math.degrees(yaw), 6),
                          "screen_direction_vector": sdv})
 

@@ -71,5 +71,10 @@ mask, so the bake reports `region_fallback_torso`. For a textured non-calibratio
 the gate keeps `region_fallback_torso` a visible **warn** and `ok` stays true. The pipeline recognises an
 explicit region map (≥2 regions with valid min/max AABBs) via `bake_asset._has_explicit_regions`.
 
+The same explicit map is also **baked into the hit-mask** (ADR-0036): the bake projects each region's world
+AABB through the locked camera and re-labels the single-material silhouette, so `<variant>` bakes a
+multi-region hitmask (`hit_regions_present` becomes `[1,2,3,4]`, not torso-only) collapsed to the engine's
+4-body palette. The exact per-region world AABBs stay in `<variant>_hitbox.json` for finer use.
+
 Tests: `pipeline/tools/test_skin_delta.py` (guard + fingerprint) and `pipeline/tools/test_bake_warnings.py`
 (the explicit-region downgrade). Both run in the `build.py` gate.

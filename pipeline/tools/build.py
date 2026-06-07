@@ -64,6 +64,8 @@ STEPS = [
     ("test_rig_states", [str(SCRIPT_DIR / "test_rig_states.py")]),
     ("test_region_aabbs", [str(SCRIPT_DIR / "test_region_aabbs.py")]),
     ("test_skin_delta", [str(SCRIPT_DIR / "test_skin_delta.py")]),
+    ("test_region_paint", [str(SCRIPT_DIR / "test_region_paint.py")]),
+    ("test_region_bake_e2e", [str(SCRIPT_DIR / "test_region_bake_e2e.py")]),
 ]
 
 

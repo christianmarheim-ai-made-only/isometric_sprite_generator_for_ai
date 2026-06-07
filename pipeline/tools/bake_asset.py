@@ -49,12 +49,13 @@ def _glb_has_armature(path: Path) -> bool:
         return True
 
 
-def _has_explicit_regions(asset: dict, base: Path, variant_id: str) -> bool:
-    """True if the asset declares its regions in an EXPLICIT authoritative hitbox map -- via files.hitbox
-    or the `<variant>_hitbox.json` sibling convention (how calibration packages + resolved skin deltas ship
-    their region_hitboxes). Requires >=2 distinct regions with valid min/max AABBs so a stub file cannot
-    dodge the region gate. Lets a single-material art model (or a skin delta cloned from one) bake without
-    region_fallback_torso being treated as a SILENT fallback."""
+def _explicit_region_path(asset: dict, base: Path, variant_id: str):
+    """Path to the asset's EXPLICIT authoritative hitbox map -- via files.hitbox or the
+    `<variant>_hitbox.json` sibling convention (how calibration packages + resolved skin deltas ship their
+    region_hitboxes) -- or None. Requires >=2 distinct regions with valid min/max AABBs so a stub file
+    cannot dodge the region gate. This single map both (a) lets a single-material model bake without
+    region_fallback_torso being treated as a SILENT fallback, and (b) drives per-region hitmask/AABB
+    projection in the bake."""
     cands = []
     hb = (asset.get("files") or {}).get("hitbox")
     if hb:
@@ -67,10 +68,14 @@ def _has_explicit_regions(asset: dict, base: Path, variant_id: str) -> bool:
                 good = [k for k, v in regions.items()
                         if isinstance(v, dict) and isinstance(v.get("min"), list) and isinstance(v.get("max"), list)]
                 if len(good) >= 2:
-                    return True
+                    return p
         except Exception:
             pass
-    return False
+    return None
+
+
+def _has_explicit_regions(asset: dict, base: Path, variant_id: str) -> bool:
+    return _explicit_region_path(asset, base, variant_id) is not None
 
 
 def _resolve_rig_profile(rig: str, base: Path) -> Path | None:
@@ -160,7 +165,11 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
             manifest, _ = bake_animated(out, blender, mesh_for_bake, anims, variant_id,
                                         default_state=asset.get("default_state"), up=up, forward=forward)
         else:
-            manifest, _ = bake_blender(out, blender, str(mesh_path), variant_id, forward=forward)
+            # an explicit authoritative region map (calibration / skin-delta sidecar) drives per-region
+            # hitmask + AABB projection so a single-material model is not baked all-torso.
+            _rmap = _explicit_region_path(asset, base, variant_id)
+            manifest, _ = bake_blender(out, blender, str(mesh_path), variant_id, forward=forward,
+                                       region_map=str(_rmap) if _rmap else None)
             route = "Blender / static"
     else:
         raise SystemExit(f"unsupported mesh format: {ext}")

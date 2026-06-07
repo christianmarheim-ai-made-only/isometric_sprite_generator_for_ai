@@ -26,7 +26,7 @@ TOOLS = argv[1]
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, TOOLS)
 import meshes  # noqa: E402  (Blender's bundled numpy)
-from constants import CANVAS, DIRS, GROUND_BAND, REGION_RGB, forward_yaw  # noqa: E402
+from constants import CANVAS, DIRS, GROUND_BAND, REGION_RGB, forward_yaw, region_for_name  # noqa: E402
 
 COS30, SIN30, INV2 = math.cos(math.radians(30.0)), 0.5, 1.0 / math.sqrt(2.0)
 # region id -> body color (the "art"); the region pass uses the same hue, flat-lit.
@@ -49,6 +49,10 @@ MESH_FILE = argv[2] if len(argv) > 2 and argv[2] else None
 # so the orbit below is byte-identical to before). Same CCW-about-+Z convention as the per-direction spin.
 FORWARD = argv[3] if len(argv) > 3 and argv[3] else "+x"
 BASE_YAW = 0.0 if FORWARD == "+x" else forward_yaw(FORWARD)
+# Optional: an explicit region-hitbox map (world AABBs). When present, project each region's AABB through
+# the SAME camera+shift per direction -> per-frame screen-space region rects (blender_meta.region_rects),
+# so a single-material model recovers per-region hit data the material-name render pass can't produce.
+REGION_MAP = argv[4] if len(argv) > 4 and argv[4] else None
 if MESH_FILE:
     from mesh_io import region_for_name, REGION_KEYWORDS  # noqa: E402
     before = set(bpy.data.objects)
@@ -175,6 +179,41 @@ for i in range(DIRS):
     r.filepath = os.path.join(OUT, f"region_dir{i:02d}.png")
     bpy.ops.render.render(write_still=True)
 
+# --- Per-region screen-space AABBs (optional). Project each world region AABB through the SAME shift
+#     + per-direction +Z rotation + ortho probe() the mesh used, so the rects are pixel-aligned to the
+#     rendered region pass. region_id collapses the (possibly creature-specific) region NAME to the R8
+#     body palette via region_for_name, so the engine's 4-id mask stays the contract. ---
+region_rects = {}
+if MESH_FILE and REGION_MAP and os.path.exists(REGION_MAP):
+    with open(REGION_MAP) as _rf:
+        _rh = (json.load(_rf).get("region_hitboxes") or {})
+
+    def _corners(mn, mx):
+        return [Vector((mx[0] if i & 1 else mn[0], mx[1] if i & 2 else mn[1], mx[2] if i & 4 else mn[2]))
+                for i in range(8)]
+
+    for _i in range(DIRS):
+        _yaw = BASE_YAW + _i * (2 * math.pi / DIRS)
+        _rz = Matrix.Rotation(_yaw, 3, 'Z')
+        _per = []
+        for _name, _box in _rh.items():
+            _mn, _mx = _box.get("min"), _box.get("max")
+            if not (isinstance(_mn, list) and isinstance(_mx, list) and len(_mn) == 3 and len(_mx) == 3):
+                continue
+            _xs, _ys = [], []
+            for _c in _corners(_mn, _mx):
+                _w = _rz @ (_c - shift)                      # SAME shift as the verts, then the object's +Z spin
+                _fx, _fy = probe(_w)
+                _xs.append(_fx * CANVAS)
+                _ys.append(_fy * CANVAS)
+            _x0, _y0 = max(0.0, min(CANVAS, min(_xs))), max(0.0, min(CANVAS, min(_ys)))
+            _x1, _y1 = max(0.0, min(CANVAS, max(_xs))), max(0.0, min(CANVAS, max(_ys)))
+            if _x1 - _x0 < 1.0 or _y1 - _y0 < 1.0:
+                continue
+            _per.append({"name": _name, "region_id": int(region_for_name(_name)),
+                         "rect": [int(round(_x0)), int(round(_y0)), int(round(_x1 - _x0)), int(round(_y1 - _y0))]})
+        region_rects[str(_i)] = _per
+
 # Measured world metrics from the FINAL mesh (local coords; foot at z~0 after normalization).
 _z = [v.co.z for v in mesh.vertices]
 _zmin, _zmax = min(_z), max(_z)
@@ -190,6 +229,8 @@ meta = {
     "has_tex": bool(has_tex),
     "blender_version": bpy.app.version_string,
 }
+if region_rects:  # only when an explicit region map was projected -> a normal bake's meta is byte-identical
+    meta["region_rects"] = region_rects
 with open(os.path.join(OUT, "blender_meta.json"), "w") as f:
     json.dump(meta, f, indent=2)
 print("R7_BLENDER_DONE", OUT)
