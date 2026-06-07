@@ -11,7 +11,8 @@ from __future__ import annotations
 import json
 import struct
 
-EPS_EXTENT = 1e-3      # per-material UV bbox max(width,height) must exceed this (degenerate < 1e-4; margin)
+EPS_EXTENT = 1e-3      # per-material UV bbox WIDTH and HEIGHT must each exceed this
+EPS_AREA = 1e-5        # per-material UV bbox area must exceed this (catches a UV collapsed to a LINE)
 BLEED = 1e-3           # islands may bleed this far outside [0,1]
 
 _COMP = {5120: ('b', 1), 5121: ('B', 1), 5122: ('h', 2), 5123: ('H', 2), 5125: ('I', 4), 5126: ('f', 4)}
@@ -82,7 +83,10 @@ def texture_capable(glb_path):
                 rec["no_uv"] += 1
                 continue
             umin, umax, vmin, vmax = min(us), max(us), min(vs), max(vs)
-            if max(umax - umin, vmax - vmin) < EPS_EXTENT:
+            w, h = (umax - umin), (vmax - vmin)
+            # degenerate = collapsed to a POINT (both tiny) OR a LINE (one axis tiny) OR a sliver
+            # (tiny area) -- a UV [w=0, h=0.8] still samples a single texel column and is unusable.
+            if w < EPS_EXTENT or h < EPS_EXTENT or (w * h) < EPS_AREA:
                 rec["degenerate_uv"].append(mn)
             if umin < -BLEED or vmin < -BLEED or umax > 1 + BLEED or vmax > 1 + BLEED:
                 rec["out_of_range_uv"].append(mn)
