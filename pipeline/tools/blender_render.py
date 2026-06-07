@@ -35,6 +35,13 @@ REGION_COLOR = REGION_RGB
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 scene.view_settings.view_transform = 'Standard'  # predictable sRGB (not AgX) for region->id mapping
+try:                                      # pin full colour management so textured albedo is faithful
+    scene.view_settings.look = 'None'
+    scene.view_settings.exposure = 0.0
+    scene.view_settings.gamma = 1.0
+    scene.display_settings.display_device = 'sRGB'
+except Exception:
+    pass
 
 # --- mesh: a real glTF/glb file (--mesh-file; HIT regions by material name), or the procedural humanoid ---
 MESH_FILE = argv[2] if len(argv) > 2 and argv[2] else None
@@ -145,7 +152,8 @@ camera_probe = {k: probe(v) for k, v in
 # COLOR pass -- the ART's real look (base-color TEXTURE if present, else the material base
 # colors), studio-lit. (Procedural/untextured -> MATERIAL shows its diffuse_color.)
 shading.color_type = 'TEXTURE' if has_tex else 'MATERIAL'
-shading.light = 'STUDIO'
+# Textured albedo -> FLAT for faithful colour (STUDIO halves saturation); flat_region -> STUDIO. (ADR-0032)
+shading.light = 'FLAT' if has_tex else 'STUDIO'
 scene.display.render_aa = '8'
 for i in range(DIRS):
     obj.rotation_euler = (0.0, 0.0, BASE_YAW + i * (2 * math.pi / DIRS))

@@ -29,6 +29,13 @@ REGION_COLOR = REGION_RGB
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 scene.view_settings.view_transform = 'Standard'
+try:                                      # pin the full colour-management state so textured albedo
+    scene.view_settings.look = 'None'     # bakes faithfully regardless of the host Blender config
+    scene.view_settings.exposure = 0.0
+    scene.view_settings.gamma = 1.0
+    scene.display_settings.display_device = 'sRGB'
+except Exception:
+    pass
 
 before = set(bpy.data.objects)
 bpy.ops.import_scene.gltf(filepath=MESH_FILE)
@@ -130,14 +137,30 @@ def _flat_base_color(bsdf):
     return bc.default_value
 
 
+def _basecolor_direct_tex(bsdf):
+    bc = bsdf.inputs['Base Color']
+    return bool(bc.is_linked and bc.links and bc.links[0].from_node.type == 'TEX_IMAGE')
+
+
 for _m in obj.data.materials:
     if _m and _m.use_nodes:
         _b = next((n for n in _m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
         if _b is not None:
-            if _b.inputs['Base Color'].is_linked:
+            # base_color_linked = the REAL grey bug ONLY: a Base Color linked through a NON-texture
+            # node (glTF vertex-colour Color-Attribute -> Mix) parks the socket default at flat grey.
+            # A DIRECT TEX_IMAGE link is a legitimate texture (renders correctly in TEXTURE mode) and
+            # must NOT be flagged -- it previously fired on every textured model incl. the known-good
+            # fixture (a near-universal false positive that would mis-trip the fidelity gate).
+            if _b.inputs['Base Color'].is_linked and not _basecolor_direct_tex(_b):
                 base_color_linked.append(_m.name)
             _c = _flat_base_color(_b)
             _m.diffuse_color = (_c[0], _c[1], _c[2], 1.0)
+        for _n in _m.node_tree.nodes:        # pin base-colour textures to sRGB (faithful albedo)
+            if _n.type == 'TEX_IMAGE' and _n.image:
+                try:
+                    _n.image.colorspace_settings.name = 'sRGB'
+                except Exception:
+                    pass
 
 right = Vector((1.0, -1.0, 0.0)).normalized()
 up = Vector((-0.5 * INV2, -0.5 * INV2, COS30)).normalized()
@@ -212,7 +235,10 @@ def render_all(prefix):
 
 
 shading.color_type = 'TEXTURE' if has_tex else 'MATERIAL'
-shading.light = 'STUDIO'
+# Textured albedo already bakes AO/value into the texture, and STUDIO light roughly halves its
+# saturation -> render the textured colour pass FLAT for faithful colour. Untextured flat_region
+# keeps STUDIO so its solid per-region colours read with some form. (ADR-0032.)
+shading.light = 'FLAT' if has_tex else 'STUDIO'
 scene.display.render_aa = '8'
 render_all("color")
 for m in obj.data.materials:
