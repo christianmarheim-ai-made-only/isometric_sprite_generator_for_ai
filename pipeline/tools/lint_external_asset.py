@@ -55,10 +55,10 @@ def lint(path: Path, check_files: bool = True, today: str | None = None) -> list
     base = Path(path).parent
     if check_files:
         for kind, rel in (asset.get("files") or {}).items():
-            if not (base / rel).exists():
+            if isinstance(rel, str) and not (base / rel).exists():        # skip non-path values
                 errs.append(f"files.{kind}: '{rel}' not found (relative to the manifest)")
         for kind, rel in (asset.get("textures") or {}).items():
-            if not (base / rel).exists():
+            if isinstance(rel, str) and not (base / rel).exists():        # textures may carry real_albedo:bool
                 errs.append(f"textures.{kind}: '{rel}' not found")
 
     rig = asset.get("rig")

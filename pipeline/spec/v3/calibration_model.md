@@ -49,6 +49,22 @@ so `wing_left → arm_left (green)` and `wing_right → arm_right (blue)` — ne
 
 ---
 
+## 1b. A calibration delivery MUST declare itself calibration
+
+The asset.json **must** carry a truthy `calibration` block (or `provenance.texture.calibration_texture: true`):
+
+```jsonc
+"calibration": { "enabled": true, "purpose": "calib_v1 verification model" }
+```
+
+This is how the pipeline knows to (a) run the `calib_color` gate that samples each hitbox centre, (b) run
+the `calib_oracle` motion check, and (c) set `real_albedo: false` (a calibration skin is debug colour, not
+real albedo). **Without it the model bakes as an ordinary textured creature and `calib_color` silently skips**
+(it reported `skipped: no region_rects` / no verification). `texture_mode` stays `textured`; do not put a
+`real_albedo` flag inside `textures` to signal calibration — that is not where the pipeline reads it.
+
+---
+
 ## 2. Each hitbox covers its colour; the bake verifies the centre sample
 
 Two halves of one contract, both reproduced exactly from `calib_v1`:
