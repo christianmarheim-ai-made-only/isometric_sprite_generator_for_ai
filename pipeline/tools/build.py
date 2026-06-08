@@ -68,6 +68,8 @@ STEPS = [
     ("test_region_bake_e2e", [str(SCRIPT_DIR / "test_region_bake_e2e.py")]),
     ("test_atlas_paging", [str(SCRIPT_DIR / "test_atlas_paging.py")]),
     ("test_useless_content", [str(SCRIPT_DIR / "test_useless_content.py")]),
+    ("test_calib_color", [str(SCRIPT_DIR / "test_calib_color.py")]),
+    ("v3_spec_self_test", [str(SCRIPT_DIR.parent / "spec" / "v3" / "self_test.py")]),
 ]
 
 

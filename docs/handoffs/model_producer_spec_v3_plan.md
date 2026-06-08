@@ -1,5 +1,12 @@
 # Model Producer Spec v3 — plan (post-hardening + independent review)
 
+- **BUILT (2026-06-08):** the pack is authored at **`pipeline/spec/v3/`** (README + calibration_model +
+  uv_format + gate_reference + prompts/ + fixtures + examples + `region_hitboxes.schema.json` + `self_test.py`,
+  the last wired into `build.py` as `v3_spec_self_test`). Combat-creature focus; calibration colours/metadata
+  hard-coded in `pipeline/tools/calib_spec.py` and verified by `calib_color.py` (gate
+  `calib_region_color_mismatch`). The three audit gaps are CLOSED in code: atlas paging (ADR-0037),
+  flat_region_bound_texture (ADR-0037), and base_color_linked is detected (a committed negative fixture is the
+  one remaining follow-up).
 - Status: **Plan** (roadmap to build the v3 pack; supersedes the v2 ZIP `dist/model_producer_delivery_spec_v2/`)
 - Date: 2026-06-07
 - Driver: an independent review of v2 (12 blockers + staged-pipeline + ~25 contract decisions) **plus** the pipeline hardening landed this session (external_asset_v2 migration, mode-aware severity, calibration oracle, waivers, AABBs, ADR-0035 anchor contract).

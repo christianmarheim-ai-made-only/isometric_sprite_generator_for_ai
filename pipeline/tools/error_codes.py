@@ -52,6 +52,7 @@ CODES = {
     # --- hitbox ---
     "region_fallback_torso":            ("warn",  "hitbox",    "no_region_fallback"),   # -> error when textured (B3)
     "region_missing":                   ("error", "hitbox",    "regions_present"),
+    "calib_region_color_mismatch":      ("error", "hitbox",    "calib_region_color_matches"),  # calib texture<->hitbox disagree
     # --- bake ---
     "oversize_atlas_page":              ("error", "bake",      "atlas_page_size"),
     "verification_build_log_disagree":  ("error", "bake",      "ok_agreement"),

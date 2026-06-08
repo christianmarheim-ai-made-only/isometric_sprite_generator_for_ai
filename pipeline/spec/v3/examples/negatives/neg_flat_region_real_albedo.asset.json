@@ -1,0 +1,11 @@
+{
+  "asset_contract_version": "external_asset_v2",
+  "variant_id": "neg_flat_region_real_albedo",
+  "archetype": "biped",
+  "texture_mode": "flat_region",
+  "rig": "biped_v1",
+  "files": { "mesh": "x.glb" },
+  "animations": { "idle": { "clip": "idle", "frames": 1, "fps": 1, "playback": "loop" } },
+  "provenance": { "texture": { "real_albedo": true } },
+  "notes": "NEGATIVE fixture -> expected code: flat_region_real_albedo (a flat_region package must not claim real_albedo:true)."
+}

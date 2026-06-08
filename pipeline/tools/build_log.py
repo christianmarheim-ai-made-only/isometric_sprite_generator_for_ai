@@ -181,7 +181,7 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
                     rig=None, archetype=None, authored_metrics=None,
                     gate_reasons=None, meta: dict | None = None, stages=None,
                     texture_mode="flat_region", calibration=False,
-                    waivers=None, explicit_regions=False, today=None) -> dict:
+                    waivers=None, explicit_regions=False, extra_warnings=None, today=None) -> dict:
     """Assemble + write out_dir/build_log.json and return the log dict.
 
     `waivers` (review snippet 07; ADR-0028/0031): an optional list of named, single-check, expiring
@@ -194,7 +194,7 @@ def write_build_log(out_dir, manifest: dict, route: str, asset_path=None, mesh=N
     out_dir = Path(out_dir)
     meta = meta or {}
     gate_reasons = gate_reasons or []
-    warnings = []
+    warnings = list(extra_warnings or [])   # caller-supplied (e.g. calib_region_color_mismatch from calib_color)
     for n in meta.get("region_fallback_materials", []):
         warnings.append({"code": "region_fallback_torso", "severity": "warn",
                          "detail": f"material '{n}' matched no region keyword -> silently defaulted to torso (id 2)"})

@@ -221,13 +221,30 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
     texture_mode = asset.get("texture_mode", "flat_region")
     calibration = bool(asset.get("calibration")
                        or ((asset.get("provenance") or {}).get("texture") or {}).get("calibration_texture"))
+    # CALIBRATION COLOUR<->HITBOX gate (calib_v1, calib_color.py): each region's hitbox centre must sample
+    # its EXPECTED calibration colour (head=red, torso=grey, L arm/wing=green, R=blue, legs=purple,
+    # tail=orange). Computed BEFORE the build log so a mismatch is a real ERROR that flips ok.
+    calib_color_rep = None
+    calib_warnings = []
+    if calibration:
+        try:
+            import calib_color as _cc
+            calib_color_rep = _cc.verify(out, manifest, meta)
+            for name in calib_color_rep.get("mismatches", []):
+                r = calib_color_rep["regions"][name]
+                calib_warnings.append({"code": "calib_region_color_mismatch", "severity": "error",
+                                       "detail": f"region '{name}': hitbox centre samples '{r['dominant']}' but the "
+                                                 f"calibration spec requires '{r['expected']}' (texture/UVs/hitbox disagree)"})
+        except Exception as _e:
+            calib_color_rep = {"ok": None, "error": str(_e)}
     log = write_build_log(out, manifest, route, asset_path=manifest_path, mesh=mesh_path,
                           clips=clips_path, rig=rig, archetype=asset.get("archetype"),
                           authored_metrics=asset.get("world_metrics"), gate_reasons=[], meta=meta,
                           stages=[{"name": "bake", "ms": bake_ms}],
                           texture_mode=texture_mode, calibration=calibration,
                           waivers=asset.get("waivers"),   # a valid in-date waiver downgrades a gate error to 'waived'
-                          explicit_regions=_has_explicit_regions(asset, base, variant_id))
+                          explicit_regions=_has_explicit_regions(asset, base, variant_id),
+                          extra_warnings=calib_warnings)
     # Deterministic OUTPUT-verify artifact: project the build_log warnings into a per-stage report;
     # verification_report.ok == build_log.ok by construction (both = "no severity==error").
     from verification_report import write_report
@@ -308,6 +325,18 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
         except Exception as _e:  # never let the oracle crash a bake; surface it instead
             manifest["calib_oracle"] = {"ok": None, "error": str(_e)}
             print(f"  CALIB_ORACLE ERROR: {_e}")
+        # calibration colour<->hitbox report (computed above; already folded into build_log warnings)
+        if calib_color_rep is not None:
+            (out / "calib_color_report.json").write_text(json.dumps(calib_color_rep, indent=2) + "\n", encoding="utf-8")
+            manifest["calib_color"] = {"ok": calib_color_rep.get("ok"),
+                                       "mismatches": calib_color_rep.get("mismatches", []),
+                                       "report": "calib_color_report.json"}
+            if calib_color_rep.get("mismatches"):
+                print(f"  CALIB_COLOUR FAIL: {calib_color_rep['mismatches']}")
+            elif calib_color_rep.get("ok"):
+                n = len(calib_color_rep.get("regions", {}))
+                print(f"  CALIB_COLOUR OK: {n} region(s) match the calib_v1 spec" if n else
+                      f"  CALIB_COLOUR: {calib_color_rep.get('skipped', 'nothing to verify')}")
 
     nwarn = len(log["warnings"])
     tail = f"  [{nwarn} warning(s): {', '.join(sorted({w['code'] for w in log['warnings']}))}]" if nwarn else ""

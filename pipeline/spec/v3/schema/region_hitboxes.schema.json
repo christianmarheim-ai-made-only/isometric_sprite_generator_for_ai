@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://slay-slayer/game_iso_v1/region_hitboxes.schema.json",
+  "title": "region_hitboxes sidecar (<variant_id>_hitbox.json) -- the bake-consumed dialect",
+  "description": "The authoritative per-region world-space AABB map a delivery ships alongside the glb. bake_asset._explicit_region_path reads `region_hitboxes` (name -> {min,max} in metres, the model's Z-up frame); calib_color.py + ADR-0036 region baking consume it. Distinct from the verification-only hitbox_v1 schema (regions/aabb_min/aabb_max).",
+  "type": "object",
+  "required": ["region_hitboxes"],
+  "additionalProperties": true,
+  "properties": {
+    "asset_id": { "type": "string" },
+    "region_hitboxes": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "region name -> world-space AABB. Calibration models name regions so they fold (calib_spec.calib_color_key) to head/torso/arm_left/arm_right/legs/tail.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["min", "max"],
+        "additionalProperties": true,
+        "properties": {
+          "min": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "max": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "asset_contract_version": "external_asset_v2",
+  "variant_id": "neg_missing_idle",
+  "archetype": "biped",
+  "texture_mode": "flat_region",
+  "rig": "biped_v1",
+  "files": { "mesh": "x.glb", "animation_clips": "x_anim.json" },
+  "animations": { "walk": { "clip": "walk", "frames": 8, "fps": 12, "playback": "loop" } },
+  "notes": "NEGATIVE fixture -> expected code: missing_required_clip (a biped must declare 'idle')."
+}

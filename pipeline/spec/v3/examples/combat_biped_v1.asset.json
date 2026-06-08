@@ -1,0 +1,23 @@
+{
+  "asset_contract_version": "external_asset_v2",
+  "variant_id": "combat_biped_v1",
+  "archetype": "biped",
+  "texture_mode": "flat_region",
+  "rig": "biped_v1",
+  "files": {
+    "mesh": "combat_biped_v1.glb",
+    "animation_clips": "combat_biped_v1_anim.json"
+  },
+  "geometry": { "up": "z", "forward": "+x", "unit": "meter" },
+  "region_source": "material_name",
+  "animations": {
+    "idle":   { "clip": "idle",   "frames": 1, "fps": 1,  "playback": "loop" },
+    "walk":   { "clip": "walk",   "frames": 8, "fps": 12, "playback": "loop" },
+    "attack": { "clip": "attack", "frames": 6, "fps": 12, "playback": "once" },
+    "hit":    { "clip": "hit",    "frames": 4, "fps": 12, "playback": "once" },
+    "death":  { "clip": "death",  "frames": 8, "fps": 10, "playback": "once" }
+  },
+  "default_state": "idle",
+  "world_metrics": { "height_world": 1.8, "footprint_radius_world": 0.4, "eye_height_world": 1.62 },
+  "notes": "v3 POSITIVE fixture: a combat-ready flat_region biped (idle/attack/hit/death + a region_hitboxes sidecar). Material base colours, NO bound texture. Validates vs external_asset_v2 and lints clean."
+}
