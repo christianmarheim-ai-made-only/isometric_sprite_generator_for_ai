@@ -5,35 +5,52 @@ Grounded by a 3-way audit (reuse-seam audit + environment-asset taxonomy + archi
 
 ## 0. The decision (architecture)
 
-**Build a SIBLING extension package — `pipeline/env/` — that IMPORTS the character pipeline as a read-only
-library and NEVER modifies it.** (Architecture eval: sibling **7/10** vs in-place 3/10 vs hard-fork 2/10.)
+**One shared CORE; two sibling consumers (Characters, Landscape); a cross-consumer test gate protecting the
+core.** (Architecture eval scored a shared-core sibling split **7/10** vs in-place-in-the-character-pipeline 3
+vs hard-fork 2.)
 
-Why, in one line: the character pipeline is hardened (42/42) and *too sensitive to touch*, while environment
-assets are a **strict subset** of what it already does (static; no rig, no clips, no calibration, no combat
-regions). So we reuse the proven core and add an env-only layer beside it that **physically cannot break the
-character gate** (separate files, separate CI gate).
-
-The boundary (the one rule that makes this safe):
+**Why not a fork (the earlier instinct): environment is not static.** A building with a swaying flag, a bird
+flapping on a stone, water shimmer, a flickering torch — these are *animations*. A fork would **duplicate the
+animation engine** (clip sampling, multi-frame atlas, paging) and guarantee drift. The animation machinery is
+exactly the expensive, well-tested core both consumers must SHARE. So: **one core, two consumers** — Landscape
+is NOT a "static subset of Characters"; it is a sibling that uses the *core* (including animation) with its own
+contract.
 
 ```
-pipeline/env/   ──imports──▶   pipeline/tools/        (ONE-WAY. env may read tools; tools must never import env)
-     │                              │
-  env-only: schemas, gates,     the proven core (unchanged):
-  map format, producer spec,    camera, atlas pack/page, manifest, Gate-1, hitmask
-  env self-test + env gate
+                 core/   (generic bake: camera, atlas pack/page, manifest, Gate-1, hitmask, ANIM/clip sampling)
+                 /   \                  *changing it requires BOTH suites below to be green*
+        character/     env/ (landscape)
+        rig, calib,     terrain, props, blocking features, water,
+        combat clips     AMBIENT animation loops, the map/area format
+   (siblings: neither imports the other; both import core; dependency is strictly one-way)
 ```
 
-Enforce it with a tiny boundary check (an env self-test assertion: no file under `pipeline/tools/` imports
-`env`, and the env gate runs as a **separate** CI job from `build.py`). A broken env bake then turns the env
-gate red and leaves the character 42/42 green.
+### Governance — the rule that protects the core (the user's rule)
 
-### The stable seam env imports (don't widen it casually)
+- A change to **`core`** must keep **BOTH** the **character** suite **and** the **landscape** suite green
+  (a combined `build_all.py` runs core + char + env). The shared foundation only moves when both things
+  standing on it still stand.
+- A **character-only** change needs core + character green (landscape can't be affected — it never imports
+  character). A **landscape-only** change needs core + landscape green.
+- **Dependency is strictly one-way:** `character → core`, `env → core`; never `character ↔ env`, never
+  `core → either`. Enforce with a tiny boundary check (no `core` file imports a consumer; each consumer gate
+  runs as its own CI job).
+- **Today the generic core is physically tangled inside `pipeline/tools/` with the character layer.** Two
+  ways to honour the rule: **(a) start now** — treat the generic functions (the seam below) as the *logical*
+  core, document it, and run the cross-gate; no risky refactor. **(b) later** — physically extract
+  `pipeline/core/`, verified by the existing green gates (a no-behaviour-change move). Recommend (a) now,
+  (b) when it earns its keep.
 
-From `pipeline/tools/`, env reuses **as-is** (the audit confirmed these are generic, not character-specific):
+### The shared-core seam both consumers reuse (don't widen it casually)
+
+From the core (today inside `pipeline/tools/`), both Characters and Landscape reuse **as-is** (the audit
+confirmed these are generic, not character-specific) — note `bake_animated`/clip sampling is core, so a
+swaying flag bakes through the SAME path as a walking knight:
 - `constants` — `CANVAS=256`, `DIRS=16`, `PAD=4`, `TILE_BASE=64×32`, `MAX_PAGE_PX=4096`, `forward_yaw()`.
 - atlas packing — `bake._pack`, `shelf_place`, `place_into`; `shard_atlas.shard` (paging, ADR-0037).
-- the camera render — `blender_render.py` (the exact game_iso_v1 ortho camera) + `bake_blender` (the **static**
-  bake path — props are already bakeable through it).
+- the camera render — `blender_render.py` (the exact game_iso_v1 ortho camera) + `bake_blender` (**static**
+  props) **and `bake_animated` + `bake_anim_from_json` (the clip-sampling path a swaying flag / ambient critter
+  reuses unchanged)**.
 - Gate-1 — `gate_engine_accept.engine_accept` (the engine-acceptance contract).
 - metrics/AABB — `measure_metrics.compute_world_metrics`, `blender_bake.region_aabbs`,
   `render3d.ground_screen_direction` / `compute_fit`.
@@ -66,6 +83,7 @@ Demo set = **flat-with-obstacles**; the rest is noted but deferred.
 | **Ground terrain tile** | `variant_class:terrain`, dir 1, 256×128 | ✅ | seamless edge tiling; diamond alpha; elevation-correctness (30°) |
 | **Blocking feature** (wall, rock, cliff-as-occluder, mountain) | static prop sprite (16-dir) + hitmask | ✅ | world_metrics → collider footprint+span; `blocks_movement`/`blocks_vision` intent; unbreakable |
 | **Static prop / scenery** (tree, crate, bush) | static prop sprite (16-dir) + optional hitmask | ✅ | clear iso silhouette; height for occlusion; usually non-blocking |
+| **Ambient animated prop** (swaying flag, flapping bird, torch flicker, foliage rustle) | **`bake_animated`** loop clip → multi-frame atlas (the SAME core path as a character) | ✅ | one looping ambient clip (no combat vocab idle/attack/hit/death, no rig profile required — bone or shape-key/vertex anim); directional (16-dir) OR radial (1-dir) per the prop; placed/composited like any feature |
 | **Water / river** | terrain tile + a water collider (`solid()` + occluding band) | ✅ (one feature) | seamless water tile; authored occluder height so LOS blocks across it |
 | **Visual effect overlay** | `variant_class:effect`, animated, directional/radial | ➖ if needed | anim frames; origin/socket policy; no collision |
 | **Tile transitions / auto-tiling** (grass↔dirt edges) | edge-variant atlas cells | ❌ defer | Wang/blob tile indices + edge-pair selection — explodes the tileset |
@@ -99,9 +117,12 @@ eyeballed without the engine — the env analogue of `preview_3x3.png`.
 
 ## 5. Roadmap (phased, demo-driven)
 
-- **P0 — Package + seam (1st).** Create `pipeline/env/` + the one-way boundary check + a trivial env
-  self-test that bakes a **static prop** through the reused `bake_blender`/Gate-1 (proves import-only reuse).
-  `pipeline/env/build_env.py` is the separate env gate. The character `build.py` is untouched.
+- **P0 — Package + seam + governance (1st).** Create `pipeline/env/` + the one-way boundary check + a
+  trivial env self-test that bakes BOTH a **static prop** (`bake_blender`) AND a tiny **animated prop**
+  (`bake_animated`, a 1-bone sway loop) through the reused core/Gate-1 — proving env reuses the *animation*
+  path, not just static. `pipeline/env/build_env.py` is the separate env gate; add `build_all.py` (core +
+  `build.py` char + `build_env.py`) as the gate any **core** change must pass. The character `build.py` is
+  untouched.
 - **P1 — Env contracts + gates.** Trimmed delivery schemas (terrain tile / prop / blocking feature / water)
   = `external_asset_v2` minus rig/clips/calib, plus collision-intent fields. Env gates: seamless-tile check
   (reuse the 3×3 preview), collision-intent presence, terrain elevation-correctness. The **env producer
@@ -119,8 +140,9 @@ eyeballed without the engine — the env analogue of `preview_3x3.png`.
   briefs + area blockouts + recipes. Big calls = the user.
 - **Env producer** — turns each brief into a glb to the trimmed env contract (the character Model Producer,
   with rig/clips/calib dropped).
-- **Env pipeline (`pipeline/env/`)** — bakes the glbs + tiles into iso sprites/tiles, runs the env gate,
-  assembles areas. Reuses the character core read-only.
+- **Env pipeline (`pipeline/env/`)** — bakes the glbs + tiles (static AND ambient-animated) into iso
+  sprites/tiles, runs the env gate, assembles areas. Reuses the **shared core** read-only (a sibling of the
+  character pipeline, not a child of it).
 
 ## 7. Open decisions for the user (the big calls)
 
