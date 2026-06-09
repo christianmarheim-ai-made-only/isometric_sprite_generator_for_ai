@@ -1,0 +1,35 @@
+{
+  "env_contract_version": "env_asset_v1",
+  "variant_id": "mesa_wall_v1",
+  "kind": "blocking_feature",
+  "texture_mode": "textured",
+  "files": {
+    "mesh": "mesa_wall_v1.glb"
+  },
+  "geometry": {
+    "up": "z",
+    "forward": "+x",
+    "unit": "meter"
+  },
+  "textures": {
+    "base_color": "mesa_wall_v1_basecolor.png"
+  },
+  "direction_count": 16,
+  "world_metrics": {
+    "height_world": 3.0,
+    "footprint_radius_world": 1.0
+  },
+  "collision": {
+    "footprint": {
+      "shape": "aabb",
+      "half_extents_world": [
+        1.0,
+        0.5
+      ]
+    },
+    "occluder_height_world": 3.0,
+    "blocks_movement": true,
+    "blocks_vision": true
+  },
+  "notes": "A mesa wall section: impassable + sight-blocking (ADR-054 solid collider). A 2D footprint + tall occluder, NOT elevation (ADR-022)."
+}

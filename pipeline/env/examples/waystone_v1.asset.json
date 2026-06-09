@@ -1,0 +1,20 @@
+{
+  "env_contract_version": "env_asset_v1",
+  "variant_id": "waystone_v1",
+  "kind": "prop",
+  "texture_mode": "flat_region",
+  "files": {
+    "mesh": "waystone_v1.glb"
+  },
+  "geometry": {
+    "up": "z",
+    "forward": "+x",
+    "unit": "meter"
+  },
+  "direction_count": 16,
+  "world_metrics": {
+    "height_world": 1.1,
+    "footprint_radius_world": 0.3
+  },
+  "notes": "An old standing waystone. Static decoration, non-blocking (no collision block)."
+}

@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://slay-slayer/game_iso_v1/env_asset.schema.json",
+  "title": "env_asset_v1 — world-scenery delivery contract (FLAT)",
+  "description": "The trimmed delivery front door for WORLD SCENERY (terrain tiles, static props, blocking features, water). It is the character external_asset_v2 contract MINUS the hard parts (no rig, no animation/combat clips, no archetype, no calibration gate) PLUS what scenery needs (a `kind`, a `collision` block = an ADR-019 collider, terrain `tiling`). FLAT-only: walkable height-TIERS are a reserved extension (see `tier`, off in v1) that lands with the tiered-terrain bake contract + the engine multi-level ADR. Baked through the SHARED core (the sibling pipeline/env reuses pipeline/tools read-only); env runs its own gate, never the character 42-gate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["env_contract_version", "variant_id", "kind", "texture_mode", "files"],
+  "properties": {
+    "env_contract_version": { "const": "env_asset_v1" },
+    "variant_id": { "type": "string", "description": "unique id, e.g. ground_arid_v1 / boulder_red_v1 / mesa_wall_v1 / wash_water_v1." },
+    "kind": {
+      "enum": ["terrain", "prop", "blocking_feature", "water"],
+      "description": "terrain = flat walkable ground tile (variant_class:terrain, dir 1, no collider, no world_metrics). prop = static scenery (16-dir sprite + world_metrics; usually non-blocking). blocking_feature = mesa/cliff/boulder/wall (static sprite + hitmask + a SOLID collider, ADR-054). water = flat tile + a sight-AND-movement-blocking collider with an occluder band (ADR-055)."
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mesh"],
+      "properties": {
+        "mesh": { "type": "string", "description": ".glb (preferred) or .obj relative to this manifest. STATIC in v1 (no rig)." },
+        "hitbox": { "type": "string", "description": "optional region_hitboxes sidecar; for scenery usually unused (a feature's collider is the `collision` block below, not per-region body hitboxes)." }
+      }
+    },
+    "texture_mode": { "enum": ["flat_region", "textured"], "description": "flat_region = material base colours (no bound texture); textured = real painted albedo with real UVs. Same gates as characters (uv_format)." },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "up": { "enum": ["y", "z"], "default": "z" },
+        "forward": { "enum": ["+x", "-x", "+y", "-y"], "default": "+x" },
+        "unit": { "const": "meter" }
+      }
+    },
+    "textures": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "base_color": { "type": "string" },
+        "normal": { "type": "string" },
+        "roughness": { "type": "string" },
+        "metallic": { "type": "string" },
+        "real_albedo": { "type": "boolean" }
+      }
+    },
+    "region_source": { "enum": ["material_name", "explicit_region_hitboxes"], "description": "scenery rarely needs body regions; default material_name." },
+    "direction_count": { "enum": [1, 16], "description": "1 for a terrain/water tile or a radially-symmetric prop; 16 for a directional prop/feature. Defaults by kind (terrain/water -> 1)." },
+    "world_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["height_world", "footprint_radius_world"],
+      "description": "REQUIRED for prop + blocking_feature (drives occlusion sort + placement avoidance + the collider span). OMITTED for terrain + water (a ground/water tile is not an occluder/viewer).",
+      "properties": {
+        "height_world": { "type": "number", "exclusiveMinimum": 0 },
+        "footprint_radius_world": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "tiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "terrain/water only. seamless = the tile must repeat edge-to-edge with no visible seam (the env gate verifies via the 3x3 tiling preview).",
+      "properties": { "seamless": { "type": "boolean", "default": true } }
+    },
+    "collision": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "An ADR-019 static collider (ADR-054). REQUIRED for blocking_feature + water; OPTIONAL for prop (default: non-blocking); FORBIDDEN for terrain (walkable ground). A cliff/mesa is a 2D footprint + a TALL occluder, never elevation (ADR-022).",
+      "required": ["footprint", "blocks_movement", "blocks_vision"],
+      "properties": {
+        "footprint": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["shape"],
+          "properties": {
+            "shape": { "enum": ["circle", "aabb", "hitmask"], "description": "circle (radius), aabb (half_extents [hx,hy]), or hitmask (derive the 2D footprint from the baked R8 hitmask)." },
+            "radius_world": { "type": "number", "exclusiveMinimum": 0 },
+            "half_extents_world": { "type": "array", "items": { "type": "number", "exclusiveMinimum": 0 }, "minItems": 2, "maxItems": 2 }
+          }
+        },
+        "occluder_height_world": { "type": "number", "exclusiveMinimum": 0, "description": "VerticalSpan top (m) the LOS uses (ADR-033). For water this is the occluder BAND height that blocks sight across the wash; for a mesa/wall, the visual height." },
+        "blocks_movement": { "type": "boolean" },
+        "blocks_vision": { "type": "boolean" }
+      }
+    },
+    "tier": {
+      "type": "object",
+      "description": "RESERVED — walkable height-tiers (the tiered-terrain bake contract + engine multi-level ADR). NOT VALID in env_asset_v1 (FLAT). Documented here so the schema extends cleanly: a future env_asset_v2 adds tier_height + edge_kind (flat_top | cliff_face | ramp | stair).",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "notes": { "type": "string" }
+  },
+  "allOf": [
+    { "if": { "properties": { "kind": { "const": "terrain" } } },
+      "then": { "not": { "anyOf": [ { "required": ["collision"] }, { "required": ["world_metrics"] } ] } } },
+    { "if": { "properties": { "kind": { "const": "prop" } } },
+      "then": { "required": ["world_metrics"] } },
+    { "if": { "properties": { "kind": { "const": "blocking_feature" } } },
+      "then": { "required": ["world_metrics", "collision"] } },
+    { "if": { "properties": { "kind": { "const": "water" } } },
+      "then": { "required": ["collision"], "not": { "required": ["world_metrics"] } } },
+    { "not": { "anyOf": [
+      { "required": ["rig"] }, { "required": ["animations"] }, { "required": ["archetype"] }, { "required": ["calibration"] }
+    ], "$comment": "trimmed: scenery is static + has no archetype/rig/clips/calibration in v1" } }
+  ]
+}

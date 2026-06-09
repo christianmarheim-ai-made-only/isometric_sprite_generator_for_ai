@@ -1,0 +1,22 @@
+{
+  "env_contract_version": "env_asset_v1",
+  "variant_id": "ground_arid_v1",
+  "kind": "terrain",
+  "texture_mode": "textured",
+  "files": {
+    "mesh": "ground_arid_v1.glb"
+  },
+  "geometry": {
+    "up": "z",
+    "forward": "+x",
+    "unit": "meter"
+  },
+  "textures": {
+    "base_color": "ground_arid_v1_basecolor.png"
+  },
+  "direction_count": 1,
+  "tiling": {
+    "seamless": true
+  },
+  "notes": "Cracked-clay badlands ground tile. Flat walkable surface; seamless 1x1 (no auto-tiling in v1)."
+}
