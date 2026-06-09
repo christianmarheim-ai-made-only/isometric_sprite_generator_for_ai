@@ -3,16 +3,13 @@
   "variant_id": "seep_pool_v1",
   "kind": "water",
   "texture_mode": "textured",
-  "files": {
-    "mesh": "seep_pool_v1.glb"
+  "textures": {
+    "base_color": "seep_pool_v1_basecolor.png"
   },
   "geometry": {
     "up": "z",
     "forward": "+x",
     "unit": "meter"
-  },
-  "textures": {
-    "base_color": "seep_pool_v1_basecolor.png"
   },
   "direction_count": 1,
   "tiling": {
@@ -30,5 +27,5 @@
     "blocks_movement": true,
     "blocks_vision": true
   },
-  "notes": "A water tile (dry-wash seep): impassable + sight-blocking via an occluder band (ADR-055); rendered flat like terrain."
+  "notes": "A water tile (dry-wash seep): TEXTURE warped flat like terrain + an impassable, sight-blocking occluder band (ADR-055)."
 }

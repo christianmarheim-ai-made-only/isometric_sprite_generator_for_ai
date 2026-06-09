@@ -17,7 +17,8 @@ ENV_DIR = Path(__file__).resolve().parent
 
 STEPS = [
     ("env_self_test", [str(ENV_DIR / "self_test.py")]),
-    # (future) env_terrain_bake, env_seamless_tiling, env_prop_hitmask, env_elevation_guard
+    ("env_bake", [str(ENV_DIR / "test_env_bake.py")]),   # bake_env routing + seamless + elevation guard + prop hitmask
+    # (future) env_area_assemble (the map/area format) when it lands
 ]
 
 

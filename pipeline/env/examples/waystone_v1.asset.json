@@ -16,5 +16,5 @@
     "height_world": 1.1,
     "footprint_radius_world": 0.3
   },
-  "notes": "An old standing waystone. Static decoration, non-blocking (no collision block)."
+  "notes": "An old standing waystone (MESH prop). Static decoration, non-blocking (no collision)."
 }

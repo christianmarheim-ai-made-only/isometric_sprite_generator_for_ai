@@ -6,13 +6,13 @@
   "files": {
     "mesh": "mesa_wall_v1.glb"
   },
+  "textures": {
+    "base_color": "mesa_wall_v1_basecolor.png"
+  },
   "geometry": {
     "up": "z",
     "forward": "+x",
     "unit": "meter"
-  },
-  "textures": {
-    "base_color": "mesa_wall_v1_basecolor.png"
   },
   "direction_count": 16,
   "world_metrics": {
@@ -31,5 +31,5 @@
     "blocks_movement": true,
     "blocks_vision": true
   },
-  "notes": "A mesa wall section: impassable + sight-blocking (ADR-054 solid collider). A 2D footprint + tall occluder, NOT elevation (ADR-022)."
+  "notes": "A mesa wall section (MESH): impassable + sight-blocking (ADR-054 solid collider). A 2D footprint + tall occluder, NOT elevation (ADR-022)."
 }
