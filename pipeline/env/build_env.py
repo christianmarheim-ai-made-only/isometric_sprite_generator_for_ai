@@ -17,7 +17,8 @@ ENV_DIR = Path(__file__).resolve().parent
 
 STEPS = [
     ("env_self_test", [str(ENV_DIR / "self_test.py")]),
-    ("env_bake", [str(ENV_DIR / "test_env_bake.py")]),   # bake_env routing + seamless + elevation guard + prop hitmask
+    ("env_collision_volumes", [str(ENV_DIR / "test_collision_volumes.py")]),  # structure volumes derive + S6 gate (pure)
+    ("env_bake", [str(ENV_DIR / "test_env_bake.py")]),   # bake_env routing + seamless + elevation guard + prop hitmask + windowed-wall
     # (future) env_area_assemble (the map/area format) when it lands
 ]
 

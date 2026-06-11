@@ -83,6 +83,33 @@
         "blocks_vision": { "type": "boolean" }
       }
     },
+    "collision_volumes": {
+      "type": "array",
+      "minItems": 1,
+      "description": "MULTI-VOLUME structure colliders (a wall with a window) -- the engine CONTRACT-scenery-structure-metadata block. AUTHORING is SEMANTICS ONLY: the modeler declares, per region, what it IS (vision/passable/material_class/projectile_response/damage_variant_role). The GEOMETRY (footprint + span_world) is NOT authored here -- the bake MEASURES it from each region's world AABB in the region_hitboxes sidecar (files.hitbox), so each `region` MUST name a sidecar entry. Supersedes the single `collision` block for collision/occlusion when present (world_metrics still required for sizing). prop/blocking_feature only; never terrain/water. The ADR-034 guard holds: CLASS names, never gameplay numbers.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["region", "vision", "passable", "material_class", "projectile_response"],
+        "properties": {
+          "region": { "type": "string", "minLength": 1, "description": "Part tag; MUST match a region_hitboxes sidecar entry (the bake measures that AABB) and is unique within the model. Joins the hitmask palette (contract S5)." },
+          "vision": { "enum": ["opaque", "transparent"], "description": "transparent = seen through (glass / lattice / arrow-slit air gap) -> blocks_vision=false. The per-region vision aperture." },
+          "passable": { "type": "boolean", "description": "Can a body occupy/walk this band. Glass = false (a clear barrier still blocks bodies). -> blocks_movement." },
+          "material_class": { "type": "string", "minLength": 1, "description": "Authored class name (stone/glass/wood ...). The ENGINE owns class->MaterialBody (durability/resistances); the manifest NEVER carries the numbers (ADR-034 guard)." },
+          "projectile_response": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["default"],
+            "properties": {
+              "default": { "enum": ["block_and_damage", "pass_ignore", "pass_and_damage"] },
+              "by_class": { "type": "object", "minProperties": 1, "additionalProperties": { "enum": ["block_and_damage", "pass_ignore", "pass_and_damage"] },
+                            "description": "Per-projectile-class override (e.g. {\"bullet\":\"pass_ignore\"} -- a gunshot passes glass with no damage). Class names are the engine's projectile vocabulary." }
+            }
+          },
+          "damage_variant_role": { "enum": ["damaged", "destroyed", null], "description": "Which part's damage transition drives the ADR-043 sprite-variant swap (e.g. glass Damaged -> the cracked-glass stage). null = drives no swap." }
+        }
+      }
+    },
     "tier": {
       "type": "object",
       "description": "RESERVED -- walkable height-tiers (ADR-0039; the tiered-terrain bake contract + engine multi-level ADR). NOT VALID in env_asset_v1 (FLAT). env_asset_v2 adds edge_kind (flat_top|cliff_face|ramp|stair) + tier_height_world + orientation.",
@@ -94,14 +121,21 @@
   "allOf": [
     { "if": { "properties": { "kind": { "const": "terrain" } } },
       "then": { "required": ["textures"], "properties": { "textures": { "required": ["base_color"] } },
-                "not": { "anyOf": [ { "required": ["collision"] }, { "required": ["world_metrics"] }, { "required": ["files"] } ] } } },
+                "not": { "anyOf": [ { "required": ["collision"] }, { "required": ["collision_volumes"] }, { "required": ["world_metrics"] }, { "required": ["files"] } ] } } },
     { "if": { "properties": { "kind": { "const": "water" } } },
       "then": { "required": ["textures", "collision"], "properties": { "textures": { "required": ["base_color"] } },
-                "not": { "anyOf": [ { "required": ["world_metrics"] }, { "required": ["files"] } ] } } },
+                "not": { "anyOf": [ { "required": ["collision_volumes"] }, { "required": ["world_metrics"] }, { "required": ["files"] } ] } } },
     { "if": { "properties": { "kind": { "const": "prop" } } },
       "then": { "required": ["files", "world_metrics"], "properties": { "files": { "required": ["mesh"] } } } },
     { "if": { "properties": { "kind": { "const": "blocking_feature" } } },
-      "then": { "required": ["files", "world_metrics", "collision"], "properties": { "files": { "required": ["mesh"] } } } },
+      "then": { "required": ["files", "world_metrics"], "properties": { "files": { "required": ["mesh"] } },
+                "oneOf": [ { "required": ["collision"] }, { "required": ["collision_volumes"] } ],
+                "$comment": "a blocking_feature carries EXACTLY one collider form: a single `collision` (simple mesa/boulder) OR multi-volume `collision_volumes` (a structure)." } },
+    { "if": { "required": ["collision_volumes"] },
+      "then": { "required": ["files", "region_source"],
+                "properties": { "files": { "required": ["mesh", "hitbox"] }, "region_source": { "const": "explicit_region_hitboxes" } },
+                "not": { "required": ["collision"] },
+                "$comment": "collision_volumes geometry is MEASURED from the region_hitboxes sidecar (files.hitbox); the single `collision` block is mutually exclusive with it." } },
     { "not": { "anyOf": [ { "required": ["rig"] }, { "required": ["animations"] }, { "required": ["archetype"] }, { "required": ["calibration"] } ],
       "$comment": "trimmed: scenery is static + has no archetype/rig/clips/calibration in v1" } }
   ]

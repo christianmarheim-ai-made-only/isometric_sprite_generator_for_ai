@@ -134,6 +134,43 @@ def main():
             ok &= check("prop manifest carries the scenery block (kind + collision)",
                         pm.get("scenery", {}).get("kind") == "blocking_feature" and pm["scenery"]["collision"] is not None)
 
+            # --- (Blender-gated) STRUCTURE: a windowed wall -> the additive collision_volumes block ---
+            # The glb is just the sprite; the per-region GEOMETRY is MEASURED from the sidecar (the contract S2
+            # example), and the window SOCKET falls out of the core's named region_rects. Full end-to-end.
+            _box_glb(td / "wall.glb", hx=1.5, height=3.0)
+            (td / "wall_hitbox.json").write_text(json.dumps({"asset_id": "t_wall", "region_hitboxes": {
+                "wall_body":     {"min": [-1.5, -0.2, 0.0], "max": [1.5, 0.2, 3.0]},
+                "window_sill":   {"min": [0.1, -0.2, 0.0],  "max": [1.1, 0.2, 1.0]},
+                "window_glass":  {"min": [0.1, -0.05, 1.0], "max": [1.1, 0.05, 2.2]},
+                "window_lintel": {"min": [0.1, -0.2, 2.2],  "max": [1.1, 0.2, 3.0]}}}), encoding="utf-8")
+            wla = td / "wall.asset.json"
+            wla.write_text(json.dumps({"env_contract_version": "env_asset_v1", "variant_id": "t_wall",
+                "kind": "blocking_feature", "texture_mode": "flat_region",
+                "files": {"mesh": "wall.glb", "hitbox": "wall_hitbox.json"}, "region_source": "explicit_region_hitboxes",
+                "direction_count": 16, "world_metrics": {"height_world": 3.0, "footprint_radius_world": 1.5},
+                "collision_volumes": [
+                    {"region": "wall_body", "vision": "opaque", "passable": False, "material_class": "stone",
+                     "projectile_response": {"default": "block_and_damage"}, "damage_variant_role": None},
+                    {"region": "window_sill", "vision": "opaque", "passable": False, "material_class": "stone",
+                     "projectile_response": {"default": "block_and_damage"}, "damage_variant_role": None},
+                    {"region": "window_glass", "vision": "transparent", "passable": False, "material_class": "glass",
+                     "projectile_response": {"default": "block_and_damage", "by_class": {"bullet": "pass_ignore"}},
+                     "damage_variant_role": "damaged"},
+                    {"region": "window_lintel", "vision": "opaque", "passable": False, "material_class": "stone",
+                     "projectile_response": {"default": "block_and_damage"}, "damage_variant_role": None}]}),
+                encoding="utf-8")
+            wm2 = bake_env.bake_env(wla, td / "wall_out", blender=blender)
+            vols = wm2.get("collision_volumes") or []
+            ok &= check("windowed wall -> manifest carries 4 collision_volumes", len(vols) == 4)
+            gv = next((v for v in vols if v["region"] == "window_glass"), {})
+            ok &= check("baked glass volume: transparent + bullet pass_ignore + span [1.0,2.2] (geometry MEASURED)",
+                        gv.get("vision") == "transparent"
+                        and gv.get("projectile_response", {}).get("by_class", {}).get("bullet") == "pass_ignore"
+                        and gv.get("span_world") == [1.0, 2.2])
+            n_sock = sum(1 for f in (wm2.get("frames") or []) if "window_0_center" in (f.get("sockets") or {}))
+            ok &= check("windowed wall -> per-frame window_0_center socket present", n_sock >= 1)
+            ok &= check("windowed wall manifest STILL engine-accepted (additive block, Gate-1)", engine_accept(wm2) == [])
+
     print("ALL PASS" if ok else "SOME FAILED")
     return 0 if ok else 1
 

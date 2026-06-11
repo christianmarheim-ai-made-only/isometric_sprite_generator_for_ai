@@ -34,15 +34,23 @@ def main():
     # 1. every example validates + the per-kind shape is right
     ex = {p.stem.replace(".asset", ""): json.loads(p.read_text(encoding="utf-8"))
           for p in (HERE / "examples").glob("*.asset.json")}
-    ok &= check(f"4 examples present (terrain/prop/blocking_feature/water)", len(ex) == 4)
+    kinds_present = {o["kind"] for o in ex.values()}
+    ok &= check("all 4 env kinds present (terrain/prop/blocking_feature/water)",
+                {"terrain", "prop", "blocking_feature", "water"} <= kinds_present)
     for name, o in sorted(ex.items()):
         ok &= check(f"example {name} validates vs env_asset_v1", valid(o))
     by_kind = {o["kind"]: o for o in ex.values()}
     ok &= check("terrain has NO collision + NO world_metrics",
                 "collision" not in by_kind["terrain"] and "world_metrics" not in by_kind["terrain"])
     ok &= check("prop has world_metrics", "world_metrics" in by_kind["prop"])
-    ok &= check("blocking_feature has collision + world_metrics",
-                "collision" in by_kind["blocking_feature"] and "world_metrics" in by_kind["blocking_feature"])
+    # a blocking_feature carries EXACTLY one collider form: a simple `collision` (mesa_wall) OR multi-volume
+    # `collision_volumes` (wall_window). Test both shipped forms explicitly.
+    mesa, wall = ex["mesa_wall_v1"], ex["wall_window_v1"]
+    ok &= check("blocking_feature (mesa_wall) has collision + world_metrics, NO collision_volumes",
+                "collision" in mesa and "world_metrics" in mesa and "collision_volumes" not in mesa)
+    ok &= check("blocking_feature (wall_window) has collision_volumes + hitbox sidecar + world_metrics, NO single collision",
+                "collision_volumes" in wall and wall.get("files", {}).get("hitbox")
+                and "world_metrics" in wall and "collision" not in wall)
     ok &= check("water has collision + tiling, NO world_metrics",
                 "collision" in by_kind["water"] and "tiling" in by_kind["water"] and "world_metrics" not in by_kind["water"])
 
@@ -53,8 +61,12 @@ def main():
     # 2. NEGATIVES (the contract must REJECT these)
     ok &= check("terrain WITH a collider -> rejected (terrain is walkable)",
                 not valid({**by_kind["terrain"], "collision": by_kind["water"]["collision"]}))
-    bf = json.loads(json.dumps(by_kind["blocking_feature"])); bf.pop("collision")
+    bf = json.loads(json.dumps(mesa)); bf.pop("collision")
     ok &= check("blocking_feature WITHOUT a collider -> rejected", not valid(bf))
+    wnoh = json.loads(json.dumps(wall)); wnoh["files"] = {"mesh": wall["files"]["mesh"]}
+    ok &= check("collision_volumes WITHOUT the region_hitboxes sidecar -> rejected", not valid(wnoh))
+    wboth = json.loads(json.dumps(wall)); wboth["collision"] = mesa["collision"]
+    ok &= check("collision_volumes + a single collision together -> rejected", not valid(wboth))
     p = json.loads(json.dumps(by_kind["prop"])); p.pop("world_metrics")
     ok &= check("prop WITHOUT world_metrics -> rejected", not valid(p))
     ok &= check("trimmed: an asset declaring a rig -> rejected", not valid(mut(rig="biped_v1")))

@@ -23,8 +23,10 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 TOOLS = HERE.parent / "tools"
 sys.path.insert(0, str(TOOLS))            # reuse the shared core READ-ONLY
+sys.path.insert(0, str(HERE))             # env-local modules (collision_volumes)
 
 from jsonschema import Draft202012Validator   # noqa: E402
+import collision_volumes as cv                # noqa: E402  (env consumer; pure, no core/engine import)
 
 SCHEMA = json.loads((HERE / "schema" / "env_asset.schema.json").read_text(encoding="utf-8"))
 
@@ -67,15 +69,54 @@ def bake_env(asset_path: Path, out: Path, blender: str | None = None) -> dict:
     mesh = base / asset["files"]["mesh"]
     if not mesh.exists():
         raise SystemExit(f"files.mesh '{mesh.name}' not found -- a {kind} needs its 3D model to bake.")
+
+    # A STRUCTURE (multi-volume) ships a region_hitboxes sidecar (schema-enforced). Pass it as the region
+    # map so the SHARED core projects each region's world AABB -> a px rect PER DIRECTION *keeping its name*
+    # (blender_render region_rects) -- we read those back for the window sockets, re-projecting nothing.
+    volumes_spec = asset.get("collision_volumes")
+    region_hitboxes, region_map = None, None
+    if volumes_spec:
+        hb = (asset.get("files") or {}).get("hitbox")
+        sidecar = base / hb
+        if not sidecar.exists():
+            raise SystemExit(f"files.hitbox '{hb}' not found -- collision_volumes geometry is MEASURED from "
+                             f"the region_hitboxes sidecar; it cannot be baked without it.")
+        region_hitboxes = (json.loads(sidecar.read_text(encoding="utf-8")).get("region_hitboxes") or {})
+        region_map = str(sidecar)
+
     from blender_bake import bake_blender            # core, read-only (static path)
     forward = (asset.get("geometry") or {}).get("forward", "+x")
-    manifest, _ = bake_blender(out, blender, str(mesh), vid, forward=forward)
+    manifest, meta = bake_blender(out, blender, str(mesh), vid, forward=forward, region_map=region_map)
+
+    if volumes_spec:
+        # DERIVE geometry (footprint + span_world) from the per-region world AABBs; MERGE the authored
+        # semantics (vision/passable/material_class/projectile_response/damage_variant_role); VALIDATE (S6)
+        # so a bad block never ships; STAMP additively (the engine ignores unknown fields by construction).
+        vols = cv.derive_volumes(region_hitboxes, volumes_spec)
+        errs, warns = cv.validate_volumes(vols, world_metrics_present=bool(asset.get("world_metrics")))
+        if errs:
+            raise SystemExit(f"collision_volumes invalid ({asset_path.name}):\n  " + "\n  ".join(errs))
+        for w in warns:
+            print(f"  WARN collision_volumes: {w}")
+        manifest["collision_volumes"] = vols
+        # window_<n>_center sockets: the projected px center of each TRANSPARENT (aperture) region, per
+        # frame, from the core's named region_rects -- positional-only, the ADR-0009 per-frame socket shape.
+        window_regions = [v["region"] for v in vols if v["vision"] == "transparent"]
+        socks = cv.window_sockets(meta.get("region_rects") or {}, window_regions, len(manifest.get("frames", [])))
+        for d, names in socks.items():
+            manifest["frames"][d].setdefault("sockets", {}).update(names)
+        n_socks = sum(len(s) for s in socks.values())
+        print(f"  STRUCTURE [{kind}]: {len(vols)} collision_volume(s); "
+              f"{len(window_regions)} window aperture(s) -> {n_socks} per-frame socket(s).")
+
     # Fold the SCENERY semantics into the manifest (variant_class stays 'character' = an engine-accepted
     # static sprite; a dedicated scenery variant_class is a future engine co-design). The map reads these.
     manifest["scenery"] = {"kind": kind, "collision": asset.get("collision"),
+                           "collision_volumes": bool(volumes_spec),
                            "declared_world_metrics": asset.get("world_metrics")}
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(f"  SCENERY [{kind}]: folded collision={'yes' if asset.get('collision') else 'none'} into manifest.")
+    if not volumes_spec:
+        print(f"  SCENERY [{kind}]: folded collision={'yes' if asset.get('collision') else 'none'} into manifest.")
     return manifest
 
 

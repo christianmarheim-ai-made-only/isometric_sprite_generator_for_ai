@@ -1,0 +1,17 @@
+{
+  "env_contract_version": "env_asset_v1",
+  "variant_id": "wall_window_v1",
+  "kind": "blocking_feature",
+  "texture_mode": "flat_region",
+  "files": { "mesh": "wall_window_v1.glb", "hitbox": "wall_window_v1_hitbox.json" },
+  "region_source": "explicit_region_hitboxes",
+  "direction_count": 16,
+  "world_metrics": { "height_world": 3.0, "footprint_radius_world": 1.5 },
+  "collision_volumes": [
+    { "region": "wall_body",    "vision": "opaque",      "passable": false, "material_class": "stone", "projectile_response": { "default": "block_and_damage" }, "damage_variant_role": null },
+    { "region": "window_sill",  "vision": "opaque",      "passable": false, "material_class": "stone", "projectile_response": { "default": "block_and_damage" }, "damage_variant_role": null },
+    { "region": "window_glass", "vision": "transparent", "passable": false, "material_class": "glass", "projectile_response": { "default": "block_and_damage", "by_class": { "bullet": "pass_ignore" } }, "damage_variant_role": "damaged" },
+    { "region": "window_lintel","vision": "opaque",      "passable": false, "material_class": "stone", "projectile_response": { "default": "block_and_damage" }, "damage_variant_role": null }
+  ],
+  "notes": "Worked example for engine CONTRACT-scenery-structure-metadata (a wall with one window). The rows above author ONLY the semantics (what each part IS); the GEOMETRY (footprint + span_world) is MEASURED by the bake from wall_window_v1_hitbox.json. Eyes above the sill see over the wall and THROUGH the glass band (sill 0-1 opaque, glass 1-2.2 transparent, lintel 2.2-3 opaque); a thrown stone is stopped and cracks the glass (default block_and_damage + damage_variant_role:damaged); a bullet passes the glass with no damage (by_class.bullet:pass_ignore); the frame survives a smashed window because sill/glass/lintel are separate volumes."
+}
