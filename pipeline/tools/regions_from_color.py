@@ -37,21 +37,36 @@ _KEYS = list(CALIBRATION_COLORS.keys())
 _PAL = np.array([CALIBRATION_COLORS[k] for k in _KEYS], dtype=np.int32)            # (K,3) sRGB
 _IDS = np.array([REGION_FROM_CALIB_KEY.get(k, 2) for k in _KEYS], dtype=np.uint8)  # (K,) -> R8 id
 
+# A WHITE background sentinel appended to the palette. Every calib colour is far from white (the lightest,
+# grey, is (130,130,130) -> sq-dist 46875 from white), so compositing the silhouette over WHITE makes the
+# NEUTRAL GREY TORSO stand out instead of blending into a dark/transparent background, and turns each
+# anti-aliased edge into a coverage decision (a <50%-covered edge pixel reads as white -> background).
+_PAL_BG = np.vstack([_PAL, [[255, 255, 255]]]).astype(np.int32)
+_IDS_BG = np.concatenate([_IDS, [0]]).astype(np.uint8)                             # white sentinel -> id 0
+
 # display colours for a human-readable preview (matches the pipeline hit-sheet legend).
 _VIS = {0: (0, 0, 0, 0), 1: (216, 38, 38, 255), 2: (42, 196, 64, 255),
         3: (40, 90, 224, 255), 4: (240, 200, 30, 255), 6: (250, 60, 140, 255)}
 
 
-def classify_regions(rgba: np.ndarray, alpha_thresh: int = 16) -> np.ndarray:
-    """RGBA image (H,W,4 or H,W,3 uint8) -> (H,W) uint8 R8 region-id mask. Each non-background pixel is
-    labelled by its NEAREST calib colour (squared-RGB distance) folded to the body palette; pixels below
-    `alpha_thresh` (or, for RGB input, never) are background id 0."""
-    arr = np.asarray(rgba)
-    rgb = arr[..., :3].astype(np.int32)                                   # (H,W,3)
-    d = ((rgb[..., None, :] - _PAL[None, None, :, :]) ** 2).sum(-1)       # (H,W,K)
-    out = _IDS[d.argmin(-1)]                                              # (H,W) nearest-colour id
+def classify_regions(rgba: np.ndarray, alpha_thresh: int = 8) -> np.ndarray:
+    """RGBA image (H,W,4 or H,W,3 uint8) -> (H,W) uint8 R8 region-id mask.
+
+    The silhouette is composited over a WHITE background (straight alpha), then each pixel is labelled by
+    its NEAREST colour among the calib palette PLUS a white background sentinel (-> id 0). White makes the
+    neutral grey torso unambiguous and resolves anti-aliased edges by coverage (an edge less than half
+    covered blends toward white -> background). A hard alpha cut still drops fully-transparent pixels.
+    NOTE: we classify on white but NEVER touch the shipped colour atlas, which stays transparent.
+    """
+    arr = np.asarray(rgba).astype(np.int32)
+    rgb = arr[..., :3]
     if arr.shape[-1] == 4:
-        out = np.where(arr[..., 3] >= alpha_thresh, out, 0)
+        a = arr[..., 3:4] / 255.0
+        rgb = (rgb * a + 255.0 * (1.0 - a)).round().astype(np.int32)      # composite over white
+    d = ((rgb[..., None, :] - _PAL_BG[None, None, :, :]) ** 2).sum(-1)    # (H,W,K+1)
+    out = _IDS_BG[d.argmin(-1)]
+    if arr.shape[-1] == 4:
+        out = np.where(arr[..., 3] >= alpha_thresh, out, 0)              # fully-transparent -> background
     return out.astype(np.uint8)
 
 
