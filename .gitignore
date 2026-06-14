@@ -32,6 +32,7 @@ pipeline/output/arrow_pilot/frames/
 # batch bake output (regenerable via bake_batch.py)
 pipeline/output/incoming_batch/
 pipeline/output/new_creatures/
+pipeline/output/warrior_calibration_1/
 
 # calibration / skin-delta verification bakes (regenerable via bake_asset.py; not goldens yet)
 pipeline/output/calibration_humanoid_v1/

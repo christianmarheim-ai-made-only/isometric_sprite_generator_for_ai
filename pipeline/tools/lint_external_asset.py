@@ -78,9 +78,9 @@ def lint(path: Path, check_files: bool = True, today: str | None = None) -> list
             if clips.get("rig") and rig and clips["rig"] != rig:
                 errs.append(f"files.animation_clips rig '{clips['rig']}' != asset rig '{rig}'")
 
-    if asset.get("region_source", "material_name") in ("vertex_attribute", "region_texture"):
-        print(f"NOTE: region_source={asset['region_source']} is a documented extension; "
-              "only material_name bakes today.")
+    if asset.get("region_source", "material_name") == "vertex_attribute":
+        print("NOTE: region_source=vertex_attribute is a documented extension; not baked today "
+              "(material_name, region_texture, and explicit_region_hitboxes are implemented).")
 
     for state, spec in (asset.get("animations") or {}).items():
         if spec.get("playback") not in ("loop", "once"):

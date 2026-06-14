@@ -69,6 +69,7 @@ STEPS = [
     ("test_atlas_paging", [str(SCRIPT_DIR / "test_atlas_paging.py")]),
     ("test_useless_content", [str(SCRIPT_DIR / "test_useless_content.py")]),
     ("test_calib_color", [str(SCRIPT_DIR / "test_calib_color.py")]),
+    ("test_regions_from_color", [str(SCRIPT_DIR / "test_regions_from_color.py")]),
     ("v3_spec_self_test", [str(SCRIPT_DIR.parent / "spec" / "v3" / "self_test.py")]),
 ]
 

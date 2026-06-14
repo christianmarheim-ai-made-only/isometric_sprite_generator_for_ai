@@ -125,21 +125,31 @@ def camera_parity_error(meta: dict) -> float:
 
 
 def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = "humanoid_blender",
-                 forward: str = "+x", region_map=None) -> tuple[dict, dict]:
+                 forward: str = "+x", region_map=None, region_source: str = "material_name") -> tuple[dict, dict]:
     meta = _run_blender(blender_exe, out, mesh_file, forward=forward, region_map=region_map)
     targets = {int(k): [round(_srgb(c) * 255) for c in v] for k, v in meta["region_color"].items()}
     color_imgs = [Image.open(out / f"color_dir{i:02d}.png").convert("RGBA") for i in range(DIRS)]
-    region_arrs = [_region_ids(out / f"region_dir{i:02d}.png", targets) for i in range(DIRS)]
-    # Explicit-hitbox region recovery: a single-material model renders an all-torso (degenerate) region
-    # pass; re-label its silhouette from the projected per-region screen boxes (region_paint) so the R8
-    # mask carries the body regions the materials couldn't. ONLY degenerate frames are touched, so a real
-    # multi-material region pass is never overwritten (a no-op when no region_map was projected).
     region_rects = meta.get("region_rects") or {}
-    if region_rects:
-        from region_paint import relabel_region_ids
-        for i in range(DIRS):
-            if len({int(v) for v in np.unique(region_arrs[i]) if v}) <= 1:
-                region_arrs[i] = relabel_region_ids(region_arrs[i], region_rects.get(str(i), []))
+    region_textured = (region_source == "region_texture")
+    if region_textured:
+        # CALIBRATION-COLOUR regions (the `region_texture` source): the painted skin IS the segmentation.
+        # Classify each colour render by NEAREST calib colour -> R8 id (regions_from_color), so a single-
+        # material calibration model needs NO region-named materials and NO hitbox sidecar. Cannot drift
+        # from the colour oracle -- both read calib_spec.CALIBRATION_COLORS.
+        from regions_from_color import classify_regions
+        region_arrs = [classify_regions(np.asarray(img)) for img in color_imgs]
+        meta["region_fallback_materials"] = []   # the material region pass is UNUSED here -> its fallback signal is meaningless
+    else:
+        region_arrs = [_region_ids(out / f"region_dir{i:02d}.png", targets) for i in range(DIRS)]
+        # Explicit-hitbox region recovery: a single-material model renders an all-torso (degenerate) region
+        # pass; re-label its silhouette from the projected per-region screen boxes (region_paint) so the R8
+        # mask carries the body regions the materials couldn't. ONLY degenerate frames are touched, so a real
+        # multi-material region pass is never overwritten (a no-op when no region_map was projected).
+        if region_rects:
+            from region_paint import relabel_region_ids
+            for i in range(DIRS):
+                if len({int(v) for v in np.unique(region_arrs[i]) if v}) <= 1:
+                    region_arrs[i] = relabel_region_ids(region_arrs[i], region_rects.get(str(i), []))
     canvas = (CANVAS, CANVAS)
     color_atlas, rects = _pack(color_imgs, canvas, "RGBA")
     mask_atlas, _ = _pack([Image.fromarray(a, "L") for a in region_arrs], canvas, "L")
@@ -164,9 +174,12 @@ def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = 
             "sockets": {"origin": [ax, ay],
                         "direction_tip": [round(ax + sdv[0] * tip_len, 3), round(ay + sdv[1] * tip_len, 3)]},
         }
-        # ADR-0025 per-region tight AABBs (frame-local, mask_rect origin) -- only when an explicit region
-        # map drove a relabel, so a normal static bake's manifest is unchanged (goldens/parity stable).
-        if region_rects:
+        # ADR-0025 per-region tight AABBs (frame-local, mask_rect origin) -- emitted when regions are
+        # explicitly defined (a projected hitbox map OR the calib-colour classification), so a plain
+        # material-name static bake's manifest is byte-unchanged (goldens/parity stable).
+        if region_textured:
+            frame["region_aabbs"] = region_aabbs(region_arrs[i], ids=(1, 2, 3, 4, 6))
+        elif region_rects:
             frame["region_aabbs"] = region_aabbs(region_arrs[i])
         frames.append(frame)
         expected.append({"direction": i, "world_yaw_degrees": round(math.degrees(yaw), 6),
@@ -201,7 +214,7 @@ def bake_blender(out: Path, blender_exe: str, mesh_file=None, variant_id: str = 
 
 def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations: dict,
                   variant_id: str, default_state: str | None = None, up: str = "y",
-                  forward: str = "+x") -> tuple[dict, dict]:
+                  forward: str = "+x", region_source: str = "material_name") -> tuple[dict, dict]:
     """R8: bake a RIGGED + ANIMATED glb into a MULTI-STATE, tight-cropped package by SAMPLING the
     glb's clips (blender_render_anim). `asset_animations` = {state: {clip, frames, fps, playback}}
     from the asset manifest. Same package shape as the procedural bake_character_anim (R5)."""
@@ -220,12 +233,20 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
     meta = json.loads(meta_p.read_text(encoding="utf-8"))
     targets = {int(k): [round(_srgb(c) * 255) for c in v] for k, v in meta["region_color"].items()}
     canvas = (CANVAS, CANVAS)
+    # region_texture: the painted calib colour IS the segmentation -> classify each frame's COLOUR render
+    # (same as the static path) instead of the material region pass, PER FRAME, so an animated calib model
+    # gets regions-from-colour on every clip frame. Cannot drift -- both read calib_spec.CALIBRATION_COLORS.
+    region_textured = (region_source == "region_texture")
+    if region_textured:
+        from regions_from_color import classify_regions
+        meta["region_fallback_materials"] = []   # material region pass UNUSED -> its fallback signal is meaningless
 
     color_imgs, region_imgs, fmeta, frame_aabbs = [], [], [], []
     for state, fi in meta["poses"]:
         for d in range(DIRS):
             cimg = Image.open(out / f"color_{state}_f{fi}_dir{d:02d}.png").convert("RGBA")
-            rids = _region_ids(out / f"region_{state}_f{fi}_dir{d:02d}.png", targets)
+            rids = (classify_regions(np.asarray(cimg)) if region_textured
+                    else _region_ids(out / f"region_{state}_f{fi}_dir{d:02d}.png", targets))
             a = np.asarray(cimg)[:, :, 3]
             ys, xs = np.nonzero(a > 0)
             bx, by, bw, bh = (int(xs.min()), int(ys.min()), int(xs.max() - xs.min() + 1),
@@ -236,7 +257,7 @@ def bake_animated(out: Path, blender_exe: str, mesh_file: str, asset_animations:
             fmeta.append((state, d, fi, [bx, by]))
             # ADR-0025: per-region TIGHT AABB derived from the SAME cropped region map that becomes the
             # frame's hitmask sub-image -> frame-local coords (origin == the frame's mask_rect origin).
-            frame_aabbs.append(region_aabbs(crop_ids))
+            frame_aabbs.append(region_aabbs(crop_ids, ids=(1, 2, 3, 4, 6) if region_textured else (1, 2, 3, 4)))
 
     placements, atlas_size = shelf_place([im.size for im in color_imgs])
     color_atlas, rects = place_into(color_imgs, placements, atlas_size, "RGBA")

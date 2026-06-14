@@ -188,13 +188,15 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
                 mesh_for_bake = str(animated)
                 route = "Blender / rigged + animated (clips embedded from animation_clips JSON)"
             manifest, _ = bake_animated(out, blender, mesh_for_bake, anims, variant_id,
-                                        default_state=asset.get("default_state"), up=up, forward=forward)
+                                        default_state=asset.get("default_state"), up=up, forward=forward,
+                                        region_source=asset.get("region_source", "material_name"))
         else:
             # an explicit authoritative region map (calibration / skin-delta sidecar) drives per-region
             # hitmask + AABB projection so a single-material model is not baked all-torso.
             _rmap = _explicit_region_path(asset, base, variant_id)
             manifest, _ = bake_blender(out, blender, str(mesh_path), variant_id, forward=forward,
-                                       region_map=str(_rmap) if _rmap else None)
+                                       region_map=str(_rmap) if _rmap else None,
+                                       region_source=asset.get("region_source", "material_name"))
             route = "Blender / static"
     else:
         raise SystemExit(f"unsupported mesh format: {ext}")
@@ -216,6 +218,8 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
             break
     if auto_rigged_from is not None:                 # record the on-the-fly rig in the build log
         meta["auto_rigged_from"] = str(auto_rigged_from)
+    if asset.get("region_source") == "region_texture":
+        meta["region_fallback_materials"] = []       # regions come from the painted colour, not materials -> fallback is moot
     clips_path = (base / clips_rel).resolve() if clips_rel else None
     rig = asset.get("rig")
     texture_mode = asset.get("texture_mode", "flat_region")
@@ -243,7 +247,8 @@ def bake_asset(manifest_path: Path, out: Path | None = None) -> dict:
                           stages=[{"name": "bake", "ms": bake_ms}],
                           texture_mode=texture_mode, calibration=calibration,
                           waivers=asset.get("waivers"),   # a valid in-date waiver downgrades a gate error to 'waived'
-                          explicit_regions=_has_explicit_regions(asset, base, variant_id),
+                          explicit_regions=(_has_explicit_regions(asset, base, variant_id)
+                                            or asset.get("region_source") == "region_texture"),
                           extra_warnings=calib_warnings)
     # Deterministic OUTPUT-verify artifact: project the build_log warnings into a per-stage report;
     # verification_report.ok == build_log.ok by construction (both = "no severity==error").

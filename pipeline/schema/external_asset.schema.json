@@ -31,7 +31,7 @@
     },
     "rig": { "type": "string", "description": "rig profile id (pipeline/schema/rig_profiles/<rig>.json). Omit for a static mesh -> procedural animation." },
     "default_state": { "type": "string", "description": "the state shown when nothing is playing (must be an `animations` key). Omit -> engine uses `idle` if present, else the lexicographically-first state." },
-    "region_source": { "enum": ["material_name", "vertex_attribute", "region_texture", "explicit_region_hitboxes"], "description": "how HIT regions are tagged. material_name bakes the render mask; explicit_region_hitboxes = regions come from the <variant>_hitbox.json sidecar (the render still uses material fallback, then ADR-0036 projects the hitbox). vertex_attribute/region_texture are documented extensions." },
+    "region_source": { "enum": ["material_name", "vertex_attribute", "region_texture", "explicit_region_hitboxes"], "description": "how HIT regions are tagged. material_name bakes the render mask (region-keyworded material names). region_texture = the regions come from a CALIBRATION-COLOURED skin: each rendered pixel is classified by nearest calib_v1 colour -> R8 id (regions_from_color), so a single-material calib model needs no region names and no sidecar (static + animated paths). explicit_region_hitboxes = regions come from the <variant>_hitbox.json sidecar (the render uses material fallback, then ADR-0036 projects the hitbox). vertex_attribute is a documented extension (not baked today)." },
     "textures": {
       "type": "object",
       "additionalProperties": false,
